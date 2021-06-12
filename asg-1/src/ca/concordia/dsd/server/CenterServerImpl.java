@@ -1,6 +1,6 @@
 package ca.concordia.dsd.server;
 
-public class ServerTasks implements ITasks{
+public class CenterServerImpl implements CenterServer {
 
     @Override
     public String createTRecord() {

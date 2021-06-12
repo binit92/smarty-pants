@@ -11,11 +11,11 @@ public class LogUtil implements IConstants{
     public LogUtil(String initiator){
         logger = Logger.getLogger(initiator);
         try{
-            File path = new File(LOG_DIR + File.separator + initiator + File.separator + initiator +".log");
-            if (!path.exists()){
-                path.mkdirs();
+            File dir  = new File(LOG_DIR + File.separator + initiator + File.separator + initiator);
+            if (!dir.exists()){
+                dir.mkdirs();
             }
-            fH = new FileHandler(path.getAbsolutePath(),true);
+            fH = new FileHandler(dir.getAbsolutePath() + File.separator + initiator+".log",true);
             SimpleFormatter sf = new SimpleFormatter();
             fH.setFormatter(sf);
             logger.setUseParentHandlers(false);
@@ -24,8 +24,7 @@ public class LogUtil implements IConstants{
 
         }catch (Exception e){
             logger.log(Level.SEVERE, e.getMessage());
-        }finally {
-
+            e.printStackTrace();
         }
     }
 
@@ -33,4 +32,7 @@ public class LogUtil implements IConstants{
         logger.log(Level.INFO,message);
     }
 
+    public void close(){
+        fH.close();
+    }
 }
