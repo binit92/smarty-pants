@@ -3,7 +3,7 @@ package ca.concordia.dsd.util;
 import java.io.File;
 import java.util.logging.*;
 
-public class LogUtil implements IConstants{
+public class LogUtil implements Constants {
 
     private Handler fH ;
     private Logger logger;
@@ -11,7 +11,7 @@ public class LogUtil implements IConstants{
     public LogUtil(String initiator){
         logger = Logger.getLogger(initiator);
         try{
-            File dir  = new File(LOG_DIR + File.separator + initiator + File.separator + initiator);
+            File dir  = new File(LOG_DIR + File.separator + initiator );
             if (!dir.exists()){
                 dir.mkdirs();
             }
@@ -29,6 +29,7 @@ public class LogUtil implements IConstants{
     }
 
     public void log(String message){
+        System.out.println(message);
         logger.log(Level.INFO,message);
     }
 
