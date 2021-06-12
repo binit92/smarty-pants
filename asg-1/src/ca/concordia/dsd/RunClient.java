@@ -1,4 +1,4 @@
-package ca.concordia.dsd.client;
+package ca.concordia.dsd;
 
 public class RunClient {
 
@@ -6,3 +6,4 @@ public class RunClient {
         System.out.println("Run client");
     }
 }
+
