@@ -167,7 +167,7 @@ public class ManagerClient implements Constants {
                     String recordID = keyboard.nextLine();
                     String recordType = recordID.substring(0, 2);
                     if (!recordType.equalsIgnoreCase("SR")
-                            || !recordType.equalsIgnoreCase("TR")) {
+                            && !recordType.equalsIgnoreCase("TR")) {
                         logUtil.log("Invalid record ID format ");
                         break;
                     }
@@ -180,15 +180,15 @@ public class ManagerClient implements Constants {
 
                     if (recordType.equalsIgnoreCase("TR")) {
                         if (!fieldName.equalsIgnoreCase("address")
-                                || !fieldName.equalsIgnoreCase("phone")
-                                || !fieldName.equalsIgnoreCase("location")) {
+                                && !fieldName.equalsIgnoreCase("phone")
+                                && !fieldName.equalsIgnoreCase("location")) {
                             logUtil.log("Invalid field name " + fieldName);
                             break;
                         }
                     } else if (recordType.equalsIgnoreCase("SR")) {
                         if (!fieldName.equalsIgnoreCase("courses")
-                                || !fieldName.equalsIgnoreCase("status")
-                                || !fieldName.equalsIgnoreCase("statusdate")) {
+                                && !fieldName.equalsIgnoreCase("status")
+                                && !fieldName.equalsIgnoreCase("statusdate")) {
                             logUtil.log("Invalid field name " + fieldName);
                             break;
                         }

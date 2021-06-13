@@ -56,7 +56,7 @@ public class CenterServerImpl implements ICenterServer {
         String key = tR.getLastName().substring(0, 1);
         String ret = addToDB(key, tR, null);
 
-        logUtil.log("new teacher " + tR.getFirstName() + "with this key " + key);
+        logUtil.log("new teacher " + tR.getFirstName() + " with this key " + key);
         logUtil.log("teacher id " + teacherid);
         return teacherid;
     }
@@ -103,7 +103,7 @@ public class CenterServerImpl implements ICenterServer {
         String key = sR.getLastName().substring(0, 1);
         String ret = addToDB(key, null, sR);
 
-        logUtil.log(" new student is added " + sR + "with this key " + key);
+        logUtil.log(" new student is added " + sR + " with this key " + key);
         logUtil.log("student record created " + studentid);
         return studentid;
     }
