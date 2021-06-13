@@ -68,4 +68,16 @@ public class StudentRecord extends Records {
     public void setStatusDate(String statusDate) {
         this.statusDate = statusDate;
     }
+
+    @Override
+    public String toString() {
+        return "StudentRecord{" +
+                "studentID='" + studentID + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", coursesRegistered=" + coursesRegistered +
+                ", status='" + status + '\'' +
+                ", statusDate='" + statusDate + '\'' +
+                '}';
+    }
 }

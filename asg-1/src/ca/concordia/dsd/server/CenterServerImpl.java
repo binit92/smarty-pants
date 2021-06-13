@@ -36,8 +36,8 @@ public class CenterServerImpl implements ICenterServer {
     }
 
     @Override
-    public String editRecord(String id, String key, String val) throws RemoteException {
-        return null;
+    public boolean editRecord(String id, String key, String val) throws RemoteException {
+        return false;
     }
 
     @Override

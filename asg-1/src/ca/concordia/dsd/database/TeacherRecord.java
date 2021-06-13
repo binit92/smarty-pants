@@ -76,4 +76,17 @@ public class TeacherRecord extends Records {
     public void setLocation(String location) {
         this.location = location;
     }
+
+    @Override
+    public String toString() {
+        return "TeacherRecord{" +
+                "teacherId='" + teacherId + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", address='" + address + '\'' +
+                ", phone='" + phone + '\'' +
+                ", specialization='" + specialization + '\'' +
+                ", location='" + location + '\'' +
+                '}';
+    }
 }
