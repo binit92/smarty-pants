@@ -19,7 +19,7 @@ public class UDPThread extends Thread implements Constants {
     private String name;
 
     public UDPThread(String name, CenterServerImpl server) {
-        name = name;
+        this.name = name;
         logUtil = new LogUtil(name);
         this.server = server;
         c = 0;
@@ -50,16 +50,15 @@ public class UDPThread extends Thread implements Constants {
     @Override
     public void run() {
         byte[] receiveData;
-        //System.out.println(c+" "+location);
         while (true) {
             try {
                 receiveData = new byte[1024];
                 receivePacket = new DatagramPacket(receiveData, receiveData.length);
                 serverSocket.receive(receivePacket);
-                System.out.println("Received pkt :: " + new String(receivePacket.getData()));
+                logUtil.log(name,"UDPThread, received pkt :: " + new String(receivePacket.getData()));
                 String inputPkt = new String(receivePacket.getData()).trim();
                 new UDPRequestThread(receivePacket, server,name).start();
-                logUtil.log("Received " + inputPkt + " from " + server);
+                logUtil.log(name,"UDPThread, Received " + inputPkt + " from " + server);
             } catch (Exception e) {
             }
         }

@@ -7,6 +7,9 @@ import ca.concordia.dsd.util.Constants;
 import ca.concordia.dsd.util.LogUtil;
 
 import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.rmi.RemoteException;
 import java.util.*;
 
@@ -16,16 +19,16 @@ public class CenterServerImpl implements ICenterServer {
     public String IPaddress;
 
     public HashMap<String, List<Records>> recordsMap;
-    private static int studentCount = 0;
-    private static int teacherCount = 0;
+    private static int studentCount = 10001;
+    private static int teacherCount = 10001;
     private String recordsCount;
-    private String serverName;
+    private final String serverName;
 
     public CenterServerImpl(String serverName) {
         this.serverName = serverName;
         logUtil = new LogUtil(serverName);
         recordsMap = new HashMap<>();
-        udpThread = new UDPThread(serverName, this);
+        udpThread = new UDPThread(this.serverName, this);
         udpThread.start();
         setIPAddress(serverName);
     }
@@ -43,105 +46,107 @@ public class CenterServerImpl implements ICenterServer {
                 break;
         }
     }
-
     @Override
-    public String createTRecord(TeacherRecord teacherRecord) throws RemoteException {
+    public String createTRecord(TeacherRecord tR) throws RemoteException {
+        logUtil.log("Create record called for teacher : " + tR.getFirstName() );
         String teacherid = "TR" + (++teacherCount);
-        teacherRecord.setTeacherId(teacherid);
-        teacherRecord.setUniqueId(teacherid);
+        tR.setTeacherId(teacherid);
+        tR.setUniqueId(teacherid);
 
-        String key = teacherRecord.getLastName().substring(0, 1);
-        // adding the teacher record to HashMap
-        String message = addRecordToHashMap(key, teacherRecord, null);
+        String key = tR.getLastName().substring(0, 1);
+        String ret = addToDB(key, tR, null);
 
-        //System.out.println(recordsMap);
-
-        System.out.println("teacher is added " + teacherRecord.getFirstName() + "with this key" + key);
-        logUtil.log("Teacher record created " + teacherid);
+        logUtil.log("new teacher " + tR.getFirstName() + "with this key " + key);
+        logUtil.log("teacher id " + teacherid);
         return teacherid;
     }
 
-    // adding the records into HashMap
-    private String addRecordToHashMap(String key, TeacherRecord teacher, StudentRecord student) {
-
-        String message = "Error";
-        if (teacher != null) {
+    private String addToDB(String key, TeacherRecord tR, StudentRecord sR) {
+        String ret = "error";
+        if (tR != null) {
             List<Records> recordList = recordsMap.get(key);
             if (recordList != null) {
-                recordList.add(teacher);
+                recordList.add(tR);
             } else {
                 List<Records> records = new ArrayList<Records>();
-                records.add(teacher);
+                records.add(tR);
                 recordList = records;
             }
             recordsMap.put(key, recordList);
-            message = "success";
+            ret = "success";
         }
 
-        if (student != null) {
+        if (sR != null) {
             List<Records> recordList = recordsMap.get(key);
             if (recordList != null) {
-                recordList.add(student);
+                recordList.add(sR);
             } else {
                 List<Records> records = new ArrayList<Records>();
-                records.add(student);
+                records.add(sR);
                 recordList = records;
             }
             recordsMap.put(key, recordList);
-            message = "success";
+            ret = "success";
         }
 
-        return message;
+        return ret;
     }
 
 
     @Override
-    public String createSRecord(StudentRecord studentRecord) throws RemoteException {
+    public String createSRecord(StudentRecord sR) throws RemoteException {
+        logUtil.log("Create record called for student : " + sR.getFirstName() );
         String studentid = "SR" + (studentCount + 1);
-        studentRecord.setUniqueId(studentid);
-        studentRecord.setStudentID(studentid);
+        sR.setUniqueId(studentid);
+        sR.setStudentID(studentid);
 
-        String key = studentRecord.getLastName().substring(0, 1);
-        // adding the student record to HashMap
-        String message = addRecordToHashMap(key, null, studentRecord);
+        String key = sR.getLastName().substring(0, 1);
+        String ret = addToDB(key, null, sR);
 
-        //System.out.println(recordsMap);
-
-        System.out.println("Student is added " + studentRecord + "with this key" + key);
-        logUtil.log("Student record created " + studentid);
+        logUtil.log(" new student is added " + sR + "with this key " + key);
+        logUtil.log("student record created " + studentid);
         return studentid;
     }
 
-    private int getCurrServerCnt(){
-        int count = 0;
-        for (Map.Entry<String, List<Records>> entry : this.recordsMap.entrySet()) {
-            List<Records> list = entry.getValue();
-            count+=list.size();
-            //System.out.println(entry.getKey()+" "+list.size());
+    private int getServerCount(){
+        int c = 0;
+        for (Map.Entry<String, List<Records>> e : this.recordsMap.entrySet()) {
+            List<Records> total = e.getValue();
+            c+=total.size();
         }
-        return count;
+        return c;
     }
 
     @Override
     public String getRecordCounts() {
+        logUtil.log("get record counts ");
         String recordCount = null;
         UDPProviderThread[] req = new UDPProviderThread[2];
-        int counter = 0;
+        int i = 0;
         ArrayList<String> locList = new ArrayList<>();
-        locList.add("MTL");
-        locList.add("LVL");
-        locList.add("DDO");
+        locList.add(Constants.MTL_TAG);
+        locList.add(Constants.LVL_TAG);
+        locList.add(Constants.DDO_TAG);
         for (String loc : locList) {
             if (loc== this.serverName) {
-                recordCount = loc+","+getCurrServerCnt();
+                recordCount = loc+","+ getServerCount();
             } else {
                 try {
-                    req[counter] = new UDPProviderThread(this);
+                    String ipAdd = Constants.MTL_SERVER_HOST;
+                    int udpPort = Constants.MTL_UDP_PORT;
+                    if(loc.equalsIgnoreCase(Constants.LVL_TAG)){
+                        ipAdd = Constants.LVL_SERVER_HOST;
+                        udpPort = Constants.LVL_UDP_PORT;
+                    }else if(loc.equalsIgnoreCase(Constants.DDO_TAG)){
+                        ipAdd = Constants.DDO_SERVER_HOST;
+                        udpPort = Constants.DDO_UDP_PORT;
+                    }
+                    req[i] = new UDPProviderThread(loc, ipAdd,udpPort);
                 } catch (IOException e) {
                     logUtil.log(e.getMessage());
                 }
-                req[counter].start();
-                counter++;
+                req[i].start();
+                i++;
             }
         }
         for (UDPProviderThread request : req) {
@@ -152,6 +157,7 @@ public class CenterServerImpl implements ICenterServer {
             }
             recordCount += " , " + request.getRemoteRecordCount().trim();
         }
+        logUtil.log("record count " + recordCount);
         return recordCount;
     }
 
@@ -159,88 +165,112 @@ public class CenterServerImpl implements ICenterServer {
     public String editRecord(String id, String key, String val) throws RemoteException {
         String type = id.substring(0, 2);
 
-        if (type.equals("TR")) {
+        if (type.equalsIgnoreCase("TR")) {
             return editTRRecord(id, key, val);
         }
 
-        else if (type.equals("SR")) {
+        else if (type.equalsIgnoreCase("SR")) {
             return editSRRecord(id, key, val);
         }
-
-        logUtil.log("Record edit successful");
-
-        return "Operation not performed!";
+        logUtil.log("Operation invalid");
+        return "Operation invalid";
     }
 
-    // Editing students records
-    private String editSRRecord(String recordID, String fieldname, String newvalue) {
-
-        //System.out.println(recordsMap);
+   private String editSRRecord(String recordID, String key, String val) {
 
         for (Map.Entry<String, List<Records>> value : recordsMap.entrySet()) {
-
             List<Records> mylist = value.getValue();
             Optional<Records> record = mylist.stream().filter(x -> x.getUniqueId().equals(recordID)).findFirst();
             if (record.isPresent()) {
-                if (record.isPresent() && fieldname.equals("Status")) {
-                    ((StudentRecord) record.get()).setStatus(newvalue);
-                    logUtil.log("Updated the records\t" + serverName);
-                    return "Updated record with status :: "+newvalue;
-                    // ((Student) record.get()).setStatus(null);
-                } else if (record.isPresent() && fieldname.equals("StatusDate")) {
-                    ((StudentRecord) record.get()).setStatusDate(newvalue);
-                    logUtil.log("Updated the records\t" + serverName);
-                    return "Updated record with status date :: "+newvalue;
+                if (record.isPresent() && key.equals("Status")) {
+                    ((StudentRecord) record.get()).setStatus(val);
+                    logUtil.log("Records update for : " + serverName);
+                    return "Records updated with status : "+val;
+                } else if (record.isPresent() && key.equals("StatusDate")) {
+                    ((StudentRecord) record.get()).setStatusDate(val);
+                    logUtil.log("Records update for : " + serverName);
+                    return "Records updated with status : "+val;
                 }
             }
         }
-        return "Record with "+recordID+"not found!";
+        return "Record : " + recordID+ " is not found";
     }
 
-    // Editing Teacher records
-    private String editTRRecord(String recordID, String fieldname, String newvalue) {
-        for (Map.Entry<String, List<Records>> val : recordsMap.entrySet()) {
+   private String editTRRecord(String recordID, String key, String val) {
+       for (Map.Entry<String, List<Records>> value : recordsMap.entrySet()) {
+           List<Records> mylist = value.getValue();
+           Optional<Records> record = mylist.stream().filter(x -> x.getUniqueId().equals(recordID)).findFirst();
 
-            List<Records> mylist = val.getValue();
-            Optional<Records> record = mylist.stream().filter(x -> x.getUniqueId().equals(recordID)).findFirst();
-
-            //System.out.println(record);
-            if (record.isPresent()) {
-                if (record.isPresent() && fieldname.equals("Phone")) {
-                    ((TeacherRecord) record.get()).setPhone(newvalue);
-                    logUtil.log("Updated the records\t" + serverName);
-                    return "Updated record with Phone :: "+newvalue;
+           if (record.isPresent()) {
+               if (record.isPresent() && key.equalsIgnoreCase("Phone")) {
+                   ((TeacherRecord) record.get()).setPhone(val);
+                   logUtil.log("Records update for : " + serverName);
+                    return "Records updated with status : "+val;
                 }
 
-                else if (record.isPresent() && fieldname.equals("Address")) {
-                    ((TeacherRecord) record.get()).setAddress(newvalue);
-                    logUtil.log("Updated the records\t" + serverName);
-                    return "Updated record with address :: "+newvalue;
+                else if (record.isPresent() && key.equalsIgnoreCase("Address")) {
+                    ((TeacherRecord) record.get()).setAddress(val);
+                    logUtil.log("Records update for : " + serverName);
+                    return "Records updated with status : "+val;
                 }
 
-                else if (record.isPresent() && fieldname.equals("Location")) {
-                    ((TeacherRecord) record.get()).setLocation(newvalue);
-                    logUtil.log("Updated the records\t" + serverName);
-                    return "Updated record with location :: "+newvalue;
+                else if (record.isPresent() && key.equalsIgnoreCase("Location")) {
+                    ((TeacherRecord) record.get()).setLocation(val);
+                    logUtil.log("Records update for : " + serverName);
+                    return "Records updated with status : "+val;
                 }
             }
         }
-        return "Record with "+recordID+" not found";
-    }
+       return "Record : " + recordID+ " is not found";
+   }
 
     @Override
     public String editCourses(String id, String key, ArrayList<String> values) throws RemoteException {
         for (Map.Entry<String, List<Records>> value : recordsMap.entrySet()) {
 
-            List<Records> mylist = value.getValue();
-            Optional<Records> record = mylist.stream().filter(x -> x.getUniqueId().equals(id)).findFirst();
-            if (record.isPresent() && key.equals("CoursesRegistered")) {
+            List<Records> list = value.getValue();
+            Optional<Records> record = list.stream().filter(x -> x.getUniqueId().equals(id)).findFirst();
+            if (record.isPresent() && key.equalsIgnoreCase("courses")) {
                 ((StudentRecord) record.get()).setCoursesRegistered(values);
-                logUtil.log("Updated the records\t" + serverName);
+                logUtil.log("Records update for : " + serverName);
             }
         }
-        //System.out.println(recordsMap);
         return null;
+    }
+
+    private String udpClient(int port) {
+        System.out.println("--> udpclient port: " + port);
+        DatagramSocket socket = null;
+        String response= null;
+        try {
+            socket=new DatagramSocket();
+            // 10 second timeout
+            socket.setSoTimeout(1000 * 5);
+            InetAddress aHost= InetAddress.getByName("localhost");
+            String data= "requesting data";
+            DatagramPacket request= new DatagramPacket(data.getBytes(), data.getBytes().length, aHost, port);
+            socket.send(request);
+            byte[] buffer= new byte[1000];
+            DatagramPacket reply= new DatagramPacket(buffer, buffer.length);
+            socket.receive(reply);
+            response=  new String(reply.getData());
+
+            System.out.println("reply is "+ new String(reply.getData()));
+        }
+        catch (Exception e) {
+            System.out.println("udpclient: "+e.getMessage());
+        }
+        finally {
+            if(socket!=null) {
+                socket.close();
+            }
+        }
+        System.out.println("-->response ");
+        return response;
+    }
+
+    public String getServerName(){
+        return serverName;
     }
 
 }

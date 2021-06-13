@@ -153,12 +153,14 @@ public class ManagerClient implements Constants {
                     }
                     break;
                 case 3:
+                    logUtil.log("Getting record counts from server");
                     try {
                         String numberOfRecords = server.getRecordCounts();
                         logUtil.log("total number of record : " + numberOfRecords);
                     } catch (RemoteException re) {
                         logUtil.log(re.getMessage());
                     }
+                    logUtil.log("record count returned");
                     break;
                 case 4:
                     System.out.println("Enter the recordID that you want to edit ?");

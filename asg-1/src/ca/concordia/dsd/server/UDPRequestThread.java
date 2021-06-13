@@ -35,12 +35,11 @@ public class UDPRequestThread extends Thread {
         try {
             String inputPkt = new String(receivePacket.getData()).trim();
             if (inputPkt.equals("GET_RECORD_COUNT")) {
-                //System.out.println("Got record count pkt");
                 responseData = Integer.toString(getRecCount()).getBytes();
                 serverSocket.send(new DatagramPacket(responseData, responseData.length, receivePacket.getAddress(),
                         receivePacket.getPort()));
             }
-            logUtil.log("Received " + inputPkt + " from " + server);
+            logUtil.log(serverName,"UDPRequestThread, Received " + inputPkt + " from " + server);
         } catch (Exception e) {
 			logUtil.log(e.getMessage());
         }

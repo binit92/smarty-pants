@@ -10,19 +10,20 @@ import java.util.logging.Logger;
 
 public class UDPProviderThread extends Thread {
     private String recordCount;
-    private Logger logger;
-    private CenterServerImpl server;
+    private String serverName;
+    private String IPaddress;
+    private int port;
 
+    public UDPProviderThread(String serverName, String IPAddress, int port) throws IOException {
+        this.serverName = serverName;
+        this.IPaddress = IPAddress;
+        this.port = port;
 
-    public UDPProviderThread(CenterServerImpl server) throws IOException {
-        this.server = server;
     }
-
 
     public String getRemoteRecordCount() {
         return recordCount;
     }
-
 
     @Override
     public void run() {
@@ -31,14 +32,14 @@ public class UDPProviderThread extends Thread {
             socket = new DatagramSocket();
             byte[] data = "GET_RECORD_COUNT".getBytes();
             //System.out.println(server.location);
-            DatagramPacket packet = new DatagramPacket(data, data.length, InetAddress.getByName(server.IPaddress), server.udpThread.udpPortNum);
+            DatagramPacket packet = new DatagramPacket(data, data.length, InetAddress.getByName(this.IPaddress), this.port);
             socket.send(packet);
             data = new byte[100];
             socket.receive(new DatagramPacket(data, data.length));
-            recordCount = server + "," + new String(data);
+            recordCount = this.serverName + "," + new String(data);
             //System.out.println(recordCount);
         } catch (Exception e) {
-            logger.log(Level.SEVERE, e.getMessage());
+            System.out.println(e.getMessage());
         } finally {
             if (socket != null) {
                 socket.close();
