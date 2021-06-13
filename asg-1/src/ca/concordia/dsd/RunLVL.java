@@ -18,11 +18,11 @@ public class RunLVL {
             // create server
             server = new CenterServerImpl(Constants.DDO_TAG);
             // create remote objects
-            stub = (ICenterServer) UnicastRemoteObject.exportObject(server,Constants.DDO_SERVER_PORT);
+            stub = (ICenterServer) UnicastRemoteObject.exportObject(server, Constants.DDO_SERVER_PORT);
             // registry binds the stub of remote object
             Registry registry = LocateRegistry.createRegistry(Constants.DDO_SERVER_PORT);
-            registry.bind(Constants.DDO_TAG,stub);
-        }catch (Exception e){
+            registry.bind(Constants.DDO_TAG, stub);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

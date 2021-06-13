@@ -18,11 +18,11 @@ public class RunMTL {
             // create server
             server = new CenterServerImpl(Constants.MTL_TAG);
             // create remote objects
-            stub = (ICenterServer) UnicastRemoteObject.exportObject(server,Constants.MTL_SERVER_PORT);
+            stub = (ICenterServer) UnicastRemoteObject.exportObject(server, Constants.MTL_SERVER_PORT);
             // registry binds the stub of remote object
             Registry registry = LocateRegistry.createRegistry(Constants.MTL_SERVER_PORT);
-            registry.bind(Constants.MTL_TAG,stub);
-        }catch (Exception e){
+            registry.bind(Constants.MTL_TAG, stub);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

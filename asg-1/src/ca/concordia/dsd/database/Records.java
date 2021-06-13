@@ -7,7 +7,7 @@ public class Records implements Serializable {
     private String uniqueId;
     private String lastName;
 
-    public Records(String ui, String ln){
+    public Records(String ui, String ln) {
         this.uniqueId = ui;
         this.lastName = ln;
     }
