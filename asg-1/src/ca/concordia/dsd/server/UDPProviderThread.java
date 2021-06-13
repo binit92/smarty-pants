@@ -30,6 +30,7 @@ public class UDPProviderThread extends Thread {
         DatagramSocket socket = null;
         try {
             socket = new DatagramSocket();
+            socket.setSoTimeout(1000 * 5);
             byte[] data = "GET_RECORD_COUNT".getBytes();
             //System.out.println(server.location);
             DatagramPacket packet = new DatagramPacket(data, data.length, InetAddress.getByName(this.IPaddress), this.port);

@@ -33,12 +33,14 @@ public class UDPRequestThread extends Thread {
     public void run() {
         byte[] responseData;
         try {
+            serverSocket.setSoTimeout(1000 * 5);
             String inputPkt = new String(receivePacket.getData()).trim();
             if (inputPkt.equals("GET_RECORD_COUNT")) {
                 responseData = Integer.toString(getRecCount()).getBytes();
                 serverSocket.send(new DatagramPacket(responseData, responseData.length, receivePacket.getAddress(),
                         receivePacket.getPort()));
             }
+
             logUtil.log(serverName,"UDPRequestThread, Received " + inputPkt + " from " + server);
         } catch (Exception e) {
 			logUtil.log(e.getMessage());

@@ -47,7 +47,7 @@ public class CenterServerImpl implements ICenterServer {
         }
     }
     @Override
-    public String createTRecord(TeacherRecord tR) throws RemoteException {
+    public synchronized String createTRecord(TeacherRecord tR) throws RemoteException {
         logUtil.log("Create record called for teacher : " + tR.getFirstName() );
         String teacherid = "TR" + (++teacherCount);
         tR.setTeacherId(teacherid);
@@ -61,7 +61,7 @@ public class CenterServerImpl implements ICenterServer {
         return teacherid;
     }
 
-    private String addToDB(String key, TeacherRecord tR, StudentRecord sR) {
+    private synchronized String addToDB(String key, TeacherRecord tR, StudentRecord sR) {
         String ret = "error";
         if (tR != null) {
             List<Records> recordList = recordsMap.get(key);
@@ -94,7 +94,7 @@ public class CenterServerImpl implements ICenterServer {
 
 
     @Override
-    public String createSRecord(StudentRecord sR) throws RemoteException {
+    public synchronized String createSRecord(StudentRecord sR) throws RemoteException {
         logUtil.log("Create record called for student : " + sR.getFirstName() );
         String studentid = "SR" + (studentCount + 1);
         sR.setUniqueId(studentid);
@@ -118,7 +118,7 @@ public class CenterServerImpl implements ICenterServer {
     }
 
     @Override
-    public String getRecordCounts() {
+    public synchronized String getRecordCounts() {
         logUtil.log("get record counts ");
         String recordCount = null;
         UDPProviderThread[] req = new UDPProviderThread[2];
@@ -176,7 +176,7 @@ public class CenterServerImpl implements ICenterServer {
         return "Operation invalid";
     }
 
-   private String editSRRecord(String recordID, String key, String val) {
+   private synchronized String editSRRecord(String recordID, String key, String val) {
 
         for (Map.Entry<String, List<Records>> value : recordsMap.entrySet()) {
             List<Records> mylist = value.getValue();

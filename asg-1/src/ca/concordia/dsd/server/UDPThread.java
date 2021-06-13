@@ -54,6 +54,7 @@ public class UDPThread extends Thread implements Constants {
             try {
                 receiveData = new byte[1024];
                 receivePacket = new DatagramPacket(receiveData, receiveData.length);
+                serverSocket.setSoTimeout(1000 * 5);
                 serverSocket.receive(receivePacket);
                 logUtil.log(name,"UDPThread, received pkt :: " + new String(receivePacket.getData()));
                 String inputPkt = new String(receivePacket.getData()).trim();
