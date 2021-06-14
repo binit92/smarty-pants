@@ -1,0 +1,6 @@
+[2021-06-13 20:42:08] [INFO   ]  Initiating RMI connection to localhost : 7717 
+[2021-06-13 20:42:08] [INFO   ]  RMI connection established to localhost : 7717 
+[2021-06-13 20:42:08] [INFO   ] Using managerId : MTL1111 
+[2021-06-13 20:42:14] [INFO   ] Getting record counts from server 
+[2021-06-13 20:42:14] [INFO   ] total number of record : MTL,4 , LVL,4 , DDO,3 
+[2021-06-13 20:42:14] [INFO   ] record count returned 
