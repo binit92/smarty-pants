@@ -20,33 +20,32 @@ public class ManagerClient implements Constants {
     private LogUtil logUtil;
 
     public ManagerClient() {
-        logUtil = new LogUtil("manager");
-        logUtil.log("Initiating ManagerClient ");
+        System.out.println("Initiating ManagerClient ");
     }
 
     public void start() {
-        logUtil.log("Starting MangerClient");
+        System.out.println("Starting MangerClient");
         try {
             String managerId = getManagerID();
-            logUtil.log("Using managerId : " + managerId);
+             logUtil.log("Using managerId : " + managerId);
 
-            takeInputForOperation();
+            takeInputForOperation(managerId);
         } catch (Exception e) {
-            logUtil.log(e.getMessage());
+            System.out.println(e.getMessage());
         }
-        logUtil.log("Ending ManagerClient");
+
     }
 
     public String getManagerID() {
         System.out.println("getManagerID");
         while (true) {
-            logUtil.log("Enter the manager id ?:");
+            System.out.println("Enter the manager id ?:");
             Scanner keyboard = new Scanner(System.in);
             String input = keyboard.nextLine();
             if (isValidManagerId(input)) {
                 return input;
             } else {
-                logUtil.log("Not a valid manager ID of format: <MTL1111>  Try Again !!!");
+                System.out.println("Not a valid manager ID of format: <MTL1111>  Try Again !!!");
             }
         }
     }
@@ -55,6 +54,8 @@ public class ManagerClient implements Constants {
         if (managerId != null && managerId.length() == 7) {
             if (Pattern.compile("[0-9]*").matcher(managerId.substring(3, 6)).matches()) {
                 String firstThree = managerId.substring(0, 3);
+                // creating logUtil instance here so that different folder can be created for different managers
+                logUtil = new LogUtil(managerId);
                 if (firstThree.equalsIgnoreCase(MTL_TAG)) {
                     return createRmiConnection(MTL_TAG, MTL_SERVER_HOST, MTL_SERVER_PORT);
                 } else if (firstThree.equalsIgnoreCase(LVL_TAG)) {
@@ -80,7 +81,7 @@ public class ManagerClient implements Constants {
         return false;
     }
 
-    private void takeInputForOperation() {
+    private void takeInputForOperation(String managerId) {
         int i = -1;
         while (i != 0) {
             System.out.println("Enter digit for operation : ");
@@ -112,7 +113,7 @@ public class ManagerClient implements Constants {
                     logUtil.log(tR.toString());
                     String tID = null;
                     try {
-                        tID = server.createTRecord(tR);
+                        tID = server.createTRecord(managerId,tR);
                     } catch (RemoteException re) {
                         logUtil.log(re.getMessage());
                     }
@@ -142,7 +143,7 @@ public class ManagerClient implements Constants {
                     logUtil.log(sR.toString());
                     String sID = null;
                     try {
-                        sID = server.createSRecord(sR);
+                        sID = server.createSRecord(managerId,sR);
                     } catch (RemoteException re) {
                         logUtil.log(re.getMessage());
                     }
@@ -155,7 +156,7 @@ public class ManagerClient implements Constants {
                 case 3:
                     logUtil.log("Getting record counts from server");
                     try {
-                        String numberOfRecords = server.getRecordCounts();
+                        String numberOfRecords = server.getRecordCounts(managerId);
                         logUtil.log("total number of record : " + numberOfRecords);
                     } catch (RemoteException re) {
                         logUtil.log(re.getMessage());
@@ -198,7 +199,7 @@ public class ManagerClient implements Constants {
                     String newValue = keyboard.nextLine();
                     logUtil.log("new value for " + fieldName + " is : " + newValue);
                     try {
-                        String ret = server.editRecord(recordID, fieldName, newValue);
+                        String ret = server.editRecord(managerId,recordID, fieldName, newValue);
                         if (!ret.contains("not found")) {
                             logUtil.log("Record updated successfully ");
                         } else {

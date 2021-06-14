@@ -22,21 +22,22 @@ public class RunLVL {
             server = new CenterServerImpl(Constants.LVL_TAG);
 
             try{
+                //"LVL0000" is a test manager id
                 //add dummy teachers
                 TeacherRecord tR1 = new TeacherRecord(null,"ted","min","Cartier","0123456789","maths","LVL");
                 TeacherRecord tR2 = new TeacherRecord(null,"ned","stark","Dorion","0123456789","algo","LVL");
-                System.out.println("> "+server.createTRecord(tR1));
-                System.out.println("> "+server.createTRecord(tR2));
+                System.out.println("> "+server.createTRecord("LVL0000",tR1));
+                System.out.println("> "+server.createTRecord("LVL0000",tR2));
                 //add dummy students
                 ArrayList<String> courses = new ArrayList<>();
                 courses.add("maths");
                 courses.add("algo");
                 StudentRecord sR1 = new StudentRecord(null,"bnna","lrank",courses,"active","01062021");
                 StudentRecord sR2 = new StudentRecord(null,"bnne","srank",courses,"inactive","02062021");
-                System.out.println("> "+server.createSRecord(sR1));
-                System.out.println("> "+server.createSRecord(sR2));
+                System.out.println("> "+server.createSRecord("LVL0000",sR1));
+                System.out.println("> "+server.createSRecord("LVL0000",sR2));
                 //get count
-                System.out.println(server.getRecordCounts());
+                System.out.println(server.getRecordCounts("LVL0000"));
 
             }catch (Throwable t){
                 System.out.println(t.getMessage());

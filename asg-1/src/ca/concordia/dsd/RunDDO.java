@@ -22,21 +22,22 @@ public class RunDDO {
             server = new CenterServerImpl(Constants.DDO_TAG);
 
             try{
+//              //"DDO0000" is test manager id
                 //add dummy teachers
                 TeacherRecord tR1 = new TeacherRecord(null,"dino","moria","Cartier","0123456789","maths","DDO");
                 TeacherRecord tR2 = new TeacherRecord(null,"fued","taker","Dorion","0123456789","algo","DDO");
-                System.out.println("> "+server.createTRecord(tR1));
-                System.out.println("> "+server.createTRecord(tR2));
+                System.out.println("> "+server.createTRecord("DDO0000",tR1));
+                System.out.println("> "+server.createTRecord("DDO0000",tR2));
                 //add dummy students
                 ArrayList<String> courses = new ArrayList<>();
                 courses.add("maths");
                 courses.add("algo");
                 StudentRecord sR1 = new StudentRecord(null,"tina","frank",courses,"active","01062021");
                 //StudentRecord sR2 = new StudentRecord(null,"mina","trank",courses,"inactive","02062021");
-                System.out.println("> "+server.createSRecord(sR1));
-                //System.out.println("> "+server.createSRecord(sR2));
+                System.out.println("> "+server.createSRecord("DDO0000",sR1));
+                //System.out.println("> "+server.createSRecord("DDO0000",sR2));
                 //get count
-                System.out.println(server.getRecordCounts());
+                System.out.println(server.getRecordCounts("DDO0000"));
 
             }catch (Throwable t){
                 System.out.println(t.getMessage());

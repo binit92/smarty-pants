@@ -47,8 +47,8 @@ public class CenterServerImpl implements ICenterServer {
         }
     }
     @Override
-    public synchronized String createTRecord(TeacherRecord tR) throws RemoteException {
-        logUtil.log("Create record called for teacher : " + tR.getFirstName() );
+    public synchronized String createTRecord(String manager,TeacherRecord tR) throws RemoteException {
+        logUtil.log(manager,"Create record called for teacher : " + tR.getFirstName() );
         String teacherid = "TR" + (++teacherCount);
         tR.setTeacherId(teacherid);
         tR.setUniqueId(teacherid);
@@ -56,8 +56,8 @@ public class CenterServerImpl implements ICenterServer {
         String key = tR.getLastName().substring(0, 1);
         String ret = addToDB(key, tR, null);
 
-        logUtil.log("new teacher " + tR.getFirstName() + " with this key " + key);
-        logUtil.log("teacher id " + teacherid);
+        logUtil.log(manager,"new teacher " + tR.getFirstName() + " with this key " + key);
+        logUtil.log(manager,"teacher id " + teacherid);
         return teacherid;
     }
 
@@ -94,8 +94,8 @@ public class CenterServerImpl implements ICenterServer {
 
 
     @Override
-    public synchronized String createSRecord(StudentRecord sR) throws RemoteException {
-        logUtil.log("Create record called for student : " + sR.getFirstName() );
+    public synchronized String createSRecord(String manager, StudentRecord sR) throws RemoteException {
+        logUtil.log(manager,"Create record called for student : " + sR.getFirstName() );
         String studentid = "SR" + (studentCount + 1);
         sR.setUniqueId(studentid);
         sR.setStudentID(studentid);
@@ -103,8 +103,8 @@ public class CenterServerImpl implements ICenterServer {
         String key = sR.getLastName().substring(0, 1);
         String ret = addToDB(key, null, sR);
 
-        logUtil.log(" new student is added " + sR + " with this key " + key);
-        logUtil.log("student record created " + studentid);
+        logUtil.log(manager ," new student is added " + sR + " with this key " + key);
+        logUtil.log(manager, "student record created " + studentid);
         return studentid;
     }
 
@@ -118,8 +118,8 @@ public class CenterServerImpl implements ICenterServer {
     }
 
     @Override
-    public synchronized String getRecordCounts() {
-        logUtil.log("get record counts ");
+    public synchronized String getRecordCounts(String manager) {
+        logUtil.log(manager,"get record counts ");
         String recordCount = null;
         UDPProviderThread[] req = new UDPProviderThread[2];
         int i = 0;
@@ -143,7 +143,7 @@ public class CenterServerImpl implements ICenterServer {
                     }
                     req[i] = new UDPProviderThread(loc, ipAdd,udpPort);
                 } catch (IOException e) {
-                    logUtil.log(e.getMessage());
+                    logUtil.log(manager,e.getMessage());
                 }
                 req[i].start();
                 i++;
@@ -157,26 +157,26 @@ public class CenterServerImpl implements ICenterServer {
             }
             recordCount += " , " + request.getRemoteRecordCount().trim();
         }
-        logUtil.log("record count " + recordCount);
+        logUtil.log(manager,"record count " + recordCount);
         return recordCount;
     }
 
     @Override
-    public String editRecord(String id, String key, String val) throws RemoteException {
+    public String editRecord(String manager, String id, String key, String val) throws RemoteException {
         String type = id.substring(0, 2);
 
         if (type.equalsIgnoreCase("TR")) {
-            return editTRRecord(id, key, val);
+            return editTRRecord(manager,id, key, val);
         }
 
         else if (type.equalsIgnoreCase("SR")) {
-            return editSRRecord(id, key, val);
+            return editSRRecord(manager,id, key, val);
         }
-        logUtil.log("Operation invalid");
+        logUtil.log(manager, "Operation invalid");
         return "Operation invalid";
     }
 
-   private synchronized String editSRRecord(String recordID, String key, String val) {
+   private synchronized String editSRRecord(String manager,String recordID, String key, String val) {
 
         for (Map.Entry<String, List<Records>> value : recordsMap.entrySet()) {
             List<Records> mylist = value.getValue();
@@ -196,7 +196,7 @@ public class CenterServerImpl implements ICenterServer {
         return "Record : " + recordID+ " is not found";
     }
 
-   private String editTRRecord(String recordID, String key, String val) {
+   private String editTRRecord(String manager,String recordID, String key, String val) {
        for (Map.Entry<String, List<Records>> value : recordsMap.entrySet()) {
            List<Records> mylist = value.getValue();
            Optional<Records> record = mylist.stream().filter(x -> x.getUniqueId().equals(recordID)).findFirst();
@@ -204,19 +204,19 @@ public class CenterServerImpl implements ICenterServer {
            if (record.isPresent()) {
                if (record.isPresent() && key.equalsIgnoreCase("Phone")) {
                    ((TeacherRecord) record.get()).setPhone(val);
-                   logUtil.log("Records update for : " + serverName);
+                   logUtil.log(manager,"Records update for : " + serverName);
                     return "Records updated with status : "+val;
                 }
 
                 else if (record.isPresent() && key.equalsIgnoreCase("Address")) {
                     ((TeacherRecord) record.get()).setAddress(val);
-                    logUtil.log("Records update for : " + serverName);
+                    logUtil.log(manager,"Records update for : " + serverName);
                     return "Records updated with status : "+val;
                 }
 
                 else if (record.isPresent() && key.equalsIgnoreCase("Location")) {
                     ((TeacherRecord) record.get()).setLocation(val);
-                    logUtil.log("Records update for : " + serverName);
+                    logUtil.log(manager,"Records update for : " + serverName);
                     return "Records updated with status : "+val;
                 }
             }
@@ -225,7 +225,7 @@ public class CenterServerImpl implements ICenterServer {
    }
 
     @Override
-    public String editCourses(String id, String key, ArrayList<String> values) throws RemoteException {
+    public String editCourses(String manager, String id, String key, ArrayList<String> values) throws RemoteException {
         for (Map.Entry<String, List<Records>> value : recordsMap.entrySet()) {
 
             List<Records> list = value.getValue();

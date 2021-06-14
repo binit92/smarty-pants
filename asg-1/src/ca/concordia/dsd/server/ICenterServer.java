@@ -9,14 +9,14 @@ import java.util.ArrayList;
 
 public interface ICenterServer extends Remote {
 
-    public String createTRecord(TeacherRecord teacherRecord) throws RemoteException;
+    public String createTRecord(String manager, TeacherRecord teacherRecord) throws RemoteException;
 
-    public String createSRecord(StudentRecord studentRecord) throws RemoteException;
+    public String createSRecord(String manager, StudentRecord studentRecord) throws RemoteException;
 
-    public String getRecordCounts() throws RemoteException;
+    public String getRecordCounts(String manager) throws RemoteException;
 
-    public String editRecord(String id, String key, String val) throws RemoteException;
+    public String editRecord(String manager, String id, String key, String val) throws RemoteException;
 
-    public String editCourses(String id, String key, ArrayList<String> values) throws RemoteException;
+    public String editCourses(String manager, String id, String key, ArrayList<String> values) throws RemoteException;
 
 }

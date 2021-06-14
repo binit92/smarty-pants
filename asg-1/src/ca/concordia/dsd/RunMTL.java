@@ -21,21 +21,22 @@ public class RunMTL {
 
             server = new CenterServerImpl(Constants.MTL_TAG);
             try{
+                // "MTL0000" is a test manager id
                 //add dummy teachers
                 TeacherRecord tR1 = new TeacherRecord(null,"ched","faker","Cartier","0123456789","maths","MTL");
                 TeacherRecord tR2 = new TeacherRecord(null,"fed","taker","Dorion","0123456789","algo","MTL");
-                System.out.println("> "+server.createTRecord(tR1));
-                System.out.println("> "+server.createTRecord(tR2));
+                System.out.println("> "+server.createTRecord("MTL0000",tR1));
+                System.out.println("> "+server.createTRecord("MTL0000",tR2));
                 //add dummy students
                 ArrayList<String> courses = new ArrayList<>();
                 courses.add("maths");
                 courses.add("algo");
                 StudentRecord sR1 = new StudentRecord(null,"anna","frank",courses,"active","01062021");
                 StudentRecord sR2 = new StudentRecord(null,"anne","trank",courses,"inactive","02062021");
-                System.out.println("> "+server.createSRecord(sR1));
-                System.out.println("> "+server.createSRecord(sR2));
+                System.out.println("> "+server.createSRecord("MTL0000",sR1));
+                System.out.println("> "+server.createSRecord("MTL0000",sR2));
                 //get count
-                System.out.println(server.getRecordCounts());
+                System.out.println(server.getRecordCounts("MTL0000"));
 
             }catch (Throwable t){
                 System.out.println(t.getMessage());

@@ -41,7 +41,7 @@ public class LogUtil implements Constants {
 
     public void log(String manager, String message) {
         System.out.println(message);
-        logger.log(Level.INFO, " [" + manager +"] "+message);
+        logger.log(Level.INFO, " [" + manager + "] "+message);
     }
 
     public void close() {
