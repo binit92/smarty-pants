@@ -92,7 +92,6 @@ public class CenterServerImpl implements ICenterServer {
         return ret;
     }
 
-
     @Override
     public synchronized String createSRecord(String manager, StudentRecord sR) throws RemoteException {
         logUtil.log(manager,"Create record called for student : " + sR.getFirstName() );

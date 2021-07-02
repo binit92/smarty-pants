@@ -4,7 +4,6 @@ import ca.concordia.dsd.arch.corba;
 import ca.concordia.dsd.arch.corbaHelper;
 import ca.concordia.dsd.database.StudentRecord;
 import ca.concordia.dsd.database.TeacherRecord;
-import ca.concordia.dsd.server.ICenterServer;
 import ca.concordia.dsd.util.Constants;
 import ca.concordia.dsd.util.LogUtil;
 import org.omg.CORBA.ORB;
@@ -12,8 +11,6 @@ import org.omg.CosNaming.NamingContextExt;
 import org.omg.CosNaming.NamingContextExtHelper;
 
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -39,13 +36,12 @@ public class ManagerClient implements Constants {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-
     }
 
     public String getManagerID() {
         System.out.println("getManagerID");
         while (true) {
-            System.out.println("Enter the manager id ?:");
+            System.out.println("Enter the manager id ? of format: <MTL1111>:");
             Scanner keyboard = new Scanner(System.in);
             String input = keyboard.nextLine();
             if (isValidManagerId(input)) {
@@ -74,7 +70,6 @@ public class ManagerClient implements Constants {
         return false;
     }
 
-
     // Putting commands arguments programmtically here:
     // java HelloClient -ORBInitialPort 1050 -ORBInitialHost localhost
     private boolean createCorbaConnection(String tag, String name, int port) {
@@ -101,7 +96,7 @@ public class ManagerClient implements Constants {
             server = corbaHelper.narrow(ncRef.resolve_str(name));
 
             //TODO
-            System.out.println(server.getRecordCounts());
+            //System.out.println(server.getRecordCounts());
 
         }catch (Exception e){
             e.printStackTrace();
@@ -141,9 +136,10 @@ public class ManagerClient implements Constants {
                     logUtil.log(tR.toString());
                     String tID = null;
                     try {
-                        tID = server.createTRecord(managerId,tR);
-                    } catch (RemoteException re) {
-                        logUtil.log(re.getMessage());
+                       // tID = server.createTRecord(managerId,tR);
+                        boolean ret = server.createTRecord(managerId,tFirstName,tLastName,tAddress,tPhoneNumber,tSpecialization,tLocation);
+                    } catch (Exception e) {
+                        logUtil.log(e.getMessage());
                     }
                     if (tID != null) {
                         logUtil.log("teacher id : " + tID + " is recorded.");
@@ -171,8 +167,10 @@ public class ManagerClient implements Constants {
                     logUtil.log(sR.toString());
                     String sID = null;
                     try {
-                        sID = server.createSRecord(managerId,sR);
-                    } catch (RemoteException re) {
+                        //TODO : change sStatus to true or false, may be
+                        //sID = server.createSRecord(managerId,sR);
+                        boolean ret = server.createSRecord(managerId,sFirstName,sLastName,sCourses,true,sStatusChange);
+                    } catch (Exception re) {
                         logUtil.log(re.getMessage());
                     }
                     if (sID != null) {
@@ -184,9 +182,11 @@ public class ManagerClient implements Constants {
                 case 3:
                     logUtil.log("Getting record counts from server");
                     try {
-                        String numberOfRecords = server.getRecordCounts(managerId);
-                        logUtil.log("total number of record : " + numberOfRecords);
-                    } catch (RemoteException re) {
+                        //TODO: add manager id here .. review and fix
+                        //String numberOfRecords = server.getRecordCounts(managerId);
+                        boolean ret = server.getRecordCounts();
+                       // logUtil.log("total number of record : " + numberOfRecords);
+                    } catch (Exception re) {
                         logUtil.log(re.getMessage());
                     }
                     logUtil.log("record count returned");
@@ -227,13 +227,16 @@ public class ManagerClient implements Constants {
                     String newValue = keyboard.nextLine();
                     logUtil.log("new value for " + fieldName + " is : " + newValue);
                     try {
-                        String ret = server.editRecord(managerId,recordID, fieldName, newValue);
+                        // TODO: review and fix stuffs
+                        //String ret = server.editRecord(managerId,recordID, fieldName, newValue);
+                        boolean returned = server .editRecord(managerId,recordID,fieldName,newValue);
+                        String ret = "";
                         if (!ret.contains("not found")) {
                             logUtil.log("Record updated successfully ");
                         } else {
                             logUtil.log("Record doesn't updated successfully, Try Again !!");
                         }
-                    } catch (RemoteException re) {
+                    } catch (Exception re) {
                         logUtil.log(re.getMessage());
                     }
                     break;
