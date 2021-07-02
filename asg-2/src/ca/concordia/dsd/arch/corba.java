@@ -1,4 +1,4 @@
-package arch;
+package ca.concordia.dsd.arch;
 
 
 /**

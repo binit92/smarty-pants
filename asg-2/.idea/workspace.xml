@@ -2,48 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="61bba50f-58d5-4520-a88d-b89c19cd7ec8" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/asg-2.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bin/ca/concordia/dsd/RunClient.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bin/ca/concordia/dsd/RunDDO.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bin/ca/concordia/dsd/RunLVL.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bin/ca/concordia/dsd/RunMTL.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bin/ca/concordia/dsd/client/ManagerClient.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bin/ca/concordia/dsd/database/Records.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bin/ca/concordia/dsd/database/StudentRecord.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bin/ca/concordia/dsd/database/TeacherRecord.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bin/ca/concordia/dsd/server/CenterServerImpl.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bin/ca/concordia/dsd/server/ICenterServer.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bin/ca/concordia/dsd/server/UDPProviderThread.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bin/ca/concordia/dsd/server/UDPRequestThread.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bin/ca/concordia/dsd/server/UDPThread.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bin/ca/concordia/dsd/util/Constants.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bin/ca/concordia/dsd/util/LogUtil.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/RunClient.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/RunDDO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/RunLVL.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/RunMTL.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/arch/_corbaArchStub.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/arch/corbaArch.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/arch/corbaArchHelper.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/arch/corbaArchHolder.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/arch/corbaArchOperations.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/arch/corbaArchPOA.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/client/ManagerClient.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/corba.idl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/database/Records.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/database/StudentRecord.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/database/TeacherRecord.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/server/CenterServerImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/server/ICenterServer.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/server/UDPProviderThread.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/server/UDPRequestThread.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/server/UDPThread.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/util/Constants.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/util/LogUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ca/concordia/dsd/arch/_corbaStub.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ca/concordia/dsd/arch/corba.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ca/concordia/dsd/arch/corbaHelper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ca/concordia/dsd/arch/corbaHolder.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ca/concordia/dsd/arch/corbaOperations.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ca/concordia/dsd/arch/corbaPOA.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ca/concordia/dsd/client/ManagerClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/client/ManagerClient.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

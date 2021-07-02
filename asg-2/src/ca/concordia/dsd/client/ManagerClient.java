@@ -1,10 +1,15 @@
 package ca.concordia.dsd.client;
 
+import ca.concordia.dsd.arch.corba;
+import ca.concordia.dsd.arch.corbaHelper;
 import ca.concordia.dsd.database.StudentRecord;
 import ca.concordia.dsd.database.TeacherRecord;
 import ca.concordia.dsd.server.ICenterServer;
 import ca.concordia.dsd.util.Constants;
 import ca.concordia.dsd.util.LogUtil;
+import org.omg.CORBA.ORB;
+import org.omg.CosNaming.NamingContextExt;
+import org.omg.CosNaming.NamingContextExtHelper;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -16,7 +21,8 @@ import java.util.regex.Pattern;
 
 public class ManagerClient implements Constants {
 
-    private static ICenterServer server;
+    //private static ICenterServer server;
+    private static corba server;
     private LogUtil logUtil;
 
     public ManagerClient() {
@@ -57,26 +63,48 @@ public class ManagerClient implements Constants {
                 // creating logUtil instance here so that different folder can be created for different managers
                 logUtil = new LogUtil(managerId);
                 if (firstThree.equalsIgnoreCase(MTL_TAG)) {
-                    return createRmiConnection(MTL_TAG, MTL_SERVER_HOST, MTL_SERVER_PORT);
+                    return createCorbaConnection(MTL_TAG, MTL_SERVER_HOST, MTL_SERVER_PORT);
                 } else if (firstThree.equalsIgnoreCase(LVL_TAG)) {
-                    return createRmiConnection(LVL_TAG, LVL_SERVER_HOST, LVL_SERVER_PORT);
+                    return createCorbaConnection(LVL_TAG, LVL_SERVER_HOST, LVL_SERVER_PORT);
                 } else if (firstThree.equalsIgnoreCase(DDO_TAG)) {
-                    return createRmiConnection(DDO_TAG, DDO_SERVER_HOST, DDO_SERVER_PORT);
+                    return createCorbaConnection(DDO_TAG, DDO_SERVER_HOST, DDO_SERVER_PORT);
                 }
             }
         }
         return false;
     }
 
-    private boolean createRmiConnection(String tag, String name, int port) {
+
+    // Putting commands arguments programmtically here:
+    // java HelloClient -ORBInitialPort 1050 -ORBInitialHost localhost
+    private boolean createCorbaConnection(String tag, String name, int port) {
         try {
-            logUtil.log(" Initiating RMI connection to " + name + " : " + port);
-            Registry registry = LocateRegistry.getRegistry(name, port);
-            server = (ICenterServer) registry.lookup(tag);
-            logUtil.log(" RMI connection established to " + name + " : " + port);
-            return true;
-        } catch (Exception e) {
-            logUtil.log(e.getMessage());
+
+            String args[] = new String[4];
+            args[0] = "-ORBInitialPort";
+            args[1] = Integer.toString(port);
+            args[2] = "-ORBInitialHost ";
+            args[3] = "name";
+
+            // create and initialize the ORB
+            ORB orb = ORB.init(args, null);
+
+            // get the root naming context
+            org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
+
+            // Use NamingContextExt instead of NamingContext. This is
+            // part of the Interoperable naming Service.
+            NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
+
+            // resolve the Object Reference in Naming
+            name = name + "Server";
+            server = corbaHelper.narrow(ncRef.resolve_str(name));
+
+            //TODO
+            System.out.println(server.getRecordCounts());
+
+        }catch (Exception e){
+            e.printStackTrace();
         }
         return false;
     }

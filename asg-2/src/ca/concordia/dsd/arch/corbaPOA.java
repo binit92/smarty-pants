@@ -1,4 +1,4 @@
-package arch;
+package ca.concordia.dsd.arch;
 
 
 /**
@@ -9,7 +9,7 @@ package arch;
 */
 
 public abstract class corbaPOA extends org.omg.PortableServer.Servant
- implements arch.corbaOperations, org.omg.CORBA.portable.InvokeHandler
+ implements corbaOperations, org.omg.CORBA.portable.InvokeHandler
 {
 
   // Constructors

@@ -1,4 +1,4 @@
-package arch;
+package ca.concordia.dsd.arch;
 
 
 /**
@@ -8,7 +8,7 @@ package arch;
 * Thursday, 1 July, 2021 9:24:23 PM EDT
 */
 
-public class _corbaStub extends org.omg.CORBA.portable.ObjectImpl implements arch.corba
+public class _corbaStub extends org.omg.CORBA.portable.ObjectImpl implements corba
 {
 
   public boolean createTRecord (String id, String fName, String lName, String address, String phone, String specialization, String location)

@@ -1,4 +1,4 @@
-package arch;
+package ca.concordia.dsd.arch;
 
 /**
 * arch/corbaHolder.java .
@@ -9,30 +9,30 @@ package arch;
 
 public final class corbaHolder implements org.omg.CORBA.portable.Streamable
 {
-  public arch.corba value = null;
+  public corba value = null;
 
   public corbaHolder ()
   {
   }
 
-  public corbaHolder (arch.corba initialValue)
+  public corbaHolder (corba initialValue)
   {
     value = initialValue;
   }
 
   public void _read (org.omg.CORBA.portable.InputStream i)
   {
-    value = arch.corbaHelper.read (i);
+    value = corbaHelper.read (i);
   }
 
   public void _write (org.omg.CORBA.portable.OutputStream o)
   {
-    arch.corbaHelper.write (o, value);
+    corbaHelper.write (o, value);
   }
 
   public org.omg.CORBA.TypeCode _type ()
   {
-    return arch.corbaHelper.type ();
+    return corbaHelper.type ();
   }
 
 }
