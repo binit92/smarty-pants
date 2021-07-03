@@ -1,54 +1,57 @@
 package ca.concordia.dsd;
 
-import ca.concordia.dsd.database.StudentRecord;
-import ca.concordia.dsd.database.TeacherRecord;
-import ca.concordia.dsd.server.CenterServerImpl;
-import ca.concordia.dsd.server.ICenterServer;
-import ca.concordia.dsd.util.Constants;
+import ca.concordia.dsd.arch.corba;
+import ca.concordia.dsd.arch.corbaHelper;
 
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
+import ca.concordia.dsd.server.CenterServerImpl;
+import ca.concordia.dsd.util.Constants;
+import org.omg.CORBA.ORB;
+import org.omg.CosNaming.NameComponent;
+import org.omg.CosNaming.NamingContextExt;
+import org.omg.CosNaming.NamingContextExtHelper;
+import org.omg.PortableServer.POA;
+import org.omg.PortableServer.POAHelper;
 
 public class RunLVL {
 
-    private static ICenterServer stub;
-    private static CenterServerImpl server;
 
     public static void main(String[] args) {
         try {
-            // create server
-            server = new CenterServerImpl(Constants.LVL_TAG);
 
-            try{
-                //"LVL0000" is a test manager id
-                //add dummy teachers
-                TeacherRecord tR1 = new TeacherRecord(null,"ted","min","Cartier","0123456789","maths","LVL");
-                TeacherRecord tR2 = new TeacherRecord(null,"ned","stark","Dorion","0123456789","algo","LVL");
-                System.out.println("> "+server.createTRecord("LVL0000",tR1));
-                System.out.println("> "+server.createTRecord("LVL0000",tR2));
-                //add dummy students
-                ArrayList<String> courses = new ArrayList<>();
-                courses.add("maths");
-                courses.add("algo");
-                StudentRecord sR1 = new StudentRecord(null,"bnna","lrank",courses,"active","01062021");
-                StudentRecord sR2 = new StudentRecord(null,"bnne","srank",courses,"inactive","02062021");
-                System.out.println("> "+server.createSRecord("LVL0000",sR1));
-                System.out.println("> "+server.createSRecord("LVL0000",sR2));
-                //get count
-                System.out.println(server.getRecordCounts("LVL0000"));
+            String localargs[] = new String[4];
+            localargs[0] = "-ORBInitialPort";
+            localargs[1] = Integer.toString(Constants.LVL_SERVER_PORT);
+            localargs[2] = "-ORBInitialHost ";
+            localargs[3] = Constants.LVL_SERVER_HOST;
 
-            }catch (Throwable t){
-                System.out.println(t.getMessage());
-            }
+            // Initiate local ORB object
+            ORB orb = ORB.init(localargs, null);
 
+            // Get reference to RootPOA and get POAManager
+            POA rootPOA = POAHelper.narrow(orb.resolve_initial_references("RootPOA"));
+            rootPOA.the_POAManager().activate();
 
-            // create remote objects
-            stub = (ICenterServer) UnicastRemoteObject.exportObject(server, Constants.LVL_SERVER_PORT);
-            // registry binds the stub of remote object
-            Registry registry = LocateRegistry.createRegistry(Constants.LVL_SERVER_PORT);
-            registry.bind(Constants.LVL_TAG, stub);
+            // Create servant and register it with the ORB
+            CenterServerImpl servant = new CenterServerImpl(Constants.LVL_TAG,Constants.LVL_SERVER_PORT,Constants.LVL_UDP_PORT);
+            servant.setORB(orb);
+
+            // Get object reference from the servant
+            org.omg.CORBA.Object ref = rootPOA.servant_to_reference(servant);
+            corba dcmsServer = corbaHelper.narrow(ref);
+
+            // Get the root Naming Context
+            org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
+            NamingContextExt namingContextRef = NamingContextExtHelper.narrow(objRef);
+
+            // Bind the object reference to the Naming Context
+            NameComponent path[] = namingContextRef.to_name(Constants.LVL_TAG);
+            namingContextRef.rebind(path, dcmsServer);
+
+            // Run the server
+            //dcmsServer.startUDPServer();
+            System.out.println("Server " + Constants.LVL_TAG + " is running ...");
+            orb.run();
+
         } catch (Exception e) {
             e.printStackTrace();
         }

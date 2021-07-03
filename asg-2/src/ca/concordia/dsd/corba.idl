@@ -1,10 +1,10 @@
 module arch
 {
 interface corba{
-     boolean createTRecord(in string id, in string fName, in string lName, in string address, in string phone, in string specialization, in string location);
-     boolean createSRecord(in string id, in string fName, in string lName, in string courses, in boolean status, in string statusDate);
-     boolean getRecordCounts();
-     boolean editRecord(in string id, in string recordID, in string fieldName, in string newValue);
-     boolean transferRecord(in string id, in string recordId, in string remoteCenterServerName);
+     string createTRecord(in string id, in string fName, in string lName, in string address, in string phone, in string specialization, in string location);
+     string createSRecord(in string id, in string fName, in string lName, in string courses, in boolean status, in string statusDate);
+     string getRecordCounts(in string id);
+     string editRecord(in string id, in string recordID, in string fieldName, in string newValue);
+     string transferRecord(in string id, in string recordId, in string remoteCenterServerName);
     };
 };

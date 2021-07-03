@@ -10,7 +10,6 @@ import org.omg.CORBA.ORB;
 import org.omg.CosNaming.NamingContextExt;
 import org.omg.CosNaming.NamingContextExtHelper;
 
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -74,12 +73,13 @@ public class ManagerClient implements Constants {
     // java HelloClient -ORBInitialPort 1050 -ORBInitialHost localhost
     private boolean createCorbaConnection(String tag, String name, int port) {
         try {
+            System.out.println("-->createcorba connection tag: " + tag + " name: " + name + " port: " + port);
 
             String args[] = new String[4];
             args[0] = "-ORBInitialPort";
             args[1] = Integer.toString(port);
             args[2] = "-ORBInitialHost ";
-            args[3] = "name";
+            args[3] = "localhost";
 
             // create and initialize the ORB
             ORB orb = ORB.init(args, null);
@@ -92,16 +92,14 @@ public class ManagerClient implements Constants {
             NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
 
             // resolve the Object Reference in Naming
-            name = name + "Server";
-            server = corbaHelper.narrow(ncRef.resolve_str(name));
 
-            //TODO
-            //System.out.println(server.getRecordCounts());
+            server = corbaHelper.narrow(ncRef.resolve_str(tag));
+
 
         }catch (Exception e){
             e.printStackTrace();
         }
-        return false;
+        return true;
     }
 
     private void takeInputForOperation(String managerId) {
@@ -137,7 +135,7 @@ public class ManagerClient implements Constants {
                     String tID = null;
                     try {
                        // tID = server.createTRecord(managerId,tR);
-                        boolean ret = server.createTRecord(managerId,tFirstName,tLastName,tAddress,tPhoneNumber,tSpecialization,tLocation);
+                        tID = server.createTRecord(managerId,tFirstName,tLastName,tAddress,tPhoneNumber,tSpecialization,tLocation);
                     } catch (Exception e) {
                         logUtil.log(e.getMessage());
                     }
@@ -169,7 +167,7 @@ public class ManagerClient implements Constants {
                     try {
                         //TODO : change sStatus to true or false, may be
                         //sID = server.createSRecord(managerId,sR);
-                        boolean ret = server.createSRecord(managerId,sFirstName,sLastName,sCourses,true,sStatusChange);
+                        sID = server.createSRecord(managerId,sFirstName,sLastName,sCourses,true,sStatusChange);
                     } catch (Exception re) {
                         logUtil.log(re.getMessage());
                     }
@@ -184,7 +182,7 @@ public class ManagerClient implements Constants {
                     try {
                         //TODO: add manager id here .. review and fix
                         //String numberOfRecords = server.getRecordCounts(managerId);
-                        boolean ret = server.getRecordCounts();
+                        String numberOfRecords = server.getRecordCounts(managerId);
                        // logUtil.log("total number of record : " + numberOfRecords);
                     } catch (Exception re) {
                         logUtil.log(re.getMessage());
@@ -229,8 +227,8 @@ public class ManagerClient implements Constants {
                     try {
                         // TODO: review and fix stuffs
                         //String ret = server.editRecord(managerId,recordID, fieldName, newValue);
-                        boolean returned = server .editRecord(managerId,recordID,fieldName,newValue);
-                        String ret = "";
+                        String ret = server .editRecord(managerId,recordID,fieldName,newValue);
+                        //String ret = "";
                         if (!ret.contains("not found")) {
                             logUtil.log("Record updated successfully ");
                         } else {

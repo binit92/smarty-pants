@@ -1,22 +1,28 @@
 package ca.concordia.dsd.server;
 
+import ca.concordia.dsd.arch.corbaPOA;
 import ca.concordia.dsd.database.Records;
 import ca.concordia.dsd.database.StudentRecord;
 import ca.concordia.dsd.database.TeacherRecord;
 import ca.concordia.dsd.util.Constants;
 import ca.concordia.dsd.util.LogUtil;
+import org.omg.CORBA.ORB;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.rmi.RemoteException;
 import java.util.*;
 
-public class CenterServerImpl implements ICenterServer {
+public class CenterServerImpl extends corbaPOA  {
     private LogUtil logUtil;
     public UDPThread udpThread;
     public String IPaddress;
+
+    int port = 0;
+    int udpPort = 0;
+
+    private ORB ddoorb;
 
     public HashMap<String, List<Records>> recordsMap;
     private static int studentCount = 10001;
@@ -24,13 +30,19 @@ public class CenterServerImpl implements ICenterServer {
     private String recordsCount;
     private final String serverName;
 
-    public CenterServerImpl(String serverName) {
+    public CenterServerImpl(String serverName, int port, int udpPort) {
         this.serverName = serverName;
+        this.port = port;
+        this.udpPort = udpPort;
         logUtil = new LogUtil(serverName);
         recordsMap = new HashMap<>();
         udpThread = new UDPThread(this.serverName, this);
         udpThread.start();
         setIPAddress(serverName);
+    }
+
+    public void setORB(ORB ddoobjectorb) {
+        this.ddoorb = ddoobjectorb;
     }
 
     private void setIPAddress(String serverName) {
@@ -45,20 +57,6 @@ public class CenterServerImpl implements ICenterServer {
                 IPaddress = Constants.DDO_SERVER_HOST;
                 break;
         }
-    }
-    @Override
-    public synchronized String createTRecord(String manager,TeacherRecord tR) throws RemoteException {
-        logUtil.log(manager,"Create record called for teacher : " + tR.getFirstName() );
-        String teacherid = "TR" + (++teacherCount);
-        tR.setTeacherId(teacherid);
-        tR.setUniqueId(teacherid);
-
-        String key = tR.getLastName().substring(0, 1);
-        String ret = addToDB(key, tR, null);
-
-        logUtil.log(manager,"new teacher " + tR.getFirstName() + " with this key " + key);
-        logUtil.log(manager,"teacher id " + teacherid);
-        return teacherid;
     }
 
     private synchronized String addToDB(String key, TeacherRecord tR, StudentRecord sR) {
@@ -92,21 +90,6 @@ public class CenterServerImpl implements ICenterServer {
         return ret;
     }
 
-    @Override
-    public synchronized String createSRecord(String manager, StudentRecord sR) throws RemoteException {
-        logUtil.log(manager,"Create record called for student : " + sR.getFirstName() );
-        String studentid = "SR" + (studentCount + 1);
-        sR.setUniqueId(studentid);
-        sR.setStudentID(studentid);
-
-        String key = sR.getLastName().substring(0, 1);
-        String ret = addToDB(key, null, sR);
-
-        logUtil.log(manager ," new student is added " + sR + " with this key " + key);
-        logUtil.log(manager, "student record created " + studentid);
-        return studentid;
-    }
-
     private int getServerCount(){
         int c = 0;
         for (Map.Entry<String, List<Records>> e : this.recordsMap.entrySet()) {
@@ -116,7 +99,42 @@ public class CenterServerImpl implements ICenterServer {
         return c;
     }
 
-    @Override
+
+    public String createTRecord(String id, String fName, String lName, String address, String phone, String specialization, String location) {
+        logUtil.log(id,"Create record called for teacher : " + fName);
+        String teacherid = "TR" + (++teacherCount);
+        TeacherRecord tR = new TeacherRecord(teacherid,fName,lName,address,phone,specialization,location);
+        //tR.setTeacherId(teacherid);
+        //tR.setUniqueId(teacherid);
+
+        String key = tR.getLastName().substring(0, 1);
+        String ret = addToDB(key, tR, null);
+        //TODO : fix return
+        logUtil.log(id,"new teacher " + tR.getFirstName() + " with this key " + key);
+        logUtil.log(id,"teacher id " + teacherid);
+
+        return teacherid;
+        //return true;
+    }
+
+    public String createSRecord(String id, String fName, String lName, String courses, boolean status, String statusDate) {
+        logUtil.log(id,"Create record called for student : " + fName);
+        String studentid = "SR" + (studentCount + 1);
+        // TODO: fix this : courses, status
+        StudentRecord sR = new StudentRecord(studentid,fName,lName,null, "True",statusDate);
+        //sR.setUniqueId(studentid);
+        //sR.setStudentID(studentid);
+
+        String key = sR.getLastName().substring(0, 1);
+        String ret = addToDB(key, null, sR);
+
+        // TODO: return ret
+        logUtil.log(id," new student is added " + sR + " with this key " + key);
+        logUtil.log(id, "student record created " + studentid);
+        return studentid;
+        //return true;
+    }
+
     public synchronized String getRecordCounts(String manager) {
         logUtil.log(manager,"get record counts ");
         String recordCount = null;
@@ -160,8 +178,7 @@ public class CenterServerImpl implements ICenterServer {
         return recordCount;
     }
 
-    @Override
-    public String editRecord(String manager, String id, String key, String val) throws RemoteException {
+    public String editRecord(String manager, String id, String key, String val)  {
         String type = id.substring(0, 2);
 
         if (type.equalsIgnoreCase("TR")) {
@@ -175,7 +192,12 @@ public class CenterServerImpl implements ICenterServer {
         return "Operation invalid";
     }
 
-   private synchronized String editSRRecord(String manager,String recordID, String key, String val) {
+    public String transferRecord(String id, String recordId, String remoteCenterServerName) {
+        return "";
+        //return false;
+    }
+
+    private synchronized String editSRRecord(String manager,String recordID, String key, String val) {
 
         for (Map.Entry<String, List<Records>> value : recordsMap.entrySet()) {
             List<Records> mylist = value.getValue();
@@ -195,7 +217,7 @@ public class CenterServerImpl implements ICenterServer {
         return "Record : " + recordID+ " is not found";
     }
 
-   private String editTRRecord(String manager,String recordID, String key, String val) {
+    private String editTRRecord(String manager,String recordID, String key, String val) {
        for (Map.Entry<String, List<Records>> value : recordsMap.entrySet()) {
            List<Records> mylist = value.getValue();
            Optional<Records> record = mylist.stream().filter(x -> x.getUniqueId().equals(recordID)).findFirst();
@@ -223,7 +245,7 @@ public class CenterServerImpl implements ICenterServer {
        return "Record : " + recordID+ " is not found";
    }
 
-    @Override
+    /* TODO
     public String editCourses(String manager, String id, String key, ArrayList<String> values) throws RemoteException {
         for (Map.Entry<String, List<Records>> value : recordsMap.entrySet()) {
 
@@ -235,7 +257,7 @@ public class CenterServerImpl implements ICenterServer {
             }
         }
         return null;
-    }
+    }*/
 
     private String udpClient(int port) {
         System.out.println("--> udpclient port: " + port);
@@ -271,5 +293,4 @@ public class CenterServerImpl implements ICenterServer {
     public String getServerName(){
         return serverName;
     }
-
 }
