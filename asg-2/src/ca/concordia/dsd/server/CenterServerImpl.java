@@ -13,6 +13,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class CenterServerImpl extends corbaPOA  {
     private LogUtil logUtil;
@@ -27,8 +28,11 @@ public class CenterServerImpl extends corbaPOA  {
     public HashMap<String, List<Records>> recordsMap;
     private static int studentCount = 10001;
     private static int teacherCount = 10001;
-    private String recordsCount;
+    private int recordsCount;
     private final String serverName;
+
+    private static final Object lockID = new Object();
+    private static final Object lockCount = new Object();
 
     public CenterServerImpl(String serverName, int port, int udpPort) {
         this.serverName = serverName;
@@ -193,8 +197,104 @@ public class CenterServerImpl extends corbaPOA  {
     }
 
     public String transferRecord(String id, String recordId, String remoteCenterServerName) {
-        return "";
-        //return false;
+        String serverTOConnect = "";
+        int serverTOConnectUDPPort = 0;
+        if(serverName.equalsIgnoreCase(Constants.DDO_TAG)){
+            serverTOConnect = Constants.DDO_SERVER_HOST;
+            serverTOConnectUDPPort = Constants.DDO_UDP_PORT;
+        }else if (serverName.equalsIgnoreCase(Constants.MTL_TAG)){
+            serverTOConnect = Constants.MTL_SERVER_HOST;
+            serverTOConnectUDPPort = Constants.MTL_UDP_PORT;
+        }else if (serverName.equalsIgnoreCase(Constants.LVL_TAG)){
+            serverTOConnect = Constants.LVL_SERVER_HOST;
+            serverTOConnectUDPPort = Constants.LVL_UDP_PORT;
+        }else{
+            logUtil.log(id,"Invalid server name ");
+            return "fail";
+        }
+        String result = "";
+        if(remoteCenterServerName.compareTo(serverName)!= 0){
+
+            synchronized ((recordsMap)){
+                for(List<Records> recordList : recordsMap.values()){
+                    Iterator<Records> iter = recordList.iterator();
+                    while(iter.hasNext()){
+                        Records found = iter.next();
+                        if(found.getUniqueId().compareTo(recordId) == 0){
+                            // not found so copy this record to another server
+                            // Using UDP to copy the record
+                            DatagramSocket socket = null;
+                            try{
+                                socket = new DatagramSocket();
+                                String req = "";
+                                InetAddress addr = InetAddress.getByName(serverTOConnect);
+                                if(found.getType() == Records.RecordType.TEACHER){
+                                    TeacherRecord tr = (TeacherRecord) found;
+                                    StringBuilder br = new StringBuilder();
+                                    br.append("TR");br.append("|");
+                                    br.append(id);br.append("|");
+                                    br.append(recordId);br.append("|");
+                                    br.append(tr.getFirstName());br.append("|");
+                                    br.append(tr.getLastName());br.append("|");
+                                    br.append(tr.getAddress());br.append("|");
+                                    br.append(tr.getPhone());br.append("|");
+                                    br.append(tr.getSpecialization());br.append("|");
+                                    br.append(tr.getLocation());br.append("|");
+                                    req = br.toString();
+
+                                }else{
+                                    StudentRecord sr = (StudentRecord) found;
+                                    StringBuilder br = new StringBuilder();
+                                    br.append("SR");br.append("|");
+                                    br.append(id);br.append("|");
+                                    br.append(recordId);br.append("|");
+                                    br.append(sr.getFirstName());br.append("|");
+                                    br.append(sr.getLastName());br.append("|");
+                                    String coursesStr = sr.getCoursesRegistered().stream()
+                                            .map(n -> String.valueOf(n))
+                                            .collect(Collectors.joining("-", "{", "}"));
+                                    br.append(coursesStr);br.append("|");
+                                    br.append(sr.getStatus());br.append("|");
+                                    br.append(sr.getStatusDate());br.append("|");
+
+                                }
+                                byte[] request = req.getBytes();
+                                DatagramPacket pckt = new DatagramPacket(request,req.length(),addr,serverTOConnectUDPPort);
+                                socket.send(pckt);
+
+                                byte[] response = new byte[1024];
+                                DatagramPacket receivedpckt = new DatagramPacket(response, response.length);
+                                socket.receive(receivedpckt);
+                                result = new String(receivedpckt.getData()).trim();
+
+                            }catch(Exception e){
+                                logUtil.log(e.getMessage());
+                            }finally {
+                                if(socket != null){
+                                    socket.close();
+                                }
+                            }
+
+                            // when data is copied through UDP, delete the record
+                            if(result.compareTo(recordId) == 0){
+                                synchronized (lockCount){
+                                    recordList.remove(found);
+                                    recordsCount--;
+                                    logUtil.log(id, recordId + " transferred to " + remoteCenterServerName);
+                                }
+                                return "success";
+                            }else{
+                                logUtil.log(id, recordId + " failed to transfer to "+ remoteCenterServerName);
+                                return "fail";
+                            }
+
+                        }
+
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     private synchronized String editSRRecord(String manager,String recordID, String key, String val) {

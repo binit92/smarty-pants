@@ -73,8 +73,8 @@ public class ManagerClient implements Constants {
     // java HelloClient -ORBInitialPort 1050 -ORBInitialHost localhost
     private boolean createCorbaConnection(String tag, String name, int port) {
         try {
-            System.out.println("-->createcorba connection tag: " + tag + " name: " + name + " port: " + port);
-
+            logUtil.log("createcorba connection tag: " + tag + " name: " + name + " port: " + port);
+            // Setting the host and port programmtically here
             String args[] = new String[4];
             args[0] = "-ORBInitialPort";
             args[1] = Integer.toString(port);

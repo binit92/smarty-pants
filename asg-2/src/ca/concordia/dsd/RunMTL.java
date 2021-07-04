@@ -15,7 +15,7 @@ public class RunMTL {
 
     public static void main(String[] args) {
         try {
-
+            // Setting the port and host programmatically here ..
             String localargs[] = new String[4];
             localargs[0] = "-ORBInitialPort";
             localargs[1] = Integer.toString(Constants.LVL_SERVER_PORT);
