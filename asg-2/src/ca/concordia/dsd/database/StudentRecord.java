@@ -13,7 +13,7 @@ public class StudentRecord extends Records {
     private String statusDate;
 
     public StudentRecord(String id, String fn, String ln, ArrayList<String> c, String s, String sd) {
-        super(id, ln);
+        super(id, ln,RecordType.STUDENT);
         this.studentID = id;
         this.firstName = fn;
         this.lastName = ln;

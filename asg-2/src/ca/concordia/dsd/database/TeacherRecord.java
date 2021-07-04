@@ -11,7 +11,7 @@ public class TeacherRecord extends Records {
     String location;
 
     public TeacherRecord(String id, String fn, String ln, String a, String p, String s, String l) {
-        super(id, ln);
+        super(id, ln,RecordType.TEACHER);
         this.teacherId = id;
         this.firstName = fn;
         this.lastName = ln;

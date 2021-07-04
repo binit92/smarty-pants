@@ -49,6 +49,7 @@ public class RunDDO {
             //dcmsServer.startUDPServer();
             System.out.println("Server " + Constants.DDO_TAG + " is running ...");
             orb.run();
+            servant.startUDPServer();
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -51,6 +51,7 @@ public class RunLVL {
             //dcmsServer.startUDPServer();
             System.out.println("Server " + Constants.LVL_TAG + " is running ...");
             orb.run();
+            servant.startUDPServer();
 
         } catch (Exception e) {
             e.printStackTrace();

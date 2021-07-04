@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -345,8 +346,8 @@ public class CenterServerImpl extends corbaPOA  {
        return "Record : " + recordID+ " is not found";
    }
 
-    /* TODO
-    public String editCourses(String manager, String id, String key, ArrayList<String> values) throws RemoteException {
+
+    public String editCourses(String manager, String id, String key, ArrayList<String> values) {
         for (Map.Entry<String, List<Records>> value : recordsMap.entrySet()) {
 
             List<Records> list = value.getValue();
@@ -357,7 +358,95 @@ public class CenterServerImpl extends corbaPOA  {
             }
         }
         return null;
-    }*/
+    }
+
+    public void startUDPServer(){
+        DatagramSocket socket = null;
+        try{
+            socket = new DatagramSocket(this.udpPort);
+            while(true){
+                //Get the request
+                byte[] buffer =new byte[1024];
+                DatagramPacket request = new DatagramPacket(buffer, buffer.length);
+                socket.receive(request);
+
+                // Each request will be handled by a separate thread making sure no request will miss..
+                DatagramSocket threadSocket = socket;
+                new Thread(() -> {
+                    String reply = "-1";
+                    String reqStr = new String(request.getData()).trim();
+                    String[] reqArr= reqStr.split("|");
+                    switch(reqArr[0]){
+                        case "TR":
+                            reply = transferTR(reqArr[1],reqArr[2],reqArr[3],reqArr[4],reqArr[5],reqArr[6],reqArr[7],reqArr[8]);
+                            break;
+                        case "SR":
+                            reply = transferSR(reqArr[1],reqArr[2],reqArr[3],reqArr[4],reqArr[5],reqArr[6],reqArr[7]);
+                    }
+                    // reply back
+                    DatagramPacket response = new DatagramPacket(reply.getBytes(),reply.length(),request.getAddress(),request.getPort());
+                    try{
+                        threadSocket.send(response);
+                    }catch (IOException io){
+                        logUtil.log(io.getMessage());
+                    }
+                }).start();
+            }
+        }catch(Exception e){
+            logUtil.log(e.getMessage());
+        }finally{
+            if(socket != null){
+                socket.close();
+            }
+        }
+    }
+
+    private String transferTR(String id, String recordID, String fName, String lName, String addr, String phone, String spec, String loc){
+        //Creating new teacher record
+        TeacherRecord newTR = new TeacherRecord(recordID, fName,lName,addr, phone,spec, loc);
+        //using synchronized here so that mututal exclusion can happend with multiple threads calling concurrently ..
+        synchronized (recordsMap){
+            List<Records> recordsList;
+            String key = lName.substring(0, 1);
+            if(recordsMap.containsKey(lName)){
+                recordsList = recordsMap.get(key);
+            }else{
+                recordsList = new ArrayList<>();
+                recordsMap.put(key,recordsList);
+            }
+            // Adding new record here
+            recordsList.add(newTR);
+            recordsCount++;
+            logUtil.log(id, "record tranferred, record ID : " + recordID + " teacher name : " + fName );
+        }
+        return recordID;
+    }
+
+    private String transferSR(String id, String recordId, String fName,String lName, String courses, String status, String date){
+        ArrayList<String> coursesRegistered = new ArrayList<>();
+        try {
+            coursesRegistered = (ArrayList<String>) Arrays.asList(courses.split(","));
+        }catch (Exception e){
+            logUtil.log(e.getMessage());
+        }
+        StudentRecord newSR = new StudentRecord(recordId,fName,lName,coursesRegistered,status,date);
+        //using synchronized here so that mututal exclusion can happend with multiple threads calling concurrently ..
+        synchronized (recordsMap){
+            List<Records> recordsList;
+            String key = lName.substring(0,1);
+            if(recordsMap.containsKey(lName)){
+                recordsList = recordsMap.get(key);
+            }else{
+                recordsList = new ArrayList<>();
+                recordsMap.put(key,recordsList);
+            }
+            // Adding new record here
+            recordsList.add(newSR);
+            recordsCount++;
+            logUtil.log(id,"record trasferred, record ID: " + recordId + " student name: " + fName);
+        }
+        return recordId;
+    }
 
     private String udpClient(int port) {
         System.out.println("--> udpclient port: " + port);

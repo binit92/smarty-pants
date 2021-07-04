@@ -110,7 +110,8 @@ public class ManagerClient implements Constants {
             System.out.println("2. Create Student record ");
             System.out.println("3. Get record count ");
             System.out.println("4. Edit record ");
-            System.out.println("5. Quit operations");
+            System.out.println("5. Transfer record to server ");
+            System.out.println("6. Quit operations");
             Scanner keyboard = new Scanner(System.in);
             int input = Integer.parseInt(keyboard.nextLine());
             switch (input) {
@@ -239,6 +240,18 @@ public class ManagerClient implements Constants {
                     }
                     break;
                 case 5:
+                    System.out.println("Enter the record ID : ");
+                    String rID = keyboard.nextLine();
+                    System.out.println("Enter the server name : ");
+                    String rServerName = keyboard.nextLine();
+                    String isSuccess = server.transferRecord(managerId,rID,rServerName);
+                    if("success".equalsIgnoreCase(isSuccess)){
+                        logUtil.log(rID  + " transferred to " + rServerName);
+                    }else{
+                        logUtil.log(rID + " failed to tranfer to " + rServerName);
+                    }
+                    break;
+                case 6:
                     i = 0;
                     break;
                 default:
