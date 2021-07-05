@@ -174,10 +174,14 @@ public class CenterServerImpl extends corbaPOA  {
         for (UDPProviderThread request : req) {
             try {
                 request.join();
+                recordCount += " , " + request.getRemoteRecordCount().trim();
+
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                //e.printStackTrace();
+                logUtil.log(e.getMessage());
+            }catch (NullPointerException npe){
+                logUtil.log("Not all servers are reachable");
             }
-            recordCount += " , " + request.getRemoteRecordCount().trim();
         }
         logUtil.log(manager,"record count " + recordCount);
         return recordCount;

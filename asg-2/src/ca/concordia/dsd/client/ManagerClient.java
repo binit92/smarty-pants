@@ -184,7 +184,7 @@ public class ManagerClient implements Constants {
                         //TODO: add manager id here .. review and fix
                         //String numberOfRecords = server.getRecordCounts(managerId);
                         String numberOfRecords = server.getRecordCounts(managerId);
-                       // logUtil.log("total number of record : " + numberOfRecords);
+                        logUtil.log("total number of record : " + numberOfRecords);
                     } catch (Exception re) {
                         logUtil.log(re.getMessage());
                     }
