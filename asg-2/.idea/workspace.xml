@@ -2,30 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="61bba50f-58d5-4520-a88d-b89c19cd7ec8" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/logs/DDO/DDO.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/logs/DDO/DDO.log.1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/logs/DDO/DDO.log.1.lck" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/logs/DDO/DDO.log.lck" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/logs/DDO1111/DDO1111.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/logs/DDO1111/DDO1111.log.lck" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/asg-2/ca/concordia/dsd/corba.idl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/orb.db/NC0" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/orb.db/counter" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/orb.db/servers.db" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/class diagram.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../asg-1/src/ca/concordia/dsd/server/CenterServerImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../asg-1/src/ca/concordia/dsd/server/CenterServerImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ca/concordia/dsd/RunDDO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/RunDDO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ca/concordia/dsd/RunLVL.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/RunLVL.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ca/concordia/dsd/RunMTL.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/RunMTL.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ca/concordia/dsd/arch/_corbaStub.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/arch/_corbaStub.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ca/concordia/dsd/arch/corba.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/arch/corba.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ca/concordia/dsd/arch/corbaHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/arch/corbaHelper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ca/concordia/dsd/arch/corbaHolder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/arch/corbaHolder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ca/concordia/dsd/arch/corbaOperations.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/arch/corbaOperations.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ca/concordia/dsd/arch/corbaPOA.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/arch/corbaPOA.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ca/concordia/dsd/client/ManagerClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/client/ManagerClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ca/concordia/dsd/corba.idl" beforeDir="false" afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/corba.idl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ca/concordia/dsd/server/CenterServerImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/server/CenterServerImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ca/concordia/dsd/server/ICenterServer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DesignDocument.docx" beforeDir="false" afterPath="$PROJECT_DIR$/DesignDocument.docx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -68,7 +48,7 @@
       <recent name="D:\smarty-pants\asg-2\src" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.RunDDO">
+  <component name="RunManager" selected="Application.RunClient">
     <configuration name="RunClient" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="ca.concordia.dsd.RunClient" />
       <module name="asg-2" />
@@ -123,5 +103,6 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
 </project>
