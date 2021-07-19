@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?><definitions xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:wsp1_2="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://Servers/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://Servers/" name="CenterServerService">
+<types>
+<xsd:schema>
+<xsd:import namespace="http://Servers/" schemaLocation="http://localhost:7718/lvl?xsd=1"></xsd:import>
+</xsd:schema>
+</types>
+<message name="setRecordID">
+<part name="parameters" element="tns:setRecordID"></part>
+</message>
+<message name="setRecordIDResponse">
+<part name="parameters" element="tns:setRecordIDResponse"></part>
+</message>
+<message name="setServerID">
+<part name="parameters" element="tns:setServerID"></part>
+</message>
+<message name="setServerIDResponse">
+<part name="parameters" element="tns:setServerIDResponse"></part>
+</message>
+<message name="setRmiPort">
+<part name="parameters" element="tns:setRmiPort"></part>
+</message>
+<message name="setRmiPortResponse">
+<part name="parameters" element="tns:setRmiPortResponse"></part>
+</message>
+<message name="setUdpPort">
+<part name="parameters" element="tns:setUdpPort"></part>
+</message>
+<message name="setUdpPortResponse">
+<part name="parameters" element="tns:setUdpPortResponse"></part>
+</message>
+<message name="getRecordID">
+<part name="parameters" element="tns:getRecordID"></part>
+</message>
+<message name="getRecordIDResponse">
+<part name="parameters" element="tns:getRecordIDResponse"></part>
+</message>
+<message name="getServerID">
+<part name="parameters" element="tns:getServerID"></part>
+</message>
+<message name="getServerIDResponse">
+<part name="parameters" element="tns:getServerIDResponse"></part>
+</message>
+<message name="getRmiPort">
+<part name="parameters" element="tns:getRmiPort"></part>
+</message>
+<message name="getRmiPortResponse">
+<part name="parameters" element="tns:getRmiPortResponse"></part>
+</message>
+<message name="getUdpPort">
+<part name="parameters" element="tns:getUdpPort"></part>
+</message>
+<message name="getUdpPortResponse">
+<part name="parameters" element="tns:getUdpPortResponse"></part>
+</message>
+<message name="createTRecord">
+<part name="parameters" element="tns:createTRecord"></part>
+</message>
+<message name="createTRecordResponse">
+<part name="parameters" element="tns:createTRecordResponse"></part>
+</message>
+<message name="createSRecord">
+<part name="parameters" element="tns:createSRecord"></part>
+</message>
+<message name="createSRecordResponse">
+<part name="parameters" element="tns:createSRecordResponse"></part>
+</message>
+<message name="getRecordCounts">
+<part name="parameters" element="tns:getRecordCounts"></part>
+</message>
+<message name="getRecordCountsResponse">
+<part name="parameters" element="tns:getRecordCountsResponse"></part>
+</message>
+<message name="editRecord">
+<part name="parameters" element="tns:editRecord"></part>
+</message>
+<message name="editRecordResponse">
+<part name="parameters" element="tns:editRecordResponse"></part>
+</message>
+<message name="transferRecord">
+<part name="parameters" element="tns:transferRecord"></part>
+</message>
+<message name="transferRecordResponse">
+<part name="parameters" element="tns:transferRecordResponse"></part>
+</message>
+<message name="getRecordType">
+<part name="parameters" element="tns:getRecordType"></part>
+</message>
+<message name="getRecordTypeResponse">
+<part name="parameters" element="tns:getRecordTypeResponse"></part>
+</message>
+<message name="printAllRecords">
+<part name="parameters" element="tns:printAllRecords"></part>
+</message>
+<message name="printAllRecordsResponse">
+<part name="parameters" element="tns:printAllRecordsResponse"></part>
+</message>
+<message name="printRecords">
+<part name="parameters" element="tns:printRecords"></part>
+</message>
+<message name="printRecordsResponse">
+<part name="parameters" element="tns:printRecordsResponse"></part>
+</message>
+<portType name="CenterServer">
+<operation name="setRecordID">
+<input wsam:Action="http://Servers/CenterServer/setRecordIDRequest" message="tns:setRecordID"></input>
+<output wsam:Action="http://Servers/CenterServer/setRecordIDResponse" message="tns:setRecordIDResponse"></output>
+</operation>
+<operation name="setServerID">
+<input wsam:Action="http://Servers/CenterServer/setServerIDRequest" message="tns:setServerID"></input>
+<output wsam:Action="http://Servers/CenterServer/setServerIDResponse" message="tns:setServerIDResponse"></output>
+</operation>
+<operation name="setRmiPort">
+<input wsam:Action="http://Servers/CenterServer/setRmiPortRequest" message="tns:setRmiPort"></input>
+<output wsam:Action="http://Servers/CenterServer/setRmiPortResponse" message="tns:setRmiPortResponse"></output>
+</operation>
+<operation name="setUdpPort">
+<input wsam:Action="http://Servers/CenterServer/setUdpPortRequest" message="tns:setUdpPort"></input>
+<output wsam:Action="http://Servers/CenterServer/setUdpPortResponse" message="tns:setUdpPortResponse"></output>
+</operation>
+<operation name="getRecordID">
+<input wsam:Action="http://Servers/CenterServer/getRecordIDRequest" message="tns:getRecordID"></input>
+<output wsam:Action="http://Servers/CenterServer/getRecordIDResponse" message="tns:getRecordIDResponse"></output>
+</operation>
+<operation name="getServerID">
+<input wsam:Action="http://Servers/CenterServer/getServerIDRequest" message="tns:getServerID"></input>
+<output wsam:Action="http://Servers/CenterServer/getServerIDResponse" message="tns:getServerIDResponse"></output>
+</operation>
+<operation name="getRmiPort">
+<input wsam:Action="http://Servers/CenterServer/getRmiPortRequest" message="tns:getRmiPort"></input>
+<output wsam:Action="http://Servers/CenterServer/getRmiPortResponse" message="tns:getRmiPortResponse"></output>
+</operation>
+<operation name="getUdpPort">
+<input wsam:Action="http://Servers/CenterServer/getUdpPortRequest" message="tns:getUdpPort"></input>
+<output wsam:Action="http://Servers/CenterServer/getUdpPortResponse" message="tns:getUdpPortResponse"></output>
+</operation>
+<operation name="createTRecord">
+<input wsam:Action="http://Servers/CenterServer/createTRecordRequest" message="tns:createTRecord"></input>
+<output wsam:Action="http://Servers/CenterServer/createTRecordResponse" message="tns:createTRecordResponse"></output>
+</operation>
+<operation name="createSRecord">
+<input wsam:Action="http://Servers/CenterServer/createSRecordRequest" message="tns:createSRecord"></input>
+<output wsam:Action="http://Servers/CenterServer/createSRecordResponse" message="tns:createSRecordResponse"></output>
+</operation>
+<operation name="getRecordCounts">
+<input wsam:Action="http://Servers/CenterServer/getRecordCountsRequest" message="tns:getRecordCounts"></input>
+<output wsam:Action="http://Servers/CenterServer/getRecordCountsResponse" message="tns:getRecordCountsResponse"></output>
+</operation>
+<operation name="editRecord">
+<input wsam:Action="http://Servers/CenterServer/editRecordRequest" message="tns:editRecord"></input>
+<output wsam:Action="http://Servers/CenterServer/editRecordResponse" message="tns:editRecordResponse"></output>
+</operation>
+<operation name="transferRecord">
+<input wsam:Action="http://Servers/CenterServer/transferRecordRequest" message="tns:transferRecord"></input>
+<output wsam:Action="http://Servers/CenterServer/transferRecordResponse" message="tns:transferRecordResponse"></output>
+</operation>
+<operation name="getRecordType">
+<input wsam:Action="http://Servers/CenterServer/getRecordTypeRequest" message="tns:getRecordType"></input>
+<output wsam:Action="http://Servers/CenterServer/getRecordTypeResponse" message="tns:getRecordTypeResponse"></output>
+</operation>
+<operation name="printAllRecords">
+<input wsam:Action="http://Servers/CenterServer/printAllRecordsRequest" message="tns:printAllRecords"></input>
+<output wsam:Action="http://Servers/CenterServer/printAllRecordsResponse" message="tns:printAllRecordsResponse"></output>
+</operation>
+<operation name="printRecords">
+<input wsam:Action="http://Servers/CenterServer/printRecordsRequest" message="tns:printRecords"></input>
+<output wsam:Action="http://Servers/CenterServer/printRecordsResponse" message="tns:printRecordsResponse"></output>
+</operation>
+</portType>
+<binding name="CenterServerPortBinding" type="tns:CenterServer">
+<soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"></soap:binding>
+<operation name="setRecordID">
+<soap:operation soapAction=""></soap:operation>
+<input>
+<soap:body use="literal"></soap:body>
+</input>
+<output>
+<soap:body use="literal"></soap:body>
+</output>
+</operation>
+<operation name="setServerID">
+<soap:operation soapAction=""></soap:operation>
+<input>
+<soap:body use="literal"></soap:body>
+</input>
+<output>
+<soap:body use="literal"></soap:body>
+</output>
+</operation>
+<operation name="setRmiPort">
+<soap:operation soapAction=""></soap:operation>
+<input>
+<soap:body use="literal"></soap:body>
+</input>
+<output>
+<soap:body use="literal"></soap:body>
+</output>
+</operation>
+<operation name="setUdpPort">
+<soap:operation soapAction=""></soap:operation>
+<input>
+<soap:body use="literal"></soap:body>
+</input>
+<output>
+<soap:body use="literal"></soap:body>
+</output>
+</operation>
+<operation name="getRecordID">
+<soap:operation soapAction=""></soap:operation>
+<input>
+<soap:body use="literal"></soap:body>
+</input>
+<output>
+<soap:body use="literal"></soap:body>
+</output>
+</operation>
+<operation name="getServerID">
+<soap:operation soapAction=""></soap:operation>
+<input>
+<soap:body use="literal"></soap:body>
+</input>
+<output>
+<soap:body use="literal"></soap:body>
+</output>
+</operation>
+<operation name="getRmiPort">
+<soap:operation soapAction=""></soap:operation>
+<input>
+<soap:body use="literal"></soap:body>
+</input>
+<output>
+<soap:body use="literal"></soap:body>
+</output>
+</operation>
+<operation name="getUdpPort">
+<soap:operation soapAction=""></soap:operation>
+<input>
+<soap:body use="literal"></soap:body>
+</input>
+<output>
+<soap:body use="literal"></soap:body>
+</output>
+</operation>
+<operation name="createTRecord">
+<soap:operation soapAction=""></soap:operation>
+<input>
+<soap:body use="literal"></soap:body>
+</input>
+<output>
+<soap:body use="literal"></soap:body>
+</output>
+</operation>
+<operation name="createSRecord">
+<soap:operation soapAction=""></soap:operation>
+<input>
+<soap:body use="literal"></soap:body>
+</input>
+<output>
+<soap:body use="literal"></soap:body>
+</output>
+</operation>
+<operation name="getRecordCounts">
+<soap:operation soapAction=""></soap:operation>
+<input>
+<soap:body use="literal"></soap:body>
+</input>
+<output>
+<soap:body use="literal"></soap:body>
+</output>
+</operation>
+<operation name="editRecord">
+<soap:operation soapAction=""></soap:operation>
+<input>
+<soap:body use="literal"></soap:body>
+</input>
+<output>
+<soap:body use="literal"></soap:body>
+</output>
+</operation>
+<operation name="transferRecord">
+<soap:operation soapAction=""></soap:operation>
+<input>
+<soap:body use="literal"></soap:body>
+</input>
+<output>
+<soap:body use="literal"></soap:body>
+</output>
+</operation>
+<operation name="getRecordType">
+<soap:operation soapAction=""></soap:operation>
+<input>
+<soap:body use="literal"></soap:body>
+</input>
+<output>
+<soap:body use="literal"></soap:body>
+</output>
+</operation>
+<operation name="printAllRecords">
+<soap:operation soapAction=""></soap:operation>
+<input>
+<soap:body use="literal"></soap:body>
+</input>
+<output>
+<soap:body use="literal"></soap:body>
+</output>
+</operation>
+<operation name="printRecords">
+<soap:operation soapAction=""></soap:operation>
+<input>
+<soap:body use="literal"></soap:body>
+</input>
+<output>
+<soap:body use="literal"></soap:body>
+</output>
+</operation>
+</binding>
+<service name="CenterServerService">
+<port name="CenterServerPort" binding="tns:CenterServerPortBinding">
+<soap:address location="http://localhost:7718/lvl"></soap:address>
+</port>
+</service>
+</definitions>
