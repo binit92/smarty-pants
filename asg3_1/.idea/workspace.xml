@@ -5,15 +5,22 @@
       <change beforePath="$PROJECT_DIR$/../asg-1/src/ca/concordia/dsd/server/CenterServerImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../asg-1/src/ca/concordia/dsd/server/CenterServerImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../asg-2/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../asg-2/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../asg-2/src/ca/concordia/dsd/corba.idl" beforeDir="false" afterPath="$PROJECT_DIR$/../asg-2/src/ca/concordia/dsd/corba.idl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../asg-3/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../asg-3/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../asg-3/logs/DDO/DDO.log" beforeDir="false" afterPath="$PROJECT_DIR$/../asg-3/logs/DDO/DDO.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../asg-3/logs/DDO/DDO.log.1" beforeDir="false" afterPath="$PROJECT_DIR$/../asg-3/logs/DDO/DDO.log.1" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../asg-3/logs/LVL/LVL.log" beforeDir="false" afterPath="$PROJECT_DIR$/../asg-3/logs/LVL/LVL.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../asg-3/logs/LVL/LVL.log.1" beforeDir="false" afterPath="$PROJECT_DIR$/../asg-3/logs/LVL/LVL.log.1" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../asg-3/logs/MTL/MTL.log" beforeDir="false" afterPath="$PROJECT_DIR$/../asg-3/logs/MTL/MTL.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../asg-3/logs/MTL/MTL.log.1" beforeDir="false" afterPath="$PROJECT_DIR$/../asg-3/logs/MTL/MTL.log.1" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../asg-3/out/production/asg-3/ca/concordia/dsd/server/CenterServerPublisher.class" beforeDir="false" afterPath="$PROJECT_DIR$/../asg-3/out/production/asg-3/ca/concordia/dsd/server/CenterServerPublisher.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../asg-3/src/ca/concordia/dsd/server/CenterServerPublisher.java" beforeDir="false" afterPath="$PROJECT_DIR$/../asg-3/src/ca/concordia/dsd/server/CenterServerPublisher.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/logs/DDO/DDO.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/DDO/DDO.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/DDO/DDO.log.1" beforeDir="false" afterPath="$PROJECT_DIR$/logs/DDO/DDO.log.1" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/LVL/LVL.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/LVL/LVL.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/LVL/LVL.log.1" beforeDir="false" afterPath="$PROJECT_DIR$/logs/LVL/LVL.log.1" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/MTL/MTL.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/MTL/MTL.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/MTL/MTL.log.1" beforeDir="false" afterPath="$PROJECT_DIR$/logs/MTL/MTL.log.1" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/asg-3/ca/concordia/dsd/server/CenterServerPublisher.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/asg-3/ca/concordia/dsd/server/CenterServerPublisher.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ca/concordia/dsd/server/CenterServerPublisher.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ca/concordia/dsd/server/CenterServerPublisher.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/logs/DDO1111/DDO1111.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/DDO1111/DDO1111.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/logs/DDO1111/DDO1111.log.lck" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/logs/MTL0001/MTL0001.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/MTL0001/MTL0001.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/logs/MTL0001/MTL0001.log.lck" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/logs/MTL1111/MTL1111.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/MTL1111/MTL1111.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/logs/MTL1111/MTL1111.log.lck" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,6 +38,7 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
   </component>
   <component name="RunManager">
     <configuration name="CenterServerPublisher" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
