@@ -1,0 +1,70 @@
+[2021-07-03 00:34:11] [INFO   ] Using managerId : DDO1111 
+[2021-07-03 00:35:00] [INFO   ] Using managerId : DDO1111 
+[2021-07-03 00:35:23] [INFO   ] TeacherRecord{teacherId='unknown', firstName='asd', lastName='asd', address='d', phone='asdfads', specialization='asdf', location='DDO'} 
+[2021-07-03 00:35:23] [INFO   ] teacher id : TR10002 is recorded. 
+[2021-07-04 19:58:04] [INFO   ] createcorba connection tag: DDO name: localhost port: 7719 
+[2021-07-04 19:58:05] [INFO   ] Using managerId : DDO1111 
+[2021-07-04 19:58:10] [INFO   ] Getting record counts from server 
+[2021-07-04 19:58:15] [INFO   ] ----------BEGIN server-side stack trace----------
+org.omg.CORBA.UNKNOWN:   vmcid: SUN  minor code: 202 completed: Maybe
+	at com.sun.corba.se.impl.logging.ORBUtilSystemException.runtimeexception(ORBUtilSystemException.java:8869)
+	at com.sun.corba.se.impl.protocol.CorbaMessageMediatorImpl.convertThrowableToSystemException(CorbaMessageMediatorImpl.java:1936)
+	at com.sun.corba.se.impl.protocol.CorbaMessageMediatorImpl.handleThrowableDuringServerDispatch(CorbaMessageMediatorImpl.java:1887)
+	at com.sun.corba.se.impl.protocol.CorbaMessageMediatorImpl.handleThrowableDuringServerDispatch(CorbaMessageMediatorImpl.java:1839)
+	at com.sun.corba.se.impl.protocol.CorbaServerRequestDispatcherImpl.dispatch(CorbaServerRequestDispatcherImpl.java:275)
+	at com.sun.corba.se.impl.protocol.CorbaMessageMediatorImpl.handleRequestRequest(CorbaMessageMediatorImpl.java:1700)
+	at com.sun.corba.se.impl.protocol.CorbaMessageMediatorImpl.handleRequest(CorbaMessageMediatorImpl.java:1558)
+	at com.sun.corba.se.impl.protocol.CorbaMessageMediatorImpl.handleInput(CorbaMessageMediatorImpl.java:940)
+	at com.sun.corba.se.impl.protocol.giopmsgheaders.RequestMessage_1_2.callback(RequestMessage_1_2.java:198)
+	at com.sun.corba.se.impl.protocol.CorbaMessageMediatorImpl.handleRequest(CorbaMessageMediatorImpl.java:712)
+	at com.sun.corba.se.impl.transport.SocketOrChannelConnectionImpl.dispatch(SocketOrChannelConnectionImpl.java:474)
+	at com.sun.corba.se.impl.transport.SocketOrChannelConnectionImpl.doWork(SocketOrChannelConnectionImpl.java:1237)
+	at com.sun.corba.se.impl.orbutil.threadpool.ThreadPoolImpl$WorkerThread.performWork(ThreadPoolImpl.java:490)
+	at com.sun.corba.se.impl.orbutil.threadpool.ThreadPoolImpl$WorkerThread.run(ThreadPoolImpl.java:519)
+Caused by: java.lang.NullPointerException
+	at ca.concordia.dsd.server.CenterServerImpl.getRecordCounts(CenterServerImpl.java:180)
+	at ca.concordia.dsd.arch.corbaPOA._invoke(corbaPOA.java:73)
+	at com.sun.corba.se.impl.protocol.CorbaServerRequestDispatcherImpl.dispatchToServant(CorbaServerRequestDispatcherImpl.java:654)
+	at com.sun.corba.se.impl.protocol.CorbaServerRequestDispatcherImpl.dispatch(CorbaServerRequestDispatcherImpl.java:205)
+	... 9 more
+
+----------END server-side stack trace---------- 
+[2021-07-04 19:58:15] [INFO   ] record count returned 
+[2021-07-04 20:01:21] [INFO   ] createcorba connection tag: DDO name: localhost port: 7719 
+[2021-07-04 20:01:22] [INFO   ] Using managerId : DDO1111 
+[2021-07-04 20:01:24] [INFO   ] Getting record counts from server 
+[2021-07-04 20:01:29] [INFO   ] ----------BEGIN server-side stack trace----------
+org.omg.CORBA.UNKNOWN:   vmcid: SUN  minor code: 202 completed: Maybe
+	at com.sun.corba.se.impl.logging.ORBUtilSystemException.runtimeexception(ORBUtilSystemException.java:8869)
+	at com.sun.corba.se.impl.protocol.CorbaMessageMediatorImpl.convertThrowableToSystemException(CorbaMessageMediatorImpl.java:1936)
+	at com.sun.corba.se.impl.protocol.CorbaMessageMediatorImpl.handleThrowableDuringServerDispatch(CorbaMessageMediatorImpl.java:1887)
+	at com.sun.corba.se.impl.protocol.CorbaMessageMediatorImpl.handleThrowableDuringServerDispatch(CorbaMessageMediatorImpl.java:1839)
+	at com.sun.corba.se.impl.protocol.CorbaServerRequestDispatcherImpl.dispatch(CorbaServerRequestDispatcherImpl.java:275)
+	at com.sun.corba.se.impl.protocol.CorbaMessageMediatorImpl.handleRequestRequest(CorbaMessageMediatorImpl.java:1700)
+	at com.sun.corba.se.impl.protocol.CorbaMessageMediatorImpl.handleRequest(CorbaMessageMediatorImpl.java:1558)
+	at com.sun.corba.se.impl.protocol.CorbaMessageMediatorImpl.handleInput(CorbaMessageMediatorImpl.java:940)
+	at com.sun.corba.se.impl.protocol.giopmsgheaders.RequestMessage_1_2.callback(RequestMessage_1_2.java:198)
+	at com.sun.corba.se.impl.protocol.CorbaMessageMediatorImpl.handleRequest(CorbaMessageMediatorImpl.java:712)
+	at com.sun.corba.se.impl.transport.SocketOrChannelConnectionImpl.dispatch(SocketOrChannelConnectionImpl.java:474)
+	at com.sun.corba.se.impl.transport.SocketOrChannelConnectionImpl.doWork(SocketOrChannelConnectionImpl.java:1237)
+	at com.sun.corba.se.impl.orbutil.threadpool.ThreadPoolImpl$WorkerThread.performWork(ThreadPoolImpl.java:490)
+	at com.sun.corba.se.impl.orbutil.threadpool.ThreadPoolImpl$WorkerThread.run(ThreadPoolImpl.java:519)
+Caused by: java.lang.NullPointerException
+	at ca.concordia.dsd.server.CenterServerImpl.getRecordCounts(CenterServerImpl.java:181)
+	at ca.concordia.dsd.arch.corbaPOA._invoke(corbaPOA.java:73)
+	at com.sun.corba.se.impl.protocol.CorbaServerRequestDispatcherImpl.dispatchToServant(CorbaServerRequestDispatcherImpl.java:654)
+	at com.sun.corba.se.impl.protocol.CorbaServerRequestDispatcherImpl.dispatch(CorbaServerRequestDispatcherImpl.java:205)
+	... 9 more
+
+----------END server-side stack trace---------- 
+[2021-07-04 20:01:29] [INFO   ] record count returned 
+[2021-07-04 20:03:48] [INFO   ] createcorba connection tag: DDO name: localhost port: 7719 
+[2021-07-04 20:03:48] [INFO   ] Using managerId : DDO1111 
+[2021-07-04 20:03:51] [INFO   ] Getting record counts from server 
+[2021-07-04 20:03:56] [INFO   ] record count returned 
+[2021-07-04 20:05:41] [INFO   ] createcorba connection tag: DDO name: localhost port: 7719 
+[2021-07-04 20:05:41] [INFO   ] Using managerId : DDO1111 
+[2021-07-04 20:05:46] [INFO   ] Getting record counts from server 
+[2021-07-04 20:05:51] [INFO   ] total number of record : DDO,0 
+[2021-07-04 20:05:51] [INFO   ] record count returned 
+[2021-07-04 20:10:19] [INFO   ] 00001 failed to tranfer to MTL 
