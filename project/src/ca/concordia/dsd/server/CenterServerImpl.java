@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -236,6 +235,8 @@ public class CenterServerImpl extends corbaPOA  {
                             DatagramSocket socket = null;
                             try{
                                 socket = new DatagramSocket();
+                                // timeout in 5 seconds
+                                socket.setSoTimeout(5 * 1000);
                                 String req = "";
                                 InetAddress addr = InetAddress.getByName(serverTOConnect);
                                 if(found.getType() == Records.RecordType.TEACHER){
