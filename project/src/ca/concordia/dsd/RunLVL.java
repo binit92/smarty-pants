@@ -11,7 +11,7 @@ import org.omg.CosNaming.NamingContextExtHelper;
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.POAHelper;
 
-public class RunLVLReplica2 {
+public class RunLVL {
 
 
     public static void main(String[] args) {
@@ -31,7 +31,7 @@ public class RunLVLReplica2 {
             rootPOA.the_POAManager().activate();
 
             // Create servant and register it with the ORB
-            CenterServerImpl servant = new CenterServerImpl(Constants.LVL_TAG,Constants.LVL_SERVER_PORT,Constants.LVL_UDP_PORT_REPLICA2);
+            CenterServerImpl servant = new CenterServerImpl(Constants.LVL_TAG,Constants.LVL_SERVER_PORT,Constants.LVL_UDP_PORT_LEADER);
             servant.setORB(orb);
 
             // Get object reference from the servant

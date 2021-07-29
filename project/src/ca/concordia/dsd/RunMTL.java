@@ -11,17 +11,16 @@ import org.omg.CosNaming.NamingContextExtHelper;
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.POAHelper;
 
-public class RunLVLLeader {
-
+public class RunMTL {
 
     public static void main(String[] args) {
         try {
-
+            // Setting the port and host programmatically here ..
             String localargs[] = new String[4];
             localargs[0] = "-ORBInitialPort";
-            localargs[1] = Integer.toString(Constants.LVL_SERVER_PORT);
+            localargs[1] = Integer.toString(Constants.MTL_SERVER_PORT);
             localargs[2] = "-ORBInitialHost ";
-            localargs[3] = Constants.LVL_SERVER_HOST;
+            localargs[3] = Constants.MTL_SERVER_HOST;
 
             // Initiate local ORB object
             ORB orb = ORB.init(localargs, null);
@@ -31,7 +30,7 @@ public class RunLVLLeader {
             rootPOA.the_POAManager().activate();
 
             // Create servant and register it with the ORB
-            CenterServerImpl servant = new CenterServerImpl(Constants.LVL_TAG,Constants.LVL_SERVER_PORT,Constants.LVL_UDP_PORT);
+            CenterServerImpl servant = new CenterServerImpl(Constants.MTL_TAG,Constants.MTL_SERVER_PORT,Constants.MTL_UDP_PORT_LEADER);
             servant.setORB(orb);
 
             // Get object reference from the servant
@@ -43,12 +42,12 @@ public class RunLVLLeader {
             NamingContextExt namingContextRef = NamingContextExtHelper.narrow(objRef);
 
             // Bind the object reference to the Naming Context
-            NameComponent path[] = namingContextRef.to_name(Constants.LVL_TAG);
+            NameComponent path[] = namingContextRef.to_name(Constants.MTL_TAG);
             namingContextRef.rebind(path, dcmsServer);
 
             // Run the server
             //dcmsServer.startUDPServer();
-            System.out.println("Server " + Constants.LVL_TAG + " is running ...");
+            System.out.println("Server " + Constants.MTL_TAG + " is running ...");
             orb.run();
             servant.startUDPServer();
 

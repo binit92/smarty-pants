@@ -159,13 +159,14 @@ public class CenterServerImpl extends corbaPOA  {
             } else {
                 try {
                     String ipAdd = Constants.MTL_SERVER_HOST;
-                    int udpPort = Constants.MTL_UDP_PORT;
+                    // todo : how to contact replica when the leader is down ?
+                    int udpPort = Constants.MTL_UDP_PORT_LEADER;
                     if(loc.equalsIgnoreCase(Constants.LVL_TAG)){
                         ipAdd = Constants.LVL_SERVER_HOST;
-                        udpPort = Constants.LVL_UDP_PORT;
+                        udpPort = Constants.LVL_UDP_PORT_LEADER;
                     }else if(loc.equalsIgnoreCase(Constants.DDO_TAG)){
                         ipAdd = Constants.DDO_SERVER_HOST;
-                        udpPort = Constants.DDO_UDP_PORT;
+                        udpPort = Constants.DDO_UDP_PORT_LEADER;
                     }
                     req[i] = new UDPProviderThread(loc, ipAdd,udpPort);
                 } catch (IOException e) {
@@ -210,13 +211,13 @@ public class CenterServerImpl extends corbaPOA  {
         int serverTOConnectUDPPort = 0;
         if(serverName.equalsIgnoreCase(Constants.DDO_TAG)){
             serverTOConnect = Constants.DDO_SERVER_HOST;
-            serverTOConnectUDPPort = Constants.DDO_UDP_PORT;
+            serverTOConnectUDPPort = Constants.DDO_UDP_PORT_LEADER;
         }else if (serverName.equalsIgnoreCase(Constants.MTL_TAG)){
             serverTOConnect = Constants.MTL_SERVER_HOST;
-            serverTOConnectUDPPort = Constants.MTL_UDP_PORT;
+            serverTOConnectUDPPort = Constants.MTL_UDP_PORT_LEADER;
         }else if (serverName.equalsIgnoreCase(Constants.LVL_TAG)){
             serverTOConnect = Constants.LVL_SERVER_HOST;
-            serverTOConnectUDPPort = Constants.LVL_UDP_PORT;
+            serverTOConnectUDPPort = Constants.LVL_UDP_PORT_LEADER;
         }else{
             logUtil.log(id,"Invalid server name ");
             return "fail";

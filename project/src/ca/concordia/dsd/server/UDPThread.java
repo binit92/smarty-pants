@@ -26,18 +26,18 @@ public class UDPThread extends Thread implements Constants {
         try {
             switch (name) {
                 case MTL_TAG:
-                    serverSocket = new DatagramSocket(MTL_UDP_PORT);
-                    udpPortNum = Constants.MTL_UDP_PORT;
+                    serverSocket = new DatagramSocket(MTL_UDP_PORT_LEADER);
+                    udpPortNum = Constants.MTL_UDP_PORT_LEADER;
                     logUtil.log("MTL UDP Server Started");
                     break;
                 case LVL_TAG:
-                    serverSocket = new DatagramSocket(LVL_UDP_PORT);
-                    udpPortNum = LVL_UDP_PORT;
+                    serverSocket = new DatagramSocket(LVL_UDP_PORT_LEADER);
+                    udpPortNum = LVL_UDP_PORT_LEADER;
                     logUtil.log("LVL UDP Server Started");
                     break;
                 case DDO_TAG:
-                    serverSocket = new DatagramSocket(DDO_UDP_PORT);
-                    udpPortNum = DDO_UDP_PORT;
+                    serverSocket = new DatagramSocket(DDO_UDP_PORT_LEADER);
+                    udpPortNum = DDO_UDP_PORT_LEADER;
                     logUtil.log("DDO UDP Server Started");
                     break;
             }

@@ -11,7 +11,7 @@ import org.omg.CosNaming.NamingContextExtHelper;
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.POAHelper;
 
-public class RunDDOReplica1 {
+public class RunDDO {
 
     public static void main(String[] args) {
         try {
@@ -30,7 +30,7 @@ public class RunDDOReplica1 {
             rootPOA.the_POAManager().activate();
 
             // Create servant and register it with the ORB
-            CenterServerImpl servant = new CenterServerImpl(Constants.DDO_TAG,Constants.DDO_SERVER_PORT,Constants.DDO_UDP_PORT_REPLICA1);
+            CenterServerImpl servant = new CenterServerImpl(Constants.DDO_TAG,Constants.DDO_SERVER_PORT,Constants.DDO_UDP_PORT_LEADER);
             servant.setORB(orb);
 
             // Get object reference from the servant
