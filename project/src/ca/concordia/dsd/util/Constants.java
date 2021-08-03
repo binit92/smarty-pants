@@ -7,6 +7,9 @@ public interface Constants {
     public static final String PROJ_DIR = System.getProperty("user.dir");
     public static final String LOG_DIR = PROJ_DIR + File.separator + "logs";
 
+    public static final String FRONT_END_UDP_HOST = "localhost";
+    public static final int FRONT_END_UDP_PORT = 7716;
+
     public static final String MTL_TAG = "MTL";
     public static final String MTL_SERVER_HOST = "localhost";
     public static final int MTL_SERVER_PORT = 7717;
@@ -37,4 +40,8 @@ public interface Constants {
     public static final String DDO_TAG_REPLICA1 = "DDO-REPLICA1";
     public static final String DDO_TAG_REPLICA2 = "DDO-REPLICA2";
 
+    public static final String RESPONSE_DATA_SPLITTER = "#";
+    public static final int LEADER_ID = 1;
+    public static final int REPLICA1_ID = 2;
+    public static final int REPLICA2_ID = 3;
 }

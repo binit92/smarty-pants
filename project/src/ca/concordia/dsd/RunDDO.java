@@ -2,7 +2,7 @@ package ca.concordia.dsd;
 
 import ca.concordia.dsd.arch.corba;
 import ca.concordia.dsd.arch.corbaHelper;
-import ca.concordia.dsd.server.CenterServerImpl;
+import ca.concordia.dsd.server.frontend.FrontEnd;
 import ca.concordia.dsd.util.Constants;
 import org.omg.CORBA.ORB;
 import org.omg.CosNaming.NameComponent;
@@ -11,10 +11,27 @@ import org.omg.CosNaming.NamingContextExtHelper;
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.POAHelper;
 
+import java.io.File;
+
 public class RunDDO {
+
+    // open CORBA port programmatically ..
+    static{
+        try{
+            String command = "orbd -ORBInitialPort " + Constants.DDO_SERVER_PORT + " -ORBInitialHost " + Constants.DDO_SERVER_HOST;
+            Runtime.getRuntime().exec(command);
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+            System.out.println("Stopping the server ");
+            System.exit(1);
+        }
+        System.out.println("Corba service started successfully ");
+    }
 
     public static void main(String[] args) {
         try {
+
+            init();
 
             String localargs[] = new String[4];
             localargs[0] = "-ORBInitialPort";
@@ -30,8 +47,11 @@ public class RunDDO {
             rootPOA.the_POAManager().activate();
 
             // Create servant and register it with the ORB
-            CenterServerImpl servant = new CenterServerImpl(Constants.DDO_TAG,Constants.DDO_SERVER_PORT,Constants.DDO_UDP_PORT_LEADER);
-            servant.setORB(orb);
+            //CenterServerImpl servant = new CenterServerImpl(Constants.DDO_TAG, Constants.DDO_SERVER_PORT, Constants.DDO_UDP_PORT_LEADER);
+            //servant.setORB(orb);
+            FrontEnd servant = new FrontEnd();
+            //servant.setORB(orb);
+
 
             // Get object reference from the servant
             org.omg.CORBA.Object ref = rootPOA.servant_to_reference(servant);
@@ -49,10 +69,30 @@ public class RunDDO {
             //dcmsServer.startUDPServer();
             System.out.println("Server " + Constants.DDO_TAG + " is running ...");
             orb.run();
-            servant.startUDPServer();
+            //servant.startUDPServer();
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+    // Initialize logging directories
+    private static void init() {
+        File frontEnd = new File(Constants.LOG_DIR + File.separator + Constants.DDO_TAG + File.separator + "front-end");
+        frontEnd.mkdirs();
+
+        File response = new File(Constants.LOG_DIR + File.separator + Constants.DDO_TAG + File.separator + "response");
+        response.mkdirs();
+
+        File leader = new File(Constants.LOG_DIR + File.separator + Constants.DDO_TAG + File.separator + "leader");
+        leader.mkdirs();
+
+        File replica1 = new File(Constants.LOG_DIR + File.separator + Constants.DDO_TAG + File.separator + "replica1");
+        replica1.mkdirs();
+
+        File replica2 = new File(Constants.LOG_DIR + File.separator + Constants.DDO_TAG + File.separator + "replica2");
+        replica2.mkdirs();
+    }
+
+
 }

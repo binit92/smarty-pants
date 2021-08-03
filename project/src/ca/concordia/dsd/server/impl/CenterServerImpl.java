@@ -1,9 +1,11 @@
-package ca.concordia.dsd.server;
+package ca.concordia.dsd.server.impl;
 
 import ca.concordia.dsd.arch.corbaPOA;
 import ca.concordia.dsd.database.Records;
 import ca.concordia.dsd.database.StudentRecord;
 import ca.concordia.dsd.database.TeacherRecord;
+import ca.concordia.dsd.server.UDPProviderThread;
+import ca.concordia.dsd.server.UDPThread;
 import ca.concordia.dsd.util.Constants;
 import ca.concordia.dsd.util.LogUtil;
 import org.omg.CORBA.ORB;
