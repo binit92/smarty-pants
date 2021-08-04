@@ -1,12 +1,17 @@
 package ca.concordia.dsd.server.frontend;
 
 import ca.concordia.dsd.arch.corbaPOA;
+import ca.concordia.dsd.database.Records;
 import ca.concordia.dsd.server.impl.CenterServerImpl;
 import ca.concordia.dsd.util.Constants;
-import org.omg.CORBA.ORB;
+import ca.concordia.dsd.util.LogUtil;
 
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  *  What this class does:
@@ -17,6 +22,7 @@ import java.util.HashMap;
 
 public class FrontEnd extends corbaPOA {
 
+    private final String LOG_TAG = "| " + FrontEnd.class.getSimpleName() + " | ";
     private CenterServerImpl leader;
     private CenterServerImpl replica1;
     private CenterServerImpl replica2;
@@ -25,20 +31,79 @@ public class FrontEnd extends corbaPOA {
     private boolean isReplica1Alive = true;
     private boolean isReplica2Alive = true;
 
+    private int requestCount;
+
+    private LogUtil logUtil;
+
+    // why ?
+    private HashMap<String, List<Records>> recordListMap;
+    private ArrayList<TransferRequestThread> transferRequestThreadArrayList ;
+    private HashMap<Integer,String> requestBufferMap;
+
+    private static Object lock = new Object();
+    public static HashMap<String, Boolean> server_leader = new HashMap<>();
+    public static HashMap<String, Long> server_reporting_time = new HashMap<>();
+
+    public static String CURRENT_SERVER_HOST;
+    public static int CURRENT_SERVER_UDP_PORT;
+
     public static ArrayList<String> listOfResponse;
-    public static HashMap<Integer, HashMap<String,CenterServerImpl>> repo;
+    public static HashMap<Integer, CenterServerImpl> repo;
+    public static HashMap<Integer, TransferResponseThread> transferResponseThreadHashMap;
+    public static ArrayList<String> responseArrayList;
 
-    public FrontEnd(){
+    public FrontEnd(String serverTag){
+        this.logUtil = new LogUtil("frontend");
 
+        //ArrayList of threads that transfer requests to current server
+        transferRequestThreadArrayList = new ArrayList<>();
+        // hashmap of transfer response threads
+        transferResponseThreadHashMap = new HashMap<>();
+        // request buffer map
+        requestBufferMap = new HashMap<>();
+        //received response list
+        responseArrayList = new ArrayList<>();
+
+        //repo - map of leader and replicas
+        repo = new HashMap<>();
+        findCurrentServerSettings(serverTag);
+
+        //variable to save the number of request that is coming to this server starting from 1
+        requestCount = 0;
+    }
+
+    private void findCurrentServerSettings(String serverTag){
+        if (serverTag.equalsIgnoreCase(Constants.DDO_TAG)){
+            CURRENT_SERVER_HOST = Constants.DDO_SERVER_HOST;
+            CURRENT_SERVER_UDP_PORT = Constants.DDO_UDP_PORT_LEADER;
+        }else if (serverTag.equalsIgnoreCase(Constants.LVL_TAG)){
+            CURRENT_SERVER_HOST = Constants.LVL_SERVER_HOST;
+            CURRENT_SERVER_UDP_PORT = Constants.LVL_UDP_PORT_LEADER;
+        }else if (serverTag.equalsIgnoreCase(Constants.MTL_TAG)){
+            CURRENT_SERVER_HOST = Constants.MTL_SERVER_HOST;
+            CURRENT_SERVER_UDP_PORT = Constants.MTL_UDP_PORT_LEADER;
+        }
     }
 
     public void init(){
         try{
+            //starting FIFO Thread
+            FIFOThread fifoThread = new FIFOThread(transferRequestThreadArrayList,logUtil);
+            fifoThread.start();
+
+            //starting UDP Response Thread
+            UDPResponseThread udpResponseThread = new UDPResponseThread(transferResponseThreadHashMap,logUtil);
+            udpResponseThread.start();
+
+            // Central Server, leader and its two replica
             leader = new CenterServerImpl(Constants.DDO_TAG,Constants.DDO_SERVER_PORT,Constants.DDO_UDP_PORT_LEADER);
             replica1 = new CenterServerImpl(Constants.DDO_TAG,Constants.DDO_SERVER_PORT,Constants.DDO_UDP_PORT_REPLICA1);
             replica2 = new CenterServerImpl(Constants.DDO_TAG,Constants.DDO_SERVER_PORT, Constants.DDO_UDP_PORT_REPLICA2);
 
             // Save details in hashmap here .. or some datastructure
+            repo.put(Constants.LEADER_ID,leader);
+            repo.put(Constants.REPLICA1_ID,replica1);
+            repo.put(Constants.REPLICA2_ID,replica2);
 
             Thread leaderThread = new Thread(){
                 public void run(){
@@ -68,10 +133,10 @@ public class FrontEnd extends corbaPOA {
                 }
             };
 
-            // start all three threads
-            leaderThread.start();
-            replica1Thread.start();
-            replica2Thread.start();
+            //>start all three threads
+            //leaderThread.start();
+            //replica1Thread.start();
+            //replica2Thread.start();
 
             Thread watcher = new Thread(){
                 public void run(){
@@ -80,7 +145,7 @@ public class FrontEnd extends corbaPOA {
                     }
                 }
             };
-            watcher.start();
+            //watcher.start();
 
         }catch (Exception e){
             e.printStackTrace();
@@ -90,36 +155,101 @@ public class FrontEnd extends corbaPOA {
 
     @Override
     public String createTRecord(String id, String fName, String lName, String address, String phone, String specialization, String location) {
-        return null;
+        System.out.println(id + " " +fName + " " + lName + " " + address);
+        StringBuilder builder = new StringBuilder();
+        builder.append(id);builder.append("|");
+        builder.append(fName);builder.append("|");
+        builder.append(lName);builder.append("|");
+        builder.append(address);builder.append("|");
+        builder.append(phone);builder.append("|");
+        builder.append(specialization);builder.append("|");
+        builder.append(location);builder.append("|");
+        logUtil.log(LOG_TAG + " dispatching createTRRecord to server : " + builder);
+        return dispatchToCurrentServer(builder.toString());
     }
 
     @Override
     public String createSRecord(String id, String fName, String lName, String courses, boolean status, String statusDate) {
-        return null;
+        System.out.println(id + " " +fName + " " + lName  );
+        StringBuilder builder = new StringBuilder();
+        builder.append(id);builder.append("|");
+        builder.append(fName);builder.append("|");
+        builder.append(lName);builder.append("|");
+        builder.append(courses);builder.append("|");
+        builder.append(status);builder.append("|");
+        builder.append(statusDate);builder.append("|");
+        logUtil.log(LOG_TAG + " dispatching createSRRecord to server : " + builder);
+        return dispatchToCurrentServer(builder.toString());
     }
 
     @Override
     public String getRecordCounts(String id) {
-        return null;
+        System.out.println(id );
+        StringBuilder builder = new StringBuilder();
+        builder.append(id);builder.append("|");
+        logUtil.log(LOG_TAG + " dispatching getRecordCounts to server : " + builder);
+        return dispatchToCurrentServer(builder.toString());
     }
 
     @Override
     public String editRecord(String id, String recordID, String fieldName, String newValue) {
-        return null;
+        System.out.println(id + " " +recordID + " " + fieldName + " " + newValue);
+        StringBuilder builder = new StringBuilder();
+        builder.append(id);builder.append("|");
+        builder.append(recordID);builder.append("|");
+        builder.append(fieldName);builder.append("|");
+        builder.append(newValue);builder.append("|");
+        logUtil.log(LOG_TAG + " dispatching editRecord to server : " + builder);
+        return dispatchToCurrentServer(builder.toString());
     }
 
     @Override
     public String transferRecord(String id, String recordId, String remoteCenterServerName) {
-        return null;
+        System.out.println(id + " " + recordId + " " + remoteCenterServerName);
+        StringBuilder builder = new StringBuilder();
+        builder.append(id);builder.append("|");
+        builder.append(recordId);builder.append("|");
+        builder.append(remoteCenterServerName);builder.append("|");
+        logUtil.log(LOG_TAG + " dispatching transferRecord to server : " + builder);
+        return dispatchToCurrentServer(builder.toString());
     }
 
-    public void connectToServer(String data){
+    public String dispatchToCurrentServer(String data){
+        try{
+            requestCount+=1;
+            DatagramSocket sSocket = new DatagramSocket();
+            data += Constants.RESPONSE_DATA_SPLITTER + Integer.toString(requestCount);
+            byte[] arr = data.getBytes();
+            DatagramPacket pkt = new DatagramPacket(arr, arr.length, InetAddress.getByName(CURRENT_SERVER_HOST),CURRENT_SERVER_UDP_PORT);
+            sSocket.send(pkt);
 
+            logUtil.log(LOG_TAG + "Saving request with id " + requestCount + " in request buffer");
+            requestBufferMap.put(requestCount,data);
+            logUtil.log(LOG_TAG + "waiting for reply from server " + CURRENT_SERVER_HOST + " : " + CURRENT_SERVER_UDP_PORT);
+
+            Thread.sleep(5 * 1000);
+
+            try{
+                // joining threads here.
+                transferResponseThreadHashMap.get(requestCount).join();
+            }catch (InterruptedException ie){
+                ie.printStackTrace();
+            }
+            // delete from the saved response buffer
+            requestBufferMap.remove(requestCount);
+            return transferResponseThreadHashMap.get(requestCount).getResponse();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     // TODO
     private void checkHeartBeats(){
+        synchronized (lock){
+            long cur = System.currentTimeMillis();
 
+        }
     }
 
 

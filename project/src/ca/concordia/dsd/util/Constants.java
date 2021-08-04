@@ -7,8 +7,12 @@ public interface Constants {
     public static final String PROJ_DIR = System.getProperty("user.dir");
     public static final String LOG_DIR = PROJ_DIR + File.separator + "logs";
 
+    // use this to run all server (DDO, LVL and MTL)
+    public static final int ORB_INITIAL_PORT = 5555;
+    public static final String ORB_INITIAL_HOST = "localhost";
+
     public static final String FRONT_END_UDP_HOST = "localhost";
-    public static final int FRONT_END_UDP_PORT = 7716;
+    public static final int FRONT_END_UDP_PORT = 7717;
 
     public static final String MTL_TAG = "MTL";
     public static final String MTL_SERVER_HOST = "localhost";
@@ -44,4 +48,6 @@ public interface Constants {
     public static final int LEADER_ID = 1;
     public static final int REPLICA1_ID = 2;
     public static final int REPLICA2_ID = 3;
+
+
 }

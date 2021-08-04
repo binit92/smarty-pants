@@ -18,6 +18,7 @@ public class UDPThread extends Thread implements Constants {
     private CenterServerImpl server;
     private int c;
     private String name;
+    private final String LOG_TAG = "| " + UDPThread.class.getSimpleName() + " | ";
 
     public UDPThread(String name, CenterServerImpl server) {
         this.name = name;
@@ -44,6 +45,7 @@ public class UDPThread extends Thread implements Constants {
             }
 
         } catch (IOException e) {
+            System.out.println(LOG_TAG + e.getMessage());
             logUtil.log(e.getMessage());
         }
     }

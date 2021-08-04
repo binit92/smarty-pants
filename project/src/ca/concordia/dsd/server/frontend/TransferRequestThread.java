@@ -8,6 +8,7 @@ import ca.concordia.dsd.util.LogUtil;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.Arrays;
 
 public class TransferRequestThread extends Thread {
 
@@ -23,8 +24,8 @@ public class TransferRequestThread extends Thread {
         this.logUtil = logUtil;
     }
 
-    private synchronized CenterServerImpl pickServer(String location){
-        return FrontEnd.repo.get(Constants.LEADER_ID).get(location);
+    private synchronized CenterServerImpl pickServer(){
+        return FrontEnd.repo.get(Constants.LEADER_ID);
     }
 
     private void reply(String requestId, String responseStr){
@@ -53,6 +54,8 @@ public class TransferRequestThread extends Thread {
         switch (oT){
             case CREATE_TR_RECORD:
                 //TODO
+                //System.out.println(strToSend[1]);
+                //dSystem.out.println(strToSend);
                 break;
             case CREATE_SR_RECORD:
                 //TODO

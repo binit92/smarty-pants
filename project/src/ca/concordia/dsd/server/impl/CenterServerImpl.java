@@ -18,6 +18,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class CenterServerImpl extends corbaPOA  {
+    private static final String LOG_TAG = "| " + CenterServerImpl.class.getSimpleName() + "| ";
+
     private LogUtil logUtil;
     public UDPThread udpThread;
     public String IPaddress;

@@ -58,11 +58,14 @@ public class ManagerClient implements Constants {
                 // creating logUtil instance here so that different folder can be created for different managers
                 logUtil = new LogUtil(managerId);
                 if (firstThree.equalsIgnoreCase(MTL_TAG)) {
-                    return createCorbaConnection(MTL_TAG, MTL_SERVER_HOST, MTL_SERVER_PORT);
+                    //return createCorbaConnection(MTL_TAG, MTL_SERVER_HOST, MTL_SERVER_PORT);
+                    return createCorbaConnection(MTL_TAG, ORB_INITIAL_HOST, ORB_INITIAL_PORT);
                 } else if (firstThree.equalsIgnoreCase(LVL_TAG)) {
-                    return createCorbaConnection(LVL_TAG, LVL_SERVER_HOST, LVL_SERVER_PORT);
+                    //return createCorbaConnection(LVL_TAG, LVL_SERVER_HOST, LVL_SERVER_PORT);
+                    return createCorbaConnection(LVL_TAG, ORB_INITIAL_HOST, ORB_INITIAL_PORT);
                 } else if (firstThree.equalsIgnoreCase(DDO_TAG)) {
-                    return createCorbaConnection(DDO_TAG, DDO_SERVER_HOST, DDO_SERVER_PORT);
+                    //return createCorbaConnection(DDO_TAG, DDO_SERVER_HOST, DDO_SERVER_PORT);
+                    return createCorbaConnection(DDO_TAG, ORB_INITIAL_HOST, ORB_INITIAL_PORT);
                 }
             }
         }

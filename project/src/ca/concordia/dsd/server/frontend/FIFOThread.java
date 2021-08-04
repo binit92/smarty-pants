@@ -24,6 +24,8 @@ public class FIFOThread extends Thread{
     private Queue<String> fifoQueue =new LinkedList<>();
     private LogUtil logUtil;
 
+    private static final String LOG_TAG = "| " + FIFOThread.class.getSimpleName() + " | ";
+
     public FIFOThread(ArrayList<TransferRequestThread> requestThreadArrayList,LogUtil logUtil){
         this.requestThreadArrayList = requestThreadArrayList;
         this.logUtil = logUtil;
@@ -32,15 +34,17 @@ public class FIFOThread extends Thread{
 
     private void init(){
         try{
-            sSocket = new DatagramSocket(Constants.FRONT_END_UDP_PORT);
+            logUtil.log(LOG_TAG + "Creating socket over frontend current server udp port " + FrontEnd.CURRENT_SERVER_UDP_PORT);
+            sSocket = new DatagramSocket(FrontEnd.CURRENT_SERVER_UDP_PORT);
         }catch (SocketException se){
-            System.out.println(se.getMessage());
+            se.printStackTrace();
+            System.out.println(LOG_TAG + se.getMessage());
         }
     }
 
     @Override
     public void run() {
-        System.out.println("Running FIFO Thread");
+        System.out.println(LOG_TAG + "Running FIFO Thread");
         byte[] data;
         // infinite loop
         while(true){
@@ -51,7 +55,7 @@ public class FIFOThread extends Thread{
                 byte[] receive = rPacket.getData();
                 String receiveStr = new String(receive).trim();
                 // TODO : use logUtil ?
-                System.out.println("received string : " + receiveStr);
+                System.out.println(LOG_TAG + "received string : " + receiveStr);
 
                 fifoQueue.add(receiveStr);
                 TransferRequestThread trt = new TransferRequestThread(fifoQueue.poll().getBytes(),logUtil);
@@ -59,7 +63,7 @@ public class FIFOThread extends Thread{
 
                 requestThreadArrayList.add(trt);
             }catch (Exception e){
-                System.out.println(e.getMessage());
+                System.out.println(LOG_TAG + e.getMessage());
             }
         }
     }

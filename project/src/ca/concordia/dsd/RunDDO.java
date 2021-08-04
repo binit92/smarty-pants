@@ -18,7 +18,8 @@ public class RunDDO {
     // open CORBA port programmatically ..
     static{
         try{
-            String command = "orbd -ORBInitialPort " + Constants.DDO_SERVER_PORT + " -ORBInitialHost " + Constants.DDO_SERVER_HOST;
+            //String command = "orbd -ORBInitialPort " + Constants.DDO_SERVER_PORT + " -ORBInitialHost " + Constants.DDO_SERVER_HOST;
+            String command = "orbd -ORBInitialPort " + Constants.ORB_INITIAL_PORT + " -ORBInitialHost " + Constants.ORB_INITIAL_HOST;
             Runtime.getRuntime().exec(command);
         }catch(Exception e){
             System.out.println(e.getMessage());
@@ -35,9 +36,11 @@ public class RunDDO {
 
             String localargs[] = new String[4];
             localargs[0] = "-ORBInitialPort";
-            localargs[1] = Integer.toString(Constants.DDO_SERVER_PORT);
+            //localargs[1] = Integer.toString(Constants.DDO_SERVER_PORT);
+            localargs[1] = Integer.toString(Constants.ORB_INITIAL_PORT);
             localargs[2] = "-ORBInitialHost ";
-            localargs[3] = Constants.DDO_SERVER_HOST;
+            //localargs[3] = Constants.DDO_SERVER_HOST;
+            localargs[3] = Constants.ORB_INITIAL_HOST;
 
             // Initiate local ORB object
             ORB orb = ORB.init(localargs, null);
@@ -49,7 +52,8 @@ public class RunDDO {
             // Create servant and register it with the ORB
             //CenterServerImpl servant = new CenterServerImpl(Constants.DDO_TAG, Constants.DDO_SERVER_PORT, Constants.DDO_UDP_PORT_LEADER);
             //servant.setORB(orb);
-            FrontEnd servant = new FrontEnd();
+            FrontEnd servant = new FrontEnd(Constants.DDO_TAG);
+            servant.init();
             //servant.setORB(orb);
 
 
