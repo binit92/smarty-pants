@@ -11,25 +11,25 @@ import java.util.HashMap;
 // FrontEnd uses this thread to received UDP response from the leader/replicas server
 // response is latest saved in hashmap
 
-public class UDPResponseReceiverThread extends Thread{
+public class UDPResponseReceiverThread extends Thread {
 
+    private final String LOG_TAG = "| " + UDPResponseReceiverThread.class.getSimpleName() + " | ";
     DatagramSocket sSocket;
     DatagramPacket rPacket;
     HashMap<Integer, TransferResponseThread> responseMap;
-    private LogUtil logUtil;
-    private final String LOG_TAG = "| " + UDPResponseReceiverThread.class.getSimpleName() + " | ";
+    private final LogUtil logUtil;
 
-    public UDPResponseReceiverThread(HashMap<Integer, TransferResponseThread> responseMap, LogUtil logUtil){
+    public UDPResponseReceiverThread(HashMap<Integer, TransferResponseThread> responseMap, LogUtil logUtil) {
         this.responseMap = responseMap;
         this.logUtil = logUtil;
         init();
     }
 
-    private void init(){
-        try{
+    private void init() {
+        try {
             logUtil.log(LOG_TAG + "Creating datagram socket over front end udp port " + Constants.FRONT_END_UDP_PORT);
             sSocket = new DatagramSocket(Constants.FRONT_END_UDP_PORT);
-        }catch (SocketException se){
+        } catch (SocketException se) {
             se.printStackTrace();
             System.out.println(LOG_TAG + se.getMessage());
         }
@@ -37,14 +37,14 @@ public class UDPResponseReceiverThread extends Thread{
 
     @Override
     public void run() {
-        System.out.println(LOG_TAG+ "Running UDP Response Thread");
+        System.out.println(LOG_TAG + "Running UDP Response Thread");
         byte[] data;
 
         // infinite loop
-        while(true){
-            try{
+        while (true) {
+            try {
                 data = new byte[1024];
-                rPacket = new DatagramPacket(data,data.length);
+                rPacket = new DatagramPacket(data, data.length);
                 sSocket.receive(rPacket);
                 byte[] response = rPacket.getData();
                 String responseStr = new String(response).trim();
@@ -54,9 +54,9 @@ public class UDPResponseReceiverThread extends Thread{
                 TransferResponseThread trt = new TransferResponseThread(responseArray[0]);
                 trt.start();
 
-                responseMap.put(Integer.parseInt(responseArray[1]),trt);
+                responseMap.put(Integer.parseInt(responseArray[1]), trt);
 
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
 
                 System.out.println(LOG_TAG + e.getMessage());

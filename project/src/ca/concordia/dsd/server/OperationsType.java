@@ -6,5 +6,5 @@ public enum OperationsType {
     CREATE_SR_RECORD,
     GET_RECORD_COUNT,
     EDIT_RECORD,
-    TRANSFER_RECORD;
+    TRANSFER_RECORD
 }

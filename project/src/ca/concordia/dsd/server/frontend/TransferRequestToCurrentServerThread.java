@@ -14,36 +14,36 @@ public class TransferRequestToCurrentServerThread extends Thread {
 
     private final String LOG_TAG = "| " + TransferRequestToCurrentServerThread.class.getSimpleName() + " |  ";
 
-    private String dataStr;
+    private final String dataStr;
     private CenterServerImpl server;
     private String responseStr;
-    private LogUtil logUtil;
+    private final LogUtil logUtil;
 
-    public TransferRequestToCurrentServerThread(byte[] data, LogUtil logUtil){
+    public TransferRequestToCurrentServerThread(byte[] data, LogUtil logUtil) {
         this.dataStr = new String(data);
         this.server = null;
         this.responseStr = null;
         this.logUtil = logUtil;
     }
 
-    private synchronized CenterServerImpl pickServer(){
-        System.out.println(LOG_TAG + " pickServer: "+ FrontEnd.repo.get(Constants.LEADER_ID).getServerName());
+    private synchronized CenterServerImpl pickServer() {
+        System.out.println(LOG_TAG + " pickServer: " + FrontEnd.repo.get(Constants.LEADER_ID).getServerName());
         return FrontEnd.repo.get(Constants.LEADER_ID);
     }
 
-    private void reply(String requestId, String responseStr){
+    private void reply(String requestId, String responseStr) {
         DatagramSocket socket;
-        try{
-            socket =new DatagramSocket();
-            responseStr += Constants.RESPONSE_DATA_SPLITTER +requestId;
-            System.out.println(LOG_TAG + "reply: responseStr : " + responseStr );
+        try {
+            socket = new DatagramSocket();
+            responseStr += Constants.RESPONSE_DATA_SPLITTER + requestId;
+            System.out.println(LOG_TAG + "reply: responseStr : " + responseStr);
             byte[] data = responseStr.getBytes();
-            System.out.println(LOG_TAG + " to HOST: "+ Constants.FRONT_END_UDP_HOST + " to PORT: "+ Constants.FRONT_END_UDP_PORT);
-            DatagramPacket sPacket = new DatagramPacket(data,data.length,
+            System.out.println(LOG_TAG + " to HOST: " + Constants.FRONT_END_UDP_HOST + " to PORT: " + Constants.FRONT_END_UDP_PORT);
+            DatagramPacket sPacket = new DatagramPacket(data, data.length,
                     InetAddress.getByName(Constants.FRONT_END_UDP_HOST),
                     Constants.FRONT_END_UDP_PORT);
             socket.send(sPacket);
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
@@ -55,10 +55,10 @@ public class TransferRequestToCurrentServerThread extends Thread {
         String[] strToSend = this.dataStr.trim().split(Constants.RESPONSE_DATA_SPLITTER);
         System.out.println(LOG_TAG + "data string  Arr: " + Arrays.toString(strToSend));
         OperationsType oT = OperationsType.valueOf(strToSend[0]);
-        String requestId = strToSend[strToSend.length -1];
-        System.out.println(LOG_TAG+ "processing request id : " + requestId);
+        String requestId = strToSend[strToSend.length - 1];
+        System.out.println(LOG_TAG + "processing request id : " + requestId);
 
-        switch (oT){
+        switch (oT) {
             case CREATE_TR_RECORD:
                 System.out.println(LOG_TAG + strToSend[1]);
                 this.server = pickServer();
@@ -72,8 +72,8 @@ public class TransferRequestToCurrentServerThread extends Thread {
                 String t_specialization = t_entries[5];
                 String t_location = t_entries[6];
 
-                responseStr = this.server.createTRecord(t_id,t_fName,t_lName,t_address,t_phone,t_specialization,t_location);
-                reply(requestId,responseStr);
+                responseStr = this.server.createTRecord(t_id, t_fName, t_lName, t_address, t_phone, t_specialization, t_location);
+                reply(requestId, responseStr);
                 break;
             case CREATE_SR_RECORD:
                 System.out.println(LOG_TAG + strToSend[1]);
@@ -87,8 +87,8 @@ public class TransferRequestToCurrentServerThread extends Thread {
                 boolean s_status = true; //TODO
                 String s_statusDate = s_entries[5];
 
-                responseStr = this.server.createSRecord(s_id,s_fName,s_lName,s_courses,s_status,s_statusDate);
-                reply(requestId,responseStr);
+                responseStr = this.server.createSRecord(s_id, s_fName, s_lName, s_courses, s_status, s_statusDate);
+                reply(requestId, responseStr);
                 break;
             case GET_RECORD_COUNT:
                 System.out.println(LOG_TAG + strToSend[1]);
@@ -98,7 +98,7 @@ public class TransferRequestToCurrentServerThread extends Thread {
                 String g_id = g_entries[0];
 
                 responseStr = this.server.getRecordCounts(g_id);
-                reply(requestId,responseStr);
+                reply(requestId, responseStr);
                 break;
             case EDIT_RECORD:
                 System.out.println(LOG_TAG + strToSend[1]);
@@ -110,8 +110,8 @@ public class TransferRequestToCurrentServerThread extends Thread {
                 String e_fieldName = e_entries[2];
                 String e_newValue = e_entries[3];
 
-                responseStr = this.server.editRecord(e_id,e_recordID,e_fieldName,e_newValue);
-                reply(requestId,responseStr);
+                responseStr = this.server.editRecord(e_id, e_recordID, e_fieldName, e_newValue);
+                reply(requestId, responseStr);
                 break;
             case TRANSFER_RECORD:
                 System.out.println(LOG_TAG + strToSend[1]);
@@ -122,8 +122,8 @@ public class TransferRequestToCurrentServerThread extends Thread {
                 String tr_recordId = tr_entries[1];
                 String tr_remoteCenterServerName = tr_entries[2];
 
-                responseStr = this.server.transferRecord(tr_id,tr_recordId,tr_remoteCenterServerName);
-                reply(requestId,responseStr);
+                responseStr = this.server.transferRecord(tr_id, tr_recordId, tr_remoteCenterServerName);
+                reply(requestId, responseStr);
                 break;
         }
     }

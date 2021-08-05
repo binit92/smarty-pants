@@ -9,16 +9,16 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
 public class UDPThread extends Thread implements Constants {
+    private final String LOG_TAG = "| " + UDPThread.class.getSimpleName() + " | ";
     public int udpPortNum;
     private DatagramSocket serverSocket;
     private DatagramPacket receivePacket;
     private DatagramPacket sendPacket;
-    private LogUtil logUtil;
+    private final LogUtil logUtil;
     private String recordCount;
-    private CenterServerImpl server;
-    private int c;
-    private String name;
-    private final String LOG_TAG = "| " + UDPThread.class.getSimpleName() + " | ";
+    private final CenterServerImpl server;
+    private final int c;
+    private final String name;
 
     public UDPThread(String name, CenterServerImpl server) {
         this.name = name;
@@ -59,10 +59,10 @@ public class UDPThread extends Thread implements Constants {
                 receivePacket = new DatagramPacket(receiveData, receiveData.length);
                 serverSocket.setSoTimeout(1000 * 5);
                 serverSocket.receive(receivePacket);
-                logUtil.log(name,"UDPThread, received pkt :: " + new String(receivePacket.getData()));
+                logUtil.log(name, "UDPThread, received pkt :: " + new String(receivePacket.getData()));
                 String inputPkt = new String(receivePacket.getData()).trim();
-                new UDPRequestThread(receivePacket, server,name).start();
-                logUtil.log(name,"UDPThread, Received " + inputPkt + " from " + server);
+                new UDPRequestThread(receivePacket, server, name).start();
+                logUtil.log(name, "UDPThread, Received " + inputPkt + " from " + server);
             } catch (Exception e) {
             }
         }

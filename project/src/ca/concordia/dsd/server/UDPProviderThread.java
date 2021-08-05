@@ -8,9 +8,9 @@ import java.net.InetAddress;
 
 public class UDPProviderThread extends Thread {
     private String recordCount;
-    private String serverName;
-    private String IPaddress;
-    private int port;
+    private final String serverName;
+    private final String IPaddress;
+    private final int port;
 
     public UDPProviderThread(String serverName, String IPAddress, int port) throws IOException {
         this.serverName = serverName;

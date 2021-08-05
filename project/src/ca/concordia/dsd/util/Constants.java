@@ -7,6 +7,10 @@ public interface Constants {
     public static final String PROJ_DIR = System.getProperty("user.dir");
     public static final String LOG_DIR = PROJ_DIR + File.separator + "logs";
 
+    public static int MULTICAST_PORT_NUMBER = 6779;
+    public static String MULTICAST_IP_ADDRESS = "224.0.0.1";
+    public static int CURRENT_PRIMARY_PORT_FOR_REPLICAS = 2323;
+
     // use this to run all server (DDO, LVL and MTL)
     public static final int ORB_INITIAL_PORT = 5555;
     public static final String ORB_INITIAL_HOST = "localhost";

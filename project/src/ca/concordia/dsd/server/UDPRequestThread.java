@@ -12,10 +12,10 @@ import java.util.Map;
 
 public class UDPRequestThread extends Thread {
     private DatagramSocket serverSocket;
-    private DatagramPacket receivePacket;
-    private CenterServerImpl server;
-    private LogUtil logUtil;
-    private String serverName;
+    private final DatagramPacket receivePacket;
+    private final CenterServerImpl server;
+    private final LogUtil logUtil;
+    private final String serverName;
 
 
     public UDPRequestThread(DatagramPacket pkt, CenterServerImpl serverImp, String name) {
@@ -42,9 +42,9 @@ public class UDPRequestThread extends Thread {
                         receivePacket.getPort()));
             }
 
-            logUtil.log(serverName,"UDPRequestThread, Received " + inputPkt + " from " + server);
+            logUtil.log(serverName, "UDPRequestThread, Received " + inputPkt + " from " + server);
         } catch (Exception e) {
-			logUtil.log(e.getMessage());
+            logUtil.log(e.getMessage());
         }
     }
 

@@ -1,10 +1,11 @@
 package ca.concordia.dsd.server.frontend;
 
 // Thread to transfer the response from leader to front end
-public class TransferResponseThread  extends Thread{
-    private final String LOG_TAG ="| "+ TransferResponseThread.class.getSimpleName() + " | ";
-    private String response;
-    public TransferResponseThread(String response ){
+public class TransferResponseThread extends Thread {
+    private final String LOG_TAG = "| " + TransferResponseThread.class.getSimpleName() + " | ";
+    private final String response;
+
+    public TransferResponseThread(String response) {
         this.response = response;
     }
 
@@ -14,7 +15,7 @@ public class TransferResponseThread  extends Thread{
         FrontEnd.listOfResponse.add(this.response);
     }
 
-    public String getResponse(){
+    public String getResponse() {
         return response;
     }
 }

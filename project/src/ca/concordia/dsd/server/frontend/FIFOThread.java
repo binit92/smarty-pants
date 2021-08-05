@@ -14,27 +14,26 @@ import java.util.Queue;
     the request can be added to the FIFO Queue to eventually
     transfer it to the current server.
  */
-public class FIFOThread extends Thread{
-
-    private DatagramSocket sSocket;
-    private DatagramPacket rPacket;
-    private ArrayList<TransferRequestToCurrentServerThread> requestThreadArrayList;
-    private Queue<String> fifoQueue =new LinkedList<>();
-    private LogUtil logUtil;
+public class FIFOThread extends Thread {
 
     private static final String LOG_TAG = "| " + FIFOThread.class.getSimpleName() + " | ";
+    private DatagramSocket sSocket;
+    private DatagramPacket rPacket;
+    private final ArrayList<TransferRequestToCurrentServerThread> requestThreadArrayList;
+    private final Queue<String> fifoQueue = new LinkedList<>();
+    private final LogUtil logUtil;
 
-    public FIFOThread(ArrayList<TransferRequestToCurrentServerThread> requestThreadArrayList, LogUtil logUtil){
+    public FIFOThread(ArrayList<TransferRequestToCurrentServerThread> requestThreadArrayList, LogUtil logUtil) {
         this.requestThreadArrayList = requestThreadArrayList;
         this.logUtil = logUtil;
         init();
     }
 
-    private void init(){
-        try{
+    private void init() {
+        try {
             logUtil.log(LOG_TAG + "Creating socket over frontend current server udp port " + FrontEnd.CURRENT_SERVER_UDP_PORT);
             sSocket = new DatagramSocket(FrontEnd.CURRENT_SERVER_UDP_PORT);
-        }catch (SocketException se){
+        } catch (SocketException se) {
             se.printStackTrace();
             System.out.println(LOG_TAG + se.getMessage());
         }
@@ -45,10 +44,10 @@ public class FIFOThread extends Thread{
         System.out.println(LOG_TAG + "Running FIFO Thread");
         byte[] data;
         // infinite loop
-        while(true){
-            try{
+        while (true) {
+            try {
                 data = new byte[1024];
-                rPacket = new DatagramPacket(data,data.length);
+                rPacket = new DatagramPacket(data, data.length);
                 sSocket.receive(rPacket);
                 byte[] receive = rPacket.getData();
                 String receiveStr = new String(receive).trim();
@@ -56,11 +55,11 @@ public class FIFOThread extends Thread{
                 System.out.println(LOG_TAG + "received string : " + receiveStr);
 
                 fifoQueue.add(receiveStr);
-                TransferRequestToCurrentServerThread trt = new TransferRequestToCurrentServerThread(fifoQueue.poll().getBytes(),logUtil);
+                TransferRequestToCurrentServerThread trt = new TransferRequestToCurrentServerThread(fifoQueue.poll().getBytes(), logUtil);
                 trt.start();
 
                 requestThreadArrayList.add(trt);
-            }catch (Exception e){
+            } catch (Exception e) {
                 System.out.println(LOG_TAG + e.getMessage());
             }
         }

@@ -17,38 +17,32 @@ import java.net.InetAddress;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class CenterServerImpl extends corbaPOA  {
+public class CenterServerImpl extends corbaPOA {
     private static final String LOG_TAG = "| " + CenterServerImpl.class.getSimpleName() + "| ";
-
-    private LogUtil logUtil;
-    public UDPThread udpThread;
-    public String IPaddress;
-
-    int port = 0;
-    int udpPort = 0;
-    int port1 ;
-    int port2 ;
-    boolean isAlive;
-
-    private ORB ddoorb;
-
-    public HashMap<String, List<Records>> recordsMap;
-    public HeartBeatReceiver heartBeatReceiver;
-    private HeartBeatSender heartBeatSender;
-    private static int studentCount = 10001;
-    private static int teacherCount = 10001;
-    private int recordsCount;
-    private final String serverName;
-
-    boolean isPrimary;
-    Integer serverID = 0;
-    public ArrayList<Integer> replicas;
-    public DatagramSocket ds;
-
     private static final Object lockID = new Object();
     private static final Object lockCount = new Object();
+    private static final int studentCount = 10001;
+    private static int teacherCount = 10001;
+    private final String serverName;
+    public UDPThread udpThread;
+    public String IPaddress;
+    public HashMap<String, List<Records>> recordsMap;
+    public HeartBeatReceiver heartBeatReceiver;
+    public ArrayList<Integer> replicas;
+    public DatagramSocket ds;
+    int port = 0;
+    int udpPort = 0;
+    int port1;
+    int port2;
+    boolean isAlive;
+    boolean isPrimary;
+    Integer serverID = 0;
+    private final LogUtil logUtil;
+    private ORB ddoorb;
+    private HeartBeatSender heartBeatSender;
+    private int recordsCount;
 
-    public CenterServerImpl(String serverName, int port,  int port1, int port2, int udpPort, DatagramSocket ds,ArrayList<Integer> replicas,int serverID, boolean isPrimary, boolean isAlive) {
+    public CenterServerImpl(String serverName, int port, int port1, int port2, int udpPort, DatagramSocket ds, ArrayList<Integer> replicas, int serverID, boolean isPrimary, boolean isAlive) {
         this.serverName = serverName;
         this.port = port;
         this.udpPort = udpPort;
@@ -75,7 +69,7 @@ public class CenterServerImpl extends corbaPOA  {
     }
 
     //implement shutdown
-    public void shutdown(){
+    public void shutdown() {
         this.ddoorb.shutdown(false);
     }
 
@@ -124,38 +118,38 @@ public class CenterServerImpl extends corbaPOA  {
         return ret;
     }
 
-    private int getServerCount(){
+    private int getServerCount() {
         int c = 0;
         for (Map.Entry<String, List<Records>> e : this.recordsMap.entrySet()) {
             List<Records> total = e.getValue();
-            c+=total.size();
+            c += total.size();
         }
         return c;
     }
 
 
     public String createTRecord(String id, String fName, String lName, String address, String phone, String specialization, String location) {
-        logUtil.log(id,LOG_TAG + "Create record called for teacher : " + fName);
+        logUtil.log(id, LOG_TAG + "Create record called for teacher : " + fName);
         String teacherid = "TR" + (++teacherCount);
-        TeacherRecord tR = new TeacherRecord(teacherid,fName,lName,address,phone,specialization,location);
+        TeacherRecord tR = new TeacherRecord(teacherid, fName, lName, address, phone, specialization, location);
         //tR.setTeacherId(teacherid);
         //tR.setUniqueId(teacherid);
 
         String key = tR.getLastName().substring(0, 1);
         String ret = addToDB(key, tR, null);
         //TODO : fix return
-        logUtil.log( id,LOG_TAG + "new teacher " + tR.getFirstName() + " with this key " + key);
-        logUtil.log( id,LOG_TAG + "teacher id " + teacherid);
+        logUtil.log(id, LOG_TAG + "new teacher " + tR.getFirstName() + " with this key " + key);
+        logUtil.log(id, LOG_TAG + "teacher id " + teacherid);
 
         return teacherid;
         //return true;
     }
 
     public String createSRecord(String id, String fName, String lName, String courses, boolean status, String statusDate) {
-        logUtil.log( id,LOG_TAG + "Create record called for student : " + fName);
+        logUtil.log(id, LOG_TAG + "Create record called for student : " + fName);
         String studentid = "SR" + (studentCount + 1);
         // TODO: fix this : courses, status
-        StudentRecord sR = new StudentRecord(studentid,fName,lName,null, "True",statusDate);
+        StudentRecord sR = new StudentRecord(studentid, fName, lName, null, "True", statusDate);
         //sR.setUniqueId(studentid);
         //sR.setStudentID(studentid);
 
@@ -163,14 +157,14 @@ public class CenterServerImpl extends corbaPOA  {
         String ret = addToDB(key, null, sR);
 
         // TODO: return ret
-        logUtil.log(id,LOG_TAG + " new student is added " + sR + " with this key " + key);
-        logUtil.log(id,LOG_TAG +  "student record created " + studentid);
+        logUtil.log(id, LOG_TAG + " new student is added " + sR + " with this key " + key);
+        logUtil.log(id, LOG_TAG + "student record created " + studentid);
         return studentid;
         //return true;
     }
 
     public synchronized String getRecordCounts(String manager) {
-        logUtil.log(manager,LOG_TAG + "get record counts ");
+        logUtil.log(manager, LOG_TAG + "get record counts ");
         String recordCount = null;
         UDPProviderThread[] req = new UDPProviderThread[2];
         int i = 0;
@@ -179,23 +173,23 @@ public class CenterServerImpl extends corbaPOA  {
         locList.add(Constants.LVL_TAG);
         locList.add(Constants.DDO_TAG);
         for (String loc : locList) {
-            if (loc== this.serverName) {
-                recordCount = loc+","+ getServerCount();
+            if (loc == this.serverName) {
+                recordCount = loc + "," + getServerCount();
             } else {
                 try {
                     String ipAdd = Constants.MTL_SERVER_HOST;
                     // todo : how to contact replica when the leader is down ?
                     int udpPort = Constants.MTL_UDP_PORT_LEADER;
-                    if(loc.equalsIgnoreCase(Constants.LVL_TAG)){
+                    if (loc.equalsIgnoreCase(Constants.LVL_TAG)) {
                         ipAdd = Constants.LVL_SERVER_HOST;
                         udpPort = Constants.LVL_UDP_PORT_LEADER;
-                    }else if(loc.equalsIgnoreCase(Constants.DDO_TAG)){
+                    } else if (loc.equalsIgnoreCase(Constants.DDO_TAG)) {
                         ipAdd = Constants.DDO_SERVER_HOST;
                         udpPort = Constants.DDO_UDP_PORT_LEADER;
                     }
-                    req[i] = new UDPProviderThread(loc, ipAdd,udpPort);
+                    req[i] = new UDPProviderThread(loc, ipAdd, udpPort);
                 } catch (IOException e) {
-                    logUtil.log(manager,LOG_TAG + e.getMessage());
+                    logUtil.log(manager, LOG_TAG + e.getMessage());
                 }
                 req[i].start();
                 i++;
@@ -209,94 +203,109 @@ public class CenterServerImpl extends corbaPOA  {
             } catch (InterruptedException e) {
                 //e.printStackTrace();
                 logUtil.log(LOG_TAG + e.getMessage());
-            }catch (NullPointerException npe){
+            } catch (NullPointerException npe) {
                 logUtil.log(LOG_TAG + "Not all servers are reachable");
             }
         }
-        logUtil.log(manager,LOG_TAG + "record count " + recordCount);
+        logUtil.log(manager, LOG_TAG + "record count " + recordCount);
         return recordCount;
     }
 
-    public String editRecord(String manager, String id, String key, String val)  {
+    public String editRecord(String manager, String id, String key, String val) {
         String type = id.substring(0, 2);
 
         if (type.equalsIgnoreCase("TR")) {
-            return editTRRecord(manager,id, key, val);
+            return editTRRecord(manager, id, key, val);
+        } else if (type.equalsIgnoreCase("SR")) {
+            return editSRRecord(manager, id, key, val);
         }
-
-        else if (type.equalsIgnoreCase("SR")) {
-            return editSRRecord(manager,id, key, val);
-        }
-        logUtil.log(manager,LOG_TAG +  "Operation invalid");
+        logUtil.log(manager, LOG_TAG + "Operation invalid");
         return "Operation invalid";
     }
 
     public String transferRecord(String id, String recordId, String remoteCenterServerName) {
         String serverTOConnect = "";
         int serverTOConnectUDPPort = 0;
-        if(serverName.equalsIgnoreCase(Constants.DDO_TAG)){
+        if (serverName.equalsIgnoreCase(Constants.DDO_TAG)) {
             serverTOConnect = Constants.DDO_SERVER_HOST;
             serverTOConnectUDPPort = Constants.DDO_UDP_PORT_LEADER;
-        }else if (serverName.equalsIgnoreCase(Constants.MTL_TAG)){
+        } else if (serverName.equalsIgnoreCase(Constants.MTL_TAG)) {
             serverTOConnect = Constants.MTL_SERVER_HOST;
             serverTOConnectUDPPort = Constants.MTL_UDP_PORT_LEADER;
-        }else if (serverName.equalsIgnoreCase(Constants.LVL_TAG)){
+        } else if (serverName.equalsIgnoreCase(Constants.LVL_TAG)) {
             serverTOConnect = Constants.LVL_SERVER_HOST;
             serverTOConnectUDPPort = Constants.LVL_UDP_PORT_LEADER;
-        }else{
-            logUtil.log( id,LOG_TAG + "Invalid server name ");
+        } else {
+            logUtil.log(id, LOG_TAG + "Invalid server name ");
             return "fail";
         }
         String result = "";
-        if(remoteCenterServerName.compareTo(serverName)!= 0){
+        if (remoteCenterServerName.compareTo(serverName) != 0) {
 
-            synchronized ((recordsMap)){
-                for(List<Records> recordList : recordsMap.values()){
+            synchronized ((recordsMap)) {
+                for (List<Records> recordList : recordsMap.values()) {
                     Iterator<Records> iter = recordList.iterator();
-                    while(iter.hasNext()){
+                    while (iter.hasNext()) {
                         Records found = iter.next();
-                        if(found.getUniqueId().compareTo(recordId) == 0){
+                        if (found.getUniqueId().compareTo(recordId) == 0) {
                             // not found so copy this record to another server
                             // Using UDP to copy the record
                             DatagramSocket socket = null;
-                            try{
+                            try {
                                 socket = new DatagramSocket();
                                 // timeout in 5 seconds
                                 socket.setSoTimeout(5 * 1000);
                                 String req = "";
                                 InetAddress addr = InetAddress.getByName(serverTOConnect);
-                                if(found.getType() == Records.RecordType.TEACHER){
+                                if (found.getType() == Records.RecordType.TEACHER) {
                                     TeacherRecord tr = (TeacherRecord) found;
                                     StringBuilder br = new StringBuilder();
-                                    br.append("TR");br.append("|");
-                                    br.append(id);br.append("|");
-                                    br.append(recordId);br.append("|");
-                                    br.append(tr.getFirstName());br.append("|");
-                                    br.append(tr.getLastName());br.append("|");
-                                    br.append(tr.getAddress());br.append("|");
-                                    br.append(tr.getPhone());br.append("|");
-                                    br.append(tr.getSpecialization());br.append("|");
-                                    br.append(tr.getLocation());br.append("|");
+                                    br.append("TR");
+                                    br.append("|");
+                                    br.append(id);
+                                    br.append("|");
+                                    br.append(recordId);
+                                    br.append("|");
+                                    br.append(tr.getFirstName());
+                                    br.append("|");
+                                    br.append(tr.getLastName());
+                                    br.append("|");
+                                    br.append(tr.getAddress());
+                                    br.append("|");
+                                    br.append(tr.getPhone());
+                                    br.append("|");
+                                    br.append(tr.getSpecialization());
+                                    br.append("|");
+                                    br.append(tr.getLocation());
+                                    br.append("|");
                                     req = br.toString();
 
-                                }else{
+                                } else {
                                     StudentRecord sr = (StudentRecord) found;
                                     StringBuilder br = new StringBuilder();
-                                    br.append("SR");br.append("|");
-                                    br.append(id);br.append("|");
-                                    br.append(recordId);br.append("|");
-                                    br.append(sr.getFirstName());br.append("|");
-                                    br.append(sr.getLastName());br.append("|");
+                                    br.append("SR");
+                                    br.append("|");
+                                    br.append(id);
+                                    br.append("|");
+                                    br.append(recordId);
+                                    br.append("|");
+                                    br.append(sr.getFirstName());
+                                    br.append("|");
+                                    br.append(sr.getLastName());
+                                    br.append("|");
                                     String coursesStr = sr.getCoursesRegistered().stream()
                                             .map(n -> String.valueOf(n))
                                             .collect(Collectors.joining("-", "{", "}"));
-                                    br.append(coursesStr);br.append("|");
-                                    br.append(sr.getStatus());br.append("|");
-                                    br.append(sr.getStatusDate());br.append("|");
+                                    br.append(coursesStr);
+                                    br.append("|");
+                                    br.append(sr.getStatus());
+                                    br.append("|");
+                                    br.append(sr.getStatusDate());
+                                    br.append("|");
 
                                 }
                                 byte[] request = req.getBytes();
-                                DatagramPacket pckt = new DatagramPacket(request,req.length(),addr,serverTOConnectUDPPort);
+                                DatagramPacket pckt = new DatagramPacket(request, req.length(), addr, serverTOConnectUDPPort);
                                 socket.send(pckt);
 
                                 byte[] response = new byte[1024];
@@ -304,24 +313,24 @@ public class CenterServerImpl extends corbaPOA  {
                                 socket.receive(receivedpckt);
                                 result = new String(receivedpckt.getData()).trim();
 
-                            }catch(Exception e){
+                            } catch (Exception e) {
                                 logUtil.log(LOG_TAG + e.getMessage());
-                            }finally {
-                                if(socket != null){
+                            } finally {
+                                if (socket != null) {
                                     socket.close();
                                 }
                             }
 
                             // when data is copied through UDP, delete the record
-                            if(result.compareTo(recordId) == 0){
-                                synchronized (lockCount){
+                            if (result.compareTo(recordId) == 0) {
+                                synchronized (lockCount) {
                                     recordList.remove(found);
                                     recordsCount--;
-                                    logUtil.log(id, LOG_TAG +  recordId + " transferred to " + remoteCenterServerName);
+                                    logUtil.log(id, LOG_TAG + recordId + " transferred to " + remoteCenterServerName);
                                 }
                                 return "success";
-                            }else{
-                                logUtil.log( id,LOG_TAG +  recordId + " failed to transfer to "+ remoteCenterServerName);
+                            } else {
+                                logUtil.log(id, LOG_TAG + recordId + " failed to transfer to " + remoteCenterServerName);
                                 return "fail";
                             }
 
@@ -335,11 +344,11 @@ public class CenterServerImpl extends corbaPOA  {
     }
 
     @Override
-    public String killPrimaryServer(String id){
+    public String killPrimaryServer(String id) {
         return "success";
     }
 
-    private synchronized String editSRRecord(String manager,String recordID, String key, String val) {
+    private synchronized String editSRRecord(String manager, String recordID, String key, String val) {
         for (Map.Entry<String, List<Records>> value : recordsMap.entrySet()) {
             List<Records> mylist = value.getValue();
             Optional<Records> record = mylist.stream().filter(x -> x.getUniqueId().equals(recordID)).findFirst();
@@ -347,44 +356,40 @@ public class CenterServerImpl extends corbaPOA  {
                 if (record.isPresent() && key.equals("Status")) {
                     ((StudentRecord) record.get()).setStatus(val);
                     logUtil.log(LOG_TAG + "Records update for : " + serverName);
-                    return "Records updated with status : "+val;
+                    return "Records updated with status : " + val;
                 } else if (record.isPresent() && key.equals("StatusDate")) {
                     ((StudentRecord) record.get()).setStatusDate(val);
                     logUtil.log(LOG_TAG + "Records update for : " + serverName);
-                    return "Records updated with status : "+val;
+                    return "Records updated with status : " + val;
                 }
             }
         }
-        return "Record : " + recordID+ " is not found";
+        return "Record : " + recordID + " is not found";
     }
 
-    private String editTRRecord(String manager,String recordID, String key, String val) {
-       for (Map.Entry<String, List<Records>> value : recordsMap.entrySet()) {
-           List<Records> mylist = value.getValue();
-           Optional<Records> record = mylist.stream().filter(x -> x.getUniqueId().equals(recordID)).findFirst();
+    private String editTRRecord(String manager, String recordID, String key, String val) {
+        for (Map.Entry<String, List<Records>> value : recordsMap.entrySet()) {
+            List<Records> mylist = value.getValue();
+            Optional<Records> record = mylist.stream().filter(x -> x.getUniqueId().equals(recordID)).findFirst();
 
-           if (record.isPresent()) {
-               if (record.isPresent() && key.equalsIgnoreCase("Phone")) {
-                   ((TeacherRecord) record.get()).setPhone(val);
-                   logUtil.log( manager, LOG_TAG + "Records update for : " + serverName);
-                    return "Records updated with status : "+val;
-                }
-
-                else if (record.isPresent() && key.equalsIgnoreCase("Address")) {
+            if (record.isPresent()) {
+                if (record.isPresent() && key.equalsIgnoreCase("Phone")) {
+                    ((TeacherRecord) record.get()).setPhone(val);
+                    logUtil.log(manager, LOG_TAG + "Records update for : " + serverName);
+                    return "Records updated with status : " + val;
+                } else if (record.isPresent() && key.equalsIgnoreCase("Address")) {
                     ((TeacherRecord) record.get()).setAddress(val);
-                    logUtil.log( manager, LOG_TAG + "Records update for : " + serverName);
-                    return "Records updated with status : "+val;
-                }
-
-                else if (record.isPresent() && key.equalsIgnoreCase("Location")) {
+                    logUtil.log(manager, LOG_TAG + "Records update for : " + serverName);
+                    return "Records updated with status : " + val;
+                } else if (record.isPresent() && key.equalsIgnoreCase("Location")) {
                     ((TeacherRecord) record.get()).setLocation(val);
-                    logUtil.log( manager, LOG_TAG + "Records update for : " + serverName);
-                    return "Records updated with status : "+val;
+                    logUtil.log(manager, LOG_TAG + "Records update for : " + serverName);
+                    return "Records updated with status : " + val;
                 }
             }
         }
-       return "Record : " + recordID+ " is not found";
-   }
+        return "Record : " + recordID + " is not found";
+    }
 
 
     public String editCourses(String manager, String id, String key, ArrayList<String> values) {
@@ -400,13 +405,13 @@ public class CenterServerImpl extends corbaPOA  {
         return null;
     }
 
-    public void startUDPServer(){
+    public void startUDPServer() {
         DatagramSocket socket = null;
-        try{
+        try {
             socket = new DatagramSocket(this.udpPort);
-            while(true){
+            while (true) {
                 //Get the request
-                byte[] buffer =new byte[1024];
+                byte[] buffer = new byte[1024];
                 DatagramPacket request = new DatagramPacket(buffer, buffer.length);
                 socket.receive(request);
 
@@ -415,75 +420,75 @@ public class CenterServerImpl extends corbaPOA  {
                 new Thread(() -> {
                     String reply = "-1";
                     String reqStr = new String(request.getData()).trim();
-                    String[] reqArr= reqStr.split("|");
-                    switch(reqArr[0]){
+                    String[] reqArr = reqStr.split("|");
+                    switch (reqArr[0]) {
                         case "TR":
-                            reply = transferTR(reqArr[1],reqArr[2],reqArr[3],reqArr[4],reqArr[5],reqArr[6],reqArr[7],reqArr[8]);
+                            reply = transferTR(reqArr[1], reqArr[2], reqArr[3], reqArr[4], reqArr[5], reqArr[6], reqArr[7], reqArr[8]);
                             break;
                         case "SR":
-                            reply = transferSR(reqArr[1],reqArr[2],reqArr[3],reqArr[4],reqArr[5],reqArr[6],reqArr[7]);
+                            reply = transferSR(reqArr[1], reqArr[2], reqArr[3], reqArr[4], reqArr[5], reqArr[6], reqArr[7]);
                     }
                     // reply back
-                    DatagramPacket response = new DatagramPacket(reply.getBytes(),reply.length(),request.getAddress(),request.getPort());
-                    try{
+                    DatagramPacket response = new DatagramPacket(reply.getBytes(), reply.length(), request.getAddress(), request.getPort());
+                    try {
                         threadSocket.send(response);
-                    }catch (IOException io){
+                    } catch (IOException io) {
                         logUtil.log(LOG_TAG + io.getMessage());
                     }
                 }).start();
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             logUtil.log(LOG_TAG + e.getMessage());
-        }finally{
-            if(socket != null){
+        } finally {
+            if (socket != null) {
                 socket.close();
             }
         }
     }
 
-    private String transferTR(String id, String recordID, String fName, String lName, String addr, String phone, String spec, String loc){
+    private String transferTR(String id, String recordID, String fName, String lName, String addr, String phone, String spec, String loc) {
         //Creating new teacher record
-        TeacherRecord newTR = new TeacherRecord(recordID, fName,lName,addr, phone,spec, loc);
+        TeacherRecord newTR = new TeacherRecord(recordID, fName, lName, addr, phone, spec, loc);
         //using synchronized here so that mututal exclusion can happend with multiple threads calling concurrently ..
-        synchronized (recordsMap){
+        synchronized (recordsMap) {
             List<Records> recordsList;
             String key = lName.substring(0, 1);
-            if(recordsMap.containsKey(lName)){
+            if (recordsMap.containsKey(lName)) {
                 recordsList = recordsMap.get(key);
-            }else{
+            } else {
                 recordsList = new ArrayList<>();
-                recordsMap.put(key,recordsList);
+                recordsMap.put(key, recordsList);
             }
             // Adding new record here
             recordsList.add(newTR);
             recordsCount++;
-            logUtil.log( id, LOG_TAG +"record tranferred, record ID : " + recordID + " teacher name : " + fName );
+            logUtil.log(id, LOG_TAG + "record tranferred, record ID : " + recordID + " teacher name : " + fName);
         }
         return recordID;
     }
 
-    private String transferSR(String id, String recordId, String fName,String lName, String courses, String status, String date){
+    private String transferSR(String id, String recordId, String fName, String lName, String courses, String status, String date) {
         ArrayList<String> coursesRegistered = new ArrayList<>();
         try {
             coursesRegistered = (ArrayList<String>) Arrays.asList(courses.split(","));
-        }catch (Exception e){
+        } catch (Exception e) {
             logUtil.log(LOG_TAG + e.getMessage());
         }
-        StudentRecord newSR = new StudentRecord(recordId,fName,lName,coursesRegistered,status,date);
+        StudentRecord newSR = new StudentRecord(recordId, fName, lName, coursesRegistered, status, date);
         //using synchronized here so that mututal exclusion can happend with multiple threads calling concurrently ..
-        synchronized (recordsMap){
+        synchronized (recordsMap) {
             List<Records> recordsList;
-            String key = lName.substring(0,1);
-            if(recordsMap.containsKey(lName)){
+            String key = lName.substring(0, 1);
+            if (recordsMap.containsKey(lName)) {
                 recordsList = recordsMap.get(key);
-            }else{
+            } else {
                 recordsList = new ArrayList<>();
-                recordsMap.put(key,recordsList);
+                recordsMap.put(key, recordsList);
             }
             // Adding new record here
             recordsList.add(newSR);
             recordsCount++;
-            logUtil.log( id, LOG_TAG + "record trasferred, record ID: " + recordId + " student name: " + fName);
+            logUtil.log(id, LOG_TAG + "record trasferred, record ID: " + recordId + " student name: " + fName);
         }
         return recordId;
     }
@@ -491,27 +496,25 @@ public class CenterServerImpl extends corbaPOA  {
     private String udpClient(int port) {
         System.out.println(LOG_TAG + "--> udpclient port: " + port);
         DatagramSocket socket = null;
-        String response= null;
+        String response = null;
         try {
-            socket=new DatagramSocket();
+            socket = new DatagramSocket();
             // 10 second timeout
             socket.setSoTimeout(1000 * 5);
-            InetAddress aHost= InetAddress.getByName("localhost");
-            String data= "requesting data";
-            DatagramPacket request= new DatagramPacket(data.getBytes(), data.getBytes().length, aHost, port);
+            InetAddress aHost = InetAddress.getByName("localhost");
+            String data = "requesting data";
+            DatagramPacket request = new DatagramPacket(data.getBytes(), data.getBytes().length, aHost, port);
             socket.send(request);
-            byte[] buffer= new byte[1000];
-            DatagramPacket reply= new DatagramPacket(buffer, buffer.length);
+            byte[] buffer = new byte[1000];
+            DatagramPacket reply = new DatagramPacket(buffer, buffer.length);
             socket.receive(reply);
-            response=  new String(reply.getData());
+            response = new String(reply.getData());
 
-            System.out.println(LOG_TAG + "reply is "+ new String(reply.getData()));
-        }
-        catch (Exception e) {
-            System.out.println(LOG_TAG + "udpclient: "+e.getMessage());
-        }
-        finally {
-            if(socket!=null) {
+            System.out.println(LOG_TAG + "reply is " + new String(reply.getData()));
+        } catch (Exception e) {
+            System.out.println(LOG_TAG + "udpclient: " + e.getMessage());
+        } finally {
+            if (socket != null) {
                 socket.close();
             }
         }
@@ -519,7 +522,7 @@ public class CenterServerImpl extends corbaPOA  {
         return response;
     }
 
-    public String getServerName(){
+    public String getServerName() {
         return serverName;
     }
 
