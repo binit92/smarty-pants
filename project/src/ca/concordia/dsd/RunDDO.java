@@ -12,6 +12,7 @@ import org.omg.PortableServer.POA;
 import org.omg.PortableServer.POAHelper;
 
 import java.io.File;
+import java.util.Arrays;
 
 public class RunDDO {
 
@@ -41,6 +42,8 @@ public class RunDDO {
             localargs[2] = "-ORBInitialHost ";
             //localargs[3] = Constants.DDO_SERVER_HOST;
             localargs[3] = Constants.ORB_INITIAL_HOST;
+
+            System.out.println(Arrays.toString(localargs));
 
             // Initiate local ORB object
             ORB orb = ORB.init(localargs, null);

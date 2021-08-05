@@ -2,6 +2,7 @@ package ca.concordia.dsd.server.frontend;
 
 import ca.concordia.dsd.arch.corbaPOA;
 import ca.concordia.dsd.database.Records;
+import ca.concordia.dsd.server.OperationsType;
 import ca.concordia.dsd.server.impl.CenterServerImpl;
 import ca.concordia.dsd.util.Constants;
 import ca.concordia.dsd.util.LogUtil;
@@ -37,7 +38,7 @@ public class FrontEnd extends corbaPOA {
 
     // why ?
     private HashMap<String, List<Records>> recordListMap;
-    private ArrayList<TransferRequestThread> transferRequestThreadArrayList ;
+    private ArrayList<TransferRequestToCurrentServerThread> transferRequestToCurrentServerThreadArrayList;
     private HashMap<Integer,String> requestBufferMap;
 
     private static Object lock = new Object();
@@ -56,7 +57,7 @@ public class FrontEnd extends corbaPOA {
         this.logUtil = new LogUtil("frontend");
 
         //ArrayList of threads that transfer requests to current server
-        transferRequestThreadArrayList = new ArrayList<>();
+        transferRequestToCurrentServerThreadArrayList = new ArrayList<>();
         // hashmap of transfer response threads
         transferResponseThreadHashMap = new HashMap<>();
         // request buffer map
@@ -88,12 +89,12 @@ public class FrontEnd extends corbaPOA {
     public void init(){
         try{
             //starting FIFO Thread
-            FIFOThread fifoThread = new FIFOThread(transferRequestThreadArrayList,logUtil);
+            FIFOThread fifoThread = new FIFOThread(transferRequestToCurrentServerThreadArrayList,logUtil);
             fifoThread.start();
 
             //starting UDP Response Thread
-            UDPResponseThread udpResponseThread = new UDPResponseThread(transferResponseThreadHashMap,logUtil);
-            udpResponseThread.start();
+            UDPResponseReceiverThread udpResponseReceiverThread = new UDPResponseReceiverThread(transferResponseThreadHashMap,logUtil);
+            udpResponseReceiverThread.start();
 
             // Central Server, leader and its two replica
             leader = new CenterServerImpl(Constants.DDO_TAG,Constants.DDO_SERVER_PORT,Constants.DDO_UDP_PORT_LEADER);
@@ -157,6 +158,7 @@ public class FrontEnd extends corbaPOA {
     public String createTRecord(String id, String fName, String lName, String address, String phone, String specialization, String location) {
         System.out.println(id + " " +fName + " " + lName + " " + address);
         StringBuilder builder = new StringBuilder();
+        builder.append(OperationsType.CREATE_TR_RECORD);builder.append(Constants.RESPONSE_DATA_SPLITTER);
         builder.append(id);builder.append("|");
         builder.append(fName);builder.append("|");
         builder.append(lName);builder.append("|");
@@ -165,13 +167,15 @@ public class FrontEnd extends corbaPOA {
         builder.append(specialization);builder.append("|");
         builder.append(location);builder.append("|");
         logUtil.log(LOG_TAG + " dispatching createTRRecord to server : " + builder);
-        return dispatchToCurrentServer(builder.toString());
+        //return dispatchToCurrentServer(builder.toString());
+        return "1232";
     }
 
     @Override
     public String createSRecord(String id, String fName, String lName, String courses, boolean status, String statusDate) {
         System.out.println(id + " " +fName + " " + lName  );
         StringBuilder builder = new StringBuilder();
+        builder.append(OperationsType.CREATE_SR_RECORD);builder.append(Constants.RESPONSE_DATA_SPLITTER);
         builder.append(id);builder.append("|");
         builder.append(fName);builder.append("|");
         builder.append(lName);builder.append("|");
@@ -186,6 +190,7 @@ public class FrontEnd extends corbaPOA {
     public String getRecordCounts(String id) {
         System.out.println(id );
         StringBuilder builder = new StringBuilder();
+        builder.append(OperationsType.GET_RECORD_COUNT);builder.append(Constants.RESPONSE_DATA_SPLITTER);
         builder.append(id);builder.append("|");
         logUtil.log(LOG_TAG + " dispatching getRecordCounts to server : " + builder);
         return dispatchToCurrentServer(builder.toString());
@@ -195,6 +200,7 @@ public class FrontEnd extends corbaPOA {
     public String editRecord(String id, String recordID, String fieldName, String newValue) {
         System.out.println(id + " " +recordID + " " + fieldName + " " + newValue);
         StringBuilder builder = new StringBuilder();
+        builder.append(OperationsType.EDIT_RECORD);builder.append(Constants.RESPONSE_DATA_SPLITTER);
         builder.append(id);builder.append("|");
         builder.append(recordID);builder.append("|");
         builder.append(fieldName);builder.append("|");
@@ -207,6 +213,7 @@ public class FrontEnd extends corbaPOA {
     public String transferRecord(String id, String recordId, String remoteCenterServerName) {
         System.out.println(id + " " + recordId + " " + remoteCenterServerName);
         StringBuilder builder = new StringBuilder();
+        builder.append(OperationsType.TRANSFER_RECORD);builder.append(Constants.RESPONSE_DATA_SPLITTER);
         builder.append(id);builder.append("|");
         builder.append(recordId);builder.append("|");
         builder.append(remoteCenterServerName);builder.append("|");
@@ -229,20 +236,24 @@ public class FrontEnd extends corbaPOA {
 
             Thread.sleep(5 * 1000);
 
-            try{
-                // joining threads here.
-                transferResponseThreadHashMap.get(requestCount).join();
-            }catch (InterruptedException ie){
-                ie.printStackTrace();
-            }
-            // delete from the saved response buffer
-            requestBufferMap.remove(requestCount);
-            return transferResponseThreadHashMap.get(requestCount).getResponse();
+
+            return getResponse(requestCount);
         }catch (Exception e){
             e.printStackTrace();
         }
         return null;
     }
+
+    public String getResponse(Integer requestId) {
+        try {
+            transferResponseThreadHashMap.get(requestId).join();
+        } catch (InterruptedException e) {
+            System.out.println(e.getMessage());
+        }
+        requestBufferMap.remove(requestId);
+        return transferResponseThreadHashMap.get(requestId).getResponse();
+    }
+
 
     // TODO
     private void checkHeartBeats(){

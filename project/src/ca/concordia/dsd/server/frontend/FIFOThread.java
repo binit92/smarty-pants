@@ -1,9 +1,7 @@
 package ca.concordia.dsd.server.frontend;
 
-import ca.concordia.dsd.util.Constants;
 import ca.concordia.dsd.util.LogUtil;
 
-import java.io.FileWriter;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
@@ -20,13 +18,13 @@ public class FIFOThread extends Thread{
 
     private DatagramSocket sSocket;
     private DatagramPacket rPacket;
-    private ArrayList<TransferRequestThread> requestThreadArrayList;
+    private ArrayList<TransferRequestToCurrentServerThread> requestThreadArrayList;
     private Queue<String> fifoQueue =new LinkedList<>();
     private LogUtil logUtil;
 
     private static final String LOG_TAG = "| " + FIFOThread.class.getSimpleName() + " | ";
 
-    public FIFOThread(ArrayList<TransferRequestThread> requestThreadArrayList,LogUtil logUtil){
+    public FIFOThread(ArrayList<TransferRequestToCurrentServerThread> requestThreadArrayList, LogUtil logUtil){
         this.requestThreadArrayList = requestThreadArrayList;
         this.logUtil = logUtil;
         init();
@@ -58,7 +56,7 @@ public class FIFOThread extends Thread{
                 System.out.println(LOG_TAG + "received string : " + receiveStr);
 
                 fifoQueue.add(receiveStr);
-                TransferRequestThread trt = new TransferRequestThread(fifoQueue.poll().getBytes(),logUtil);
+                TransferRequestToCurrentServerThread trt = new TransferRequestToCurrentServerThread(fifoQueue.poll().getBytes(),logUtil);
                 trt.start();
 
                 requestThreadArrayList.add(trt);

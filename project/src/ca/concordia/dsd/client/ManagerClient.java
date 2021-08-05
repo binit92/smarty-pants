@@ -82,7 +82,9 @@ public class ManagerClient implements Constants {
             args[0] = "-ORBInitialPort";
             args[1] = Integer.toString(port);
             args[2] = "-ORBInitialHost ";
-            args[3] = "localhost";
+            args[3] = name;
+
+            System.out.println(Arrays.toString(args));
 
             // create and initialize the ORB
             ORB orb = ORB.init(args, null);
@@ -158,7 +160,11 @@ public class ManagerClient implements Constants {
                     ArrayList<String> sCourseList = new ArrayList<>();
                     String sCourses = keyboard.nextLine();
                     logUtil.log("Entered Student's courses to be added " + sCourses);
-                    sCourseList = (ArrayList<String>) Arrays.asList(sCourses.split(","));
+                    if (sCourses.contains(",")) {
+                        sCourseList = (ArrayList<String>) Arrays.asList(sCourses.split(","));
+                    }else{
+                        sCourseList.add(sCourses);
+                    }
                     System.out.println("Status of student (Active/Inactive)");
                     String sStatus = keyboard.nextLine();
                     System.out.println("Status change date of student");

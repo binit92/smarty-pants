@@ -11,15 +11,15 @@ import java.util.HashMap;
 // FrontEnd uses this thread to received UDP response from the leader/replicas server
 // response is latest saved in hashmap
 
-public class UDPResponseThread extends Thread{
+public class UDPResponseReceiverThread extends Thread{
 
     DatagramSocket sSocket;
     DatagramPacket rPacket;
     HashMap<Integer, TransferResponseThread> responseMap;
     private LogUtil logUtil;
-    private final String LOG_TAG = "| " + UDPResponseThread.class.getSimpleName() + " | ";
+    private final String LOG_TAG = "| " + UDPResponseReceiverThread.class.getSimpleName() + " | ";
 
-    public UDPResponseThread(HashMap<Integer, TransferResponseThread> responseMap, LogUtil logUtil){
+    public UDPResponseReceiverThread(HashMap<Integer, TransferResponseThread> responseMap, LogUtil logUtil){
         this.responseMap = responseMap;
         this.logUtil = logUtil;
         init();

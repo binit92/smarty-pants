@@ -12,6 +12,8 @@ import org.omg.CosNaming.NamingContextExtHelper;
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.POAHelper;
 
+import java.util.Arrays;
+
 public class RunLVL {
 
     // open CORBA port programmatically ..
@@ -39,6 +41,7 @@ public class RunLVL {
             //localargs[3] = Constants.LVL_SERVER_HOST;
             localargs[3] = Constants.ORB_INITIAL_HOST;
 
+            System.out.println(Arrays.toString(localargs));
 
             // Initiate local ORB object
             ORB orb = ORB.init(localargs, null);
@@ -50,7 +53,7 @@ public class RunLVL {
             // Create servant and register it with the ORB
             //CenterServerImpl servant = new CenterServerImpl(Constants.LVL_TAG,Constants.LVL_SERVER_PORT,Constants.LVL_UDP_PORT_LEADER);
             //servant.setORB(orb);
-            FrontEnd servant = new FrontEnd(Constants.DDO_TAG);
+            FrontEnd servant = new FrontEnd(Constants.LVL_TAG);
             //servant.init();
 
             // Get object reference from the servant
