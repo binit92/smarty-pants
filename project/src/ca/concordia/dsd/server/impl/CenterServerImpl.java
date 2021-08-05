@@ -114,7 +114,7 @@ public class CenterServerImpl extends corbaPOA  {
 
 
     public String createTRecord(String id, String fName, String lName, String address, String phone, String specialization, String location) {
-        logUtil.log(id,"Create record called for teacher : " + fName);
+        logUtil.log(LOG_TAG + id,"Create record called for teacher : " + fName);
         String teacherid = "TR" + (++teacherCount);
         TeacherRecord tR = new TeacherRecord(teacherid,fName,lName,address,phone,specialization,location);
         //tR.setTeacherId(teacherid);
@@ -123,15 +123,15 @@ public class CenterServerImpl extends corbaPOA  {
         String key = tR.getLastName().substring(0, 1);
         String ret = addToDB(key, tR, null);
         //TODO : fix return
-        logUtil.log(id,"new teacher " + tR.getFirstName() + " with this key " + key);
-        logUtil.log(id,"teacher id " + teacherid);
+        logUtil.log(LOG_TAG + id,"new teacher " + tR.getFirstName() + " with this key " + key);
+        logUtil.log(LOG_TAG + id,"teacher id " + teacherid);
 
         return teacherid;
         //return true;
     }
 
     public String createSRecord(String id, String fName, String lName, String courses, boolean status, String statusDate) {
-        logUtil.log(id,"Create record called for student : " + fName);
+        logUtil.log(LOG_TAG + id,"Create record called for student : " + fName);
         String studentid = "SR" + (studentCount + 1);
         // TODO: fix this : courses, status
         StudentRecord sR = new StudentRecord(studentid,fName,lName,null, "True",statusDate);
@@ -142,14 +142,14 @@ public class CenterServerImpl extends corbaPOA  {
         String ret = addToDB(key, null, sR);
 
         // TODO: return ret
-        logUtil.log(id," new student is added " + sR + " with this key " + key);
-        logUtil.log(id, "student record created " + studentid);
+        logUtil.log(LOG_TAG + id," new student is added " + sR + " with this key " + key);
+        logUtil.log(LOG_TAG + id, "student record created " + studentid);
         return studentid;
         //return true;
     }
 
     public synchronized String getRecordCounts(String manager) {
-        logUtil.log(manager,"get record counts ");
+        logUtil.log(LOG_TAG + manager,"get record counts ");
         String recordCount = null;
         UDPProviderThread[] req = new UDPProviderThread[2];
         int i = 0;
@@ -206,7 +206,7 @@ public class CenterServerImpl extends corbaPOA  {
         else if (type.equalsIgnoreCase("SR")) {
             return editSRRecord(manager,id, key, val);
         }
-        logUtil.log(manager, "Operation invalid");
+        logUtil.log(LOG_TAG + manager, "Operation invalid");
         return "Operation invalid";
     }
 
@@ -223,7 +223,7 @@ public class CenterServerImpl extends corbaPOA  {
             serverTOConnect = Constants.LVL_SERVER_HOST;
             serverTOConnectUDPPort = Constants.LVL_UDP_PORT_LEADER;
         }else{
-            logUtil.log(id,"Invalid server name ");
+            logUtil.log(LOG_TAG + id,"Invalid server name ");
             return "fail";
         }
         String result = "";
@@ -284,7 +284,7 @@ public class CenterServerImpl extends corbaPOA  {
                                 result = new String(receivedpckt.getData()).trim();
 
                             }catch(Exception e){
-                                logUtil.log(e.getMessage());
+                                logUtil.log(LOG_TAG + e.getMessage());
                             }finally {
                                 if(socket != null){
                                     socket.close();
@@ -296,11 +296,11 @@ public class CenterServerImpl extends corbaPOA  {
                                 synchronized (lockCount){
                                     recordList.remove(found);
                                     recordsCount--;
-                                    logUtil.log(id, recordId + " transferred to " + remoteCenterServerName);
+                                    logUtil.log(LOG_TAG + id, recordId + " transferred to " + remoteCenterServerName);
                                 }
                                 return "success";
                             }else{
-                                logUtil.log(id, recordId + " failed to transfer to "+ remoteCenterServerName);
+                                logUtil.log(LOG_TAG + id, recordId + " failed to transfer to "+ remoteCenterServerName);
                                 return "fail";
                             }
 
@@ -321,11 +321,11 @@ public class CenterServerImpl extends corbaPOA  {
             if (record.isPresent()) {
                 if (record.isPresent() && key.equals("Status")) {
                     ((StudentRecord) record.get()).setStatus(val);
-                    logUtil.log("Records update for : " + serverName);
+                    logUtil.log(LOG_TAG + "Records update for : " + serverName);
                     return "Records updated with status : "+val;
                 } else if (record.isPresent() && key.equals("StatusDate")) {
                     ((StudentRecord) record.get()).setStatusDate(val);
-                    logUtil.log("Records update for : " + serverName);
+                    logUtil.log(LOG_TAG + "Records update for : " + serverName);
                     return "Records updated with status : "+val;
                 }
             }
@@ -341,19 +341,19 @@ public class CenterServerImpl extends corbaPOA  {
            if (record.isPresent()) {
                if (record.isPresent() && key.equalsIgnoreCase("Phone")) {
                    ((TeacherRecord) record.get()).setPhone(val);
-                   logUtil.log(manager,"Records update for : " + serverName);
+                   logUtil.log(LOG_TAG + manager,"Records update for : " + serverName);
                     return "Records updated with status : "+val;
                 }
 
                 else if (record.isPresent() && key.equalsIgnoreCase("Address")) {
                     ((TeacherRecord) record.get()).setAddress(val);
-                    logUtil.log(manager,"Records update for : " + serverName);
+                    logUtil.log(LOG_TAG + manager,"Records update for : " + serverName);
                     return "Records updated with status : "+val;
                 }
 
                 else if (record.isPresent() && key.equalsIgnoreCase("Location")) {
                     ((TeacherRecord) record.get()).setLocation(val);
-                    logUtil.log(manager,"Records update for : " + serverName);
+                    logUtil.log(LOG_TAG + manager,"Records update for : " + serverName);
                     return "Records updated with status : "+val;
                 }
             }
@@ -369,7 +369,7 @@ public class CenterServerImpl extends corbaPOA  {
             Optional<Records> record = list.stream().filter(x -> x.getUniqueId().equals(id)).findFirst();
             if (record.isPresent() && key.equalsIgnoreCase("courses")) {
                 ((StudentRecord) record.get()).setCoursesRegistered(values);
-                logUtil.log("Records update for : " + serverName);
+                logUtil.log(LOG_TAG + "Records update for : " + serverName);
             }
         }
         return null;
@@ -403,12 +403,12 @@ public class CenterServerImpl extends corbaPOA  {
                     try{
                         threadSocket.send(response);
                     }catch (IOException io){
-                        logUtil.log(io.getMessage());
+                        logUtil.log(LOG_TAG + io.getMessage());
                     }
                 }).start();
             }
         }catch(Exception e){
-            logUtil.log(e.getMessage());
+            logUtil.log(LOG_TAG + e.getMessage());
         }finally{
             if(socket != null){
                 socket.close();
@@ -432,7 +432,7 @@ public class CenterServerImpl extends corbaPOA  {
             // Adding new record here
             recordsList.add(newTR);
             recordsCount++;
-            logUtil.log(id, "record tranferred, record ID : " + recordID + " teacher name : " + fName );
+            logUtil.log(LOG_TAG + id, "record tranferred, record ID : " + recordID + " teacher name : " + fName );
         }
         return recordID;
     }
@@ -442,7 +442,7 @@ public class CenterServerImpl extends corbaPOA  {
         try {
             coursesRegistered = (ArrayList<String>) Arrays.asList(courses.split(","));
         }catch (Exception e){
-            logUtil.log(e.getMessage());
+            logUtil.log(LOG_TAG + e.getMessage());
         }
         StudentRecord newSR = new StudentRecord(recordId,fName,lName,coursesRegistered,status,date);
         //using synchronized here so that mututal exclusion can happend with multiple threads calling concurrently ..
@@ -458,13 +458,13 @@ public class CenterServerImpl extends corbaPOA  {
             // Adding new record here
             recordsList.add(newSR);
             recordsCount++;
-            logUtil.log(id,"record trasferred, record ID: " + recordId + " student name: " + fName);
+            logUtil.log(LOG_TAG + id,"record trasferred, record ID: " + recordId + " student name: " + fName);
         }
         return recordId;
     }
 
     private String udpClient(int port) {
-        System.out.println("--> udpclient port: " + port);
+        System.out.println(LOG_TAG + "--> udpclient port: " + port);
         DatagramSocket socket = null;
         String response= null;
         try {
@@ -480,17 +480,17 @@ public class CenterServerImpl extends corbaPOA  {
             socket.receive(reply);
             response=  new String(reply.getData());
 
-            System.out.println("reply is "+ new String(reply.getData()));
+            System.out.println(LOG_TAG + "reply is "+ new String(reply.getData()));
         }
         catch (Exception e) {
-            System.out.println("udpclient: "+e.getMessage());
+            System.out.println(LOG_TAG + "udpclient: "+e.getMessage());
         }
         finally {
             if(socket!=null) {
                 socket.close();
             }
         }
-        System.out.println("-->response ");
+        System.out.println(LOG_TAG + "-->response ");
         return response;
     }
 

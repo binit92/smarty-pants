@@ -62,7 +62,7 @@ public class TransferRequestToCurrentServerThread extends Thread {
             case CREATE_TR_RECORD:
                 System.out.println(LOG_TAG + strToSend[1]);
                 this.server = pickServer();
-                String[] t_entries = strToSend[1].split("\|");
+                String[] t_entries = strToSend[1].split("\\|");
                 System.out.println(LOG_TAG + Arrays.toString(t_entries));
                 String t_id = t_entries[0];
                 String t_fName = t_entries[1];
@@ -78,7 +78,7 @@ public class TransferRequestToCurrentServerThread extends Thread {
             case CREATE_SR_RECORD:
                 System.out.println(LOG_TAG + strToSend[1]);
                 this.server = pickServer();
-                String[] s_entries = strToSend[1].split("|");
+                String[] s_entries = strToSend[1].split("\\|");
                 System.out.println(LOG_TAG + Arrays.toString(s_entries));
                 String s_id = s_entries[0];
                 String s_fName = s_entries[1];
@@ -93,7 +93,7 @@ public class TransferRequestToCurrentServerThread extends Thread {
             case GET_RECORD_COUNT:
                 System.out.println(LOG_TAG + strToSend[1]);
                 this.server = pickServer();
-                String[] g_entries = strToSend[1].split("|");
+                String[] g_entries = strToSend[1].split("\\|");
                 System.out.println(LOG_TAG + Arrays.toString(g_entries));
                 String g_id = g_entries[0];
 
@@ -103,7 +103,7 @@ public class TransferRequestToCurrentServerThread extends Thread {
             case EDIT_RECORD:
                 System.out.println(LOG_TAG + strToSend[1]);
                 this.server = pickServer();
-                String[] e_entries = strToSend[1].split("|");
+                String[] e_entries = strToSend[1].split("\\|");
                 System.out.println(LOG_TAG + Arrays.toString(e_entries));
                 String e_id = e_entries[0];
                 String e_recordID = e_entries[1];
@@ -116,7 +116,7 @@ public class TransferRequestToCurrentServerThread extends Thread {
             case TRANSFER_RECORD:
                 System.out.println(LOG_TAG + strToSend[1]);
                 this.server = pickServer();
-                String[] tr_entries = strToSend[1].split("|");
+                String[] tr_entries = strToSend[1].split("\\|");
                 System.out.println(LOG_TAG + Arrays.toString(tr_entries));
                 String tr_id = tr_entries[0];
                 String tr_recordId = tr_entries[1];
