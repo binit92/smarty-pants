@@ -13,6 +13,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  *  What this class does:
@@ -256,20 +257,31 @@ public class FrontEnd extends corbaPOA {
             System.out.println(e.getMessage());
         }
         requestBufferMap.remove(requestId);
-        return transferResponseThreadHashMap.get(requestId).getResponse();
+        String response = transferResponseThreadHashMap.get(requestId).getResponse();
+        logUtil.log(LOG_TAG + "response : " + response);
+        return response;
     }
 
 
-    // TODO
-    private void checkHeartBeats(){
+    // TODO : add some comment and details here
+    private void checkHeartBeats(String name_of_server){
         synchronized (lock){
             long cur = System.currentTimeMillis();
-
+            if (server_reporting_time.containsKey(name_of_server)) {
+                if (cur - server_reporting_time.get(name_of_server) > Constants.LEADER_DOWN_TIME_LIMIT) {
+                    if (server_leader.containsKey(name_of_server)) {
+                        if (server_leader.get(name_of_server)) {
+                            logUtil.log(LOG_TAG + name_of_server + " Leader Server has failed!!!");
+                            electNewLeader(name_of_server);
+                        }
+                    }
+                }
+            }
         }
     }
 
-
-    private void electNewLeader(){
+    // TODO: add some comment and details here
+    private void electNewLeader(String old_leader_server){
 
     }
 

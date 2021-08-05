@@ -49,5 +49,6 @@ public interface Constants {
     public static final int REPLICA1_ID = 2;
     public static final int REPLICA2_ID = 3;
 
+    public static final int LEADER_DOWN_TIME_LIMIT = 1000;
 
 }
