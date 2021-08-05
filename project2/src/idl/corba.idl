@@ -1,0 +1,19 @@
+module DcmsApp
+{
+  interface Dcms
+  {	  	
+	  	string createTRecord(in string managerID,in string teacher);
+	
+		string createSRecord(in string managerID,in string student);
+	
+		string getRecordCount(in string managerID);
+	
+		string editRecord(in string managerID,in string recordID, in string fieldname, in string newvalue);
+		
+		string transferRecord(in string managerID, in string recordID, in string location);
+		
+		string killServer(in string location);
+
+
+  };
+};
