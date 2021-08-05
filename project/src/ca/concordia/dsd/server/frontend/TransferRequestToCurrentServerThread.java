@@ -73,7 +73,7 @@ public class TransferRequestToCurrentServerThread extends Thread {
                 String t_location = t_entries[6];
 
                 responseStr = this.server.createTRecord(t_id,t_fName,t_lName,t_address,t_phone,t_specialization,t_location);
-                reply(t_id,responseStr);
+                reply(requestId,responseStr);
                 break;
             case CREATE_SR_RECORD:
                 System.out.println(LOG_TAG + strToSend[1]);
@@ -88,7 +88,7 @@ public class TransferRequestToCurrentServerThread extends Thread {
                 String s_statusDate = s_entries[5];
 
                 responseStr = this.server.createSRecord(s_id,s_fName,s_lName,s_courses,s_status,s_statusDate);
-                reply(s_id,responseStr);
+                reply(requestId,responseStr);
                 break;
             case GET_RECORD_COUNT:
                 System.out.println(LOG_TAG + strToSend[1]);
@@ -98,7 +98,7 @@ public class TransferRequestToCurrentServerThread extends Thread {
                 String g_id = g_entries[0];
 
                 responseStr = this.server.getRecordCounts(g_id);
-                reply(g_id,responseStr);
+                reply(requestId,responseStr);
                 break;
             case EDIT_RECORD:
                 System.out.println(LOG_TAG + strToSend[1]);
@@ -111,7 +111,7 @@ public class TransferRequestToCurrentServerThread extends Thread {
                 String e_newValue = e_entries[3];
 
                 responseStr = this.server.editRecord(e_id,e_recordID,e_fieldName,e_newValue);
-                reply(e_id,responseStr);
+                reply(requestId,responseStr);
                 break;
             case TRANSFER_RECORD:
                 System.out.println(LOG_TAG + strToSend[1]);
@@ -123,7 +123,7 @@ public class TransferRequestToCurrentServerThread extends Thread {
                 String tr_remoteCenterServerName = tr_entries[2];
 
                 responseStr = this.server.transferRecord(tr_id,tr_recordId,tr_remoteCenterServerName);
-                reply(tr_id,responseStr);
+                reply(requestId,responseStr);
                 break;
         }
     }

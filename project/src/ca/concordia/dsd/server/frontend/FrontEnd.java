@@ -65,6 +65,8 @@ public class FrontEnd extends corbaPOA {
         //received response list
         responseArrayList = new ArrayList<>();
 
+        // save the list of response from TransferResponseThread
+        listOfResponse = new ArrayList<>();
         //repo - map of leader and replicas
         repo = new HashMap<>();
         findCurrentServerSettings(serverTag);
@@ -167,8 +169,7 @@ public class FrontEnd extends corbaPOA {
         builder.append(specialization);builder.append("|");
         builder.append(location);builder.append("|");
         logUtil.log(LOG_TAG + " dispatching createTRRecord to server : " + builder);
-        //return dispatchToCurrentServer(builder.toString());
-        return "1232";
+        return dispatchToCurrentServer(builder.toString());
     }
 
     @Override
