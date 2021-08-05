@@ -26,19 +26,29 @@ public class CenterServerImpl extends corbaPOA  {
 
     int port = 0;
     int udpPort = 0;
+    int port1 ;
+    int port2 ;
+    boolean isAlive;
 
     private ORB ddoorb;
 
     public HashMap<String, List<Records>> recordsMap;
+    public HeartBeatReceiver heartBeatReceiver;
+    private HeartBeatSender heartBeatSender;
     private static int studentCount = 10001;
     private static int teacherCount = 10001;
     private int recordsCount;
     private final String serverName;
 
+    boolean isPrimary;
+    Integer serverID = 0;
+    public ArrayList<Integer> replicas;
+    public DatagramSocket ds;
+
     private static final Object lockID = new Object();
     private static final Object lockCount = new Object();
 
-    public CenterServerImpl(String serverName, int port, int udpPort) {
+    public CenterServerImpl(String serverName, int port,  int port1, int port2, int udpPort, DatagramSocket ds,ArrayList<Integer> replicas,int serverID, boolean isPrimary, boolean isAlive) {
         this.serverName = serverName;
         this.port = port;
         this.udpPort = udpPort;
@@ -47,6 +57,17 @@ public class CenterServerImpl extends corbaPOA  {
         udpThread = new UDPThread(this.serverName, this);
         udpThread.start();
         setIPAddress(serverName);
+        this.isPrimary = isPrimary;
+        this.serverID = serverID;
+        this.replicas = replicas;
+
+        this.isAlive = isAlive;
+        this.port1 = port1;
+        this.port2 = port2;
+        this.ds = ds;
+
+        heartBeatReceiver = new HeartBeatReceiver(isAlive, serverName, port);
+        heartBeatReceiver.start();
     }
 
     public void setORB(ORB ddoobjectorb) {
@@ -313,12 +334,12 @@ public class CenterServerImpl extends corbaPOA  {
         return result;
     }
 
-    public String killServer(String id, String location){
-        return "false";
+    @Override
+    public String killPrimaryServer(String id){
+        return "success";
     }
 
     private synchronized String editSRRecord(String manager,String recordID, String key, String val) {
-
         for (Map.Entry<String, List<Records>> value : recordsMap.entrySet()) {
             List<Records> mylist = value.getValue();
             Optional<Records> record = mylist.stream().filter(x -> x.getUniqueId().equals(recordID)).findFirst();
@@ -500,5 +521,34 @@ public class CenterServerImpl extends corbaPOA  {
 
     public String getServerName(){
         return serverName;
+    }
+
+    public void sendHeartBeat() {
+        heartBeatSender = new HeartBeatSender(ds, serverName, port1, port2);
+        heartBeatSender.start();
+    }
+
+    public boolean isPrimary() {
+        return isPrimary;
+    }
+
+    public void setPrimary(boolean isPrimary) {
+        this.isPrimary = isPrimary;
+    }
+
+    public ArrayList<Integer> getReplicas() {
+        return replicas;
+    }
+
+    public void setReplicas(ArrayList<Integer> replicas) {
+        this.replicas = replicas;
+    }
+
+    public Integer getServerID() {
+        return serverID;
+    }
+
+    public void setServerID(Integer serverID) {
+        this.serverID = serverID;
     }
 }

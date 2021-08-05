@@ -262,13 +262,12 @@ public class ManagerClient implements Constants {
                     }
                     break;
                 case 6:
-                    System.out.println("Enter location of server : ");
-                    String rLocation = keyboard.nextLine();
-                    String ret  = server.killServer(managerId,rLocation);
+                    System.out.println(" Request to kill primary server of " + getManagerID().substring(0,3));
+                    String ret  = server.killPrimaryServer(managerId);
                     if("success".equalsIgnoreCase(ret)){
-                        logUtil.log(" leader server of location " + rLocation + " is killed successfully" );
+                        logUtil.log(" leader server is killed successfully" );
                     }else{
-                        logUtil.log(" leader server of location " + rLocation + " is NOT killed !" );
+                        logUtil.log(" leader server is NOT killed !" );
                     }
                     break;
 
