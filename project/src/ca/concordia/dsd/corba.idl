@@ -6,6 +6,7 @@ interface corba{
      string getRecordCounts(in string id);
      string editRecord(in string id, in string recordID, in string fieldName, in string newValue);
      string transferRecord(in string id, in string recordId, in string remoteCenterServerName);
+     string killServer(in string id, in string location);
     };
 };
 

@@ -116,7 +116,8 @@ public class ManagerClient implements Constants {
             System.out.println("3. Get record count ");
             System.out.println("4. Edit record ");
             System.out.println("5. Transfer record to server ");
-            System.out.println("6. Quit operations");
+            System.out.println("6. Kill the leader server");
+            System.out.println("7. Quit operations");
             Scanner keyboard = new Scanner(System.in);
             int input = Integer.parseInt(keyboard.nextLine());
             switch (input) {
@@ -251,7 +252,7 @@ public class ManagerClient implements Constants {
                 case 5:
                     System.out.println("Enter the record ID : ");
                     String rID = keyboard.nextLine();
-                    System.out.println("Enter the server name : ");
+                    System.out.println("Enter the server name <MTL/DDO/LVL> : ");
                     String rServerName = keyboard.nextLine();
                     String isSuccess = server.transferRecord(managerId,rID,rServerName);
                     if("success".equalsIgnoreCase(isSuccess)){
@@ -261,8 +262,20 @@ public class ManagerClient implements Constants {
                     }
                     break;
                 case 6:
+                    System.out.println("Enter location of server : ");
+                    String rLocation = keyboard.nextLine();
+                    String ret  = server.killServer(managerId,rLocation);
+                    if("success".equalsIgnoreCase(ret)){
+                        logUtil.log(" leader server of location " + rLocation + " is killed successfully" );
+                    }else{
+                        logUtil.log(" leader server of location " + rLocation + " is NOT killed !" );
+                    }
+                    break;
+
+                case 7:
                     i = 0;
                     break;
+
                 default:
                     System.out.println("Wrong input, select between 1 to 5");
             }

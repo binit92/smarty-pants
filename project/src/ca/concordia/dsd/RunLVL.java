@@ -3,7 +3,6 @@ package ca.concordia.dsd;
 import ca.concordia.dsd.arch.corba;
 import ca.concordia.dsd.arch.corbaHelper;
 import ca.concordia.dsd.server.frontend.FrontEnd;
-import ca.concordia.dsd.server.impl.CenterServerImpl;
 import ca.concordia.dsd.util.Constants;
 import org.omg.CORBA.ORB;
 import org.omg.CosNaming.NameComponent;

@@ -56,7 +56,7 @@ public class TransferRequestToCurrentServerThread extends Thread {
         System.out.println(LOG_TAG + "data string  Arr: " + Arrays.toString(strToSend));
         OperationsType oT = OperationsType.valueOf(strToSend[0]);
         String requestId = strToSend[strToSend.length -1];
-        System.out.println("processing request id : " + requestId);
+        System.out.println(LOG_TAG+ "processing request id : " + requestId);
 
         switch (oT){
             case CREATE_TR_RECORD:

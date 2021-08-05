@@ -313,6 +313,10 @@ public class CenterServerImpl extends corbaPOA  {
         return result;
     }
 
+    public String killServer(String id, String location){
+        return "false";
+    }
+
     private synchronized String editSRRecord(String manager,String recordID, String key, String val) {
 
         for (Map.Entry<String, List<Records>> value : recordsMap.entrySet()) {

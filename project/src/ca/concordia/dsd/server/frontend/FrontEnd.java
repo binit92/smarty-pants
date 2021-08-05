@@ -158,7 +158,7 @@ public class FrontEnd extends corbaPOA {
 
     @Override
     public String createTRecord(String id, String fName, String lName, String address, String phone, String specialization, String location) {
-        System.out.println(id + " " +fName + " " + lName + " " + address);
+        System.out.println(LOG_TAG + "createTRecord: " +  id + " " +fName + " " + lName + " " + address);
         StringBuilder builder = new StringBuilder();
         builder.append(OperationsType.CREATE_TR_RECORD);builder.append(Constants.RESPONSE_DATA_SPLITTER);
         builder.append(id);builder.append("|");
@@ -174,7 +174,7 @@ public class FrontEnd extends corbaPOA {
 
     @Override
     public String createSRecord(String id, String fName, String lName, String courses, boolean status, String statusDate) {
-        System.out.println(id + " " +fName + " " + lName  );
+        System.out.println(LOG_TAG + "createSRecord: " +   id + " " +fName + " " + lName  );
         StringBuilder builder = new StringBuilder();
         builder.append(OperationsType.CREATE_SR_RECORD);builder.append(Constants.RESPONSE_DATA_SPLITTER);
         builder.append(id);builder.append("|");
@@ -189,7 +189,7 @@ public class FrontEnd extends corbaPOA {
 
     @Override
     public String getRecordCounts(String id) {
-        System.out.println(id );
+        System.out.println(LOG_TAG + "getRecordCounts: " + id );
         StringBuilder builder = new StringBuilder();
         builder.append(OperationsType.GET_RECORD_COUNT);builder.append(Constants.RESPONSE_DATA_SPLITTER);
         builder.append(id);builder.append("|");
@@ -212,7 +212,7 @@ public class FrontEnd extends corbaPOA {
 
     @Override
     public String transferRecord(String id, String recordId, String remoteCenterServerName) {
-        System.out.println(id + " " + recordId + " " + remoteCenterServerName);
+        System.out.println(LOG_TAG + "transferRecord : " + id + " " + recordId + " " + remoteCenterServerName);
         StringBuilder builder = new StringBuilder();
         builder.append(OperationsType.TRANSFER_RECORD);builder.append(Constants.RESPONSE_DATA_SPLITTER);
         builder.append(id);builder.append("|");
@@ -220,6 +220,10 @@ public class FrontEnd extends corbaPOA {
         builder.append(remoteCenterServerName);builder.append("|");
         logUtil.log(LOG_TAG + " dispatching transferRecord to server : " + builder);
         return dispatchToCurrentServer(builder.toString());
+    }
+
+    public String killServer(String id, String location){
+        return "false";
     }
 
     public String dispatchToCurrentServer(String data){
