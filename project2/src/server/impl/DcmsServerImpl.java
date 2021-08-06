@@ -15,13 +15,6 @@ import model.Student;
 import model.Teacher;
 import server.frontend.DcmsServerFE;
 
-/**
- * 
- * DcmsServerImpl class includes all the server operations' implementations,
- * implements all the methods in the IDL interface Performs the necessary
- * operations and returns the result/acknowledgement back to the Client.
- *
- */
 
 public class DcmsServerImpl extends corbaPOA{
 	private LogManager logManager;
@@ -51,13 +44,6 @@ public class DcmsServerImpl extends corbaPOA{
 		return this.locUDPPort;
 	}
 
-	/*
-	 * DcmsServerImpl Constructor to initializes the variables used for the
-	 * implementation
-	 * 
-	 * @param loc The server location for which the server implementation should
-	 * be initialized
-	 */
 	public DcmsServerImpl(int serverID, boolean isPrimary, ServerCenterLocation loc, int locUDPPort, DatagramSocket ds,
 			boolean isAlive, String name, int receivePort, int port1, int port2, ArrayList<Integer> replicas,
 			LogManager logger) {
@@ -118,17 +104,6 @@ public class DcmsServerImpl extends corbaPOA{
 
 	}
 
-	/**
-	 * Once the student record is created, the function createSRecord returns
-	 * the record ID of the student record created to the client
-	 * 
-	 * @param managerID
-	 *            gets the managerID
-	 * @param studentFields
-	 *            values of the student attribute concatenated by the comma
-	 *            which are received the client
-	 * 
-	 */
 
 	@Override
 	public synchronized String createSRecord(String managerID, String student) {
@@ -162,13 +137,6 @@ public class DcmsServerImpl extends corbaPOA{
 		return studentID;
 	}
 
-	
-
-	/**
-	 *
-	 * returns the current server record count
-	 * 
-	 */
 
 	private synchronized int getCurrServerCnt() {
 		int count = 0;
@@ -181,12 +149,6 @@ public class DcmsServerImpl extends corbaPOA{
 		return count;
 	}
 
-	/**
-	 * Invokes record count request on MTL/LVL/DDO server to get record count
-	 * from all the servers Creates UDPRequest Provider objects for each request
-	 * and creates separate thread for each request. And makes sure each thread
-	 * is complete and returns the result
-	 */
 
 	@Override
 	public synchronized String getRecordCount(String manager) {
@@ -248,21 +210,6 @@ public class DcmsServerImpl extends corbaPOA{
 		return recordCount;
 	}
 
-	/**
-	 * The edit record function performs the edit operation on the server and
-	 * returns the appropriate message
-	 * 
-	 * @param managerID
-	 *            gets the managerID
-	 * @param recordID
-	 *            gets the recordID to be edited
-	 * @param fieldname
-	 *            gets the fieldname to be edited for the given recordID
-	 * @param newvalue
-	 *            gets the newvalue to be replaced to the given fieldname from
-	 *            the client
-	 */
-
 	@Override
 	public synchronized String editRecord(String managerID, String recordID, String fieldname, String newvalue) {
 		if (isPrimary) {
@@ -284,20 +231,6 @@ public class DcmsServerImpl extends corbaPOA{
 		return "Operation not performed!";
 	}
 
-	/**
-	 * Performs the transfer record to the remoteCenterServer by sending the
-	 * appropriate packet to the DcmsServerUDPRequestProvider thread Creates
-	 * UDPRequest Provider objects for each request and creates separate thread
-	 * for each request. And makes sure each thread is complete and returns the
-	 * result
-	 * 
-	 * @param managerID
-	 *            gets the managerID
-	 * @param recordID
-	 *            gets the recordID to be edited
-	 * @param remoteCenterServerName
-	 *            gets the location to transfer the recordID from the client
-	 */
 	public synchronized String transferRecord(String managerID, String recordID, String data) {
 
 		if (isPrimary) {
@@ -362,12 +295,6 @@ public class DcmsServerImpl extends corbaPOA{
 		return "Transfer record operation unsuccessful!";
 	}
 
-	/*
-	 * Remove record after transfer method, removes the record from current
-	 * server after the transfer operation is performed.
-	 * 
-	 * @param recordID record id of the student/teacher to be removed
-	 */
 	private synchronized String removeRecordAfterTransfer(String recordID) {
 		synchronized (recordsMapAccessorLock) {
 			for (Entry<String, List<Record>> element : recordsMap.entrySet()) {
@@ -384,10 +311,6 @@ public class DcmsServerImpl extends corbaPOA{
 		return "success";
 	}
 
-	/*
-	 * Get record for transfer method gets the record from the hashmap given the
-	 * record ID of the student/teacher
-	 */
 	private synchronized Record getRecordForTransfer(String recordID) {
 		synchronized (recordsMapAccessorLock) {
 			for (Entry<String, List<Record>> value : recordsMap.entrySet()) {
@@ -404,21 +327,6 @@ public class DcmsServerImpl extends corbaPOA{
 		}
 		return null;
 	}
-
-	/**
-	 * The editSRRecord function performs the edit operation on the student
-	 * record and returns the appropriate message
-	 * 
-	 * @param managerID
-	 *            gets the managerID
-	 * @param recordID
-	 *            gets the recordID to be edited
-	 * @param fieldname
-	 *            gets the fieldname to be edited for the given recordID
-	 * @param newvalue
-	 *            gets the newvalue to be replaced to the given fieldname from
-	 *            the client
-	 */
 
 	private synchronized String editSRRecord(String maangerID, String recordID, String fieldname, String data) {
 		String newdata[] = data.split(Constants.RECEIVED_DATA_SEPERATOR);
@@ -463,20 +371,6 @@ public class DcmsServerImpl extends corbaPOA{
 		return "Record with " + recordID + "not found!";
 	}
 
-	/**
-	 * The editTRRecord function performs the edit operation on the Teacher
-	 * record and returns the appropriate message
-	 * 
-	 * @param managerID
-	 *            gets the managerID
-	 * @param recordID
-	 *            gets the recordID to be edited
-	 * @param fieldname
-	 *            gets the fieldname to be edited for the given recordID
-	 * @param newvalue
-	 *            gets the newvalue to be replaced to the given fieldname from
-	 *            the client
-	 */
 
 	private synchronized String editTRRecord(String managerID, String recordID, String fieldname, String data) {
 		String newdata[] = data.split(Constants.RECEIVED_DATA_SEPERATOR);
@@ -526,9 +420,6 @@ public class DcmsServerImpl extends corbaPOA{
 	}
 	
 	
-	/*
-	 * Methods to access only from FE once the primary sever is killed.
-	 */
 
 	public void send() {
 		heartBeatSender = new HeartBeatSender(ds, name, port1, port2);
@@ -564,11 +455,6 @@ public class DcmsServerImpl extends corbaPOA{
 		this.serverID = serverID;
 	}
 
-	/**
-	 * The Function passes the respective HashMap to the DcmsServerBackupWriter
-	 * class to store a written backup of the Repository
-	 */
-
 	public synchronized void takeTheBackup() {
 		synchronized (recordsMapAccessorLock) {
 			if (this.location.equalsIgnoreCase("MTL") && serverID == 1 && recordsMap.size() > 0) {
@@ -593,11 +479,6 @@ public class DcmsServerImpl extends corbaPOA{
 		}
 	}
 
-	/**
-	 * Takes the backup after transfer record operation is performed
-	 * 
-	 * @param remoteCenterServerName
-	 */
 
 	public void backupAfterTransferRecord(Integer serverID, String remoteCenterServerName) {
 		synchronized (recordsMapAccessorLock) {
@@ -609,21 +490,6 @@ public class DcmsServerImpl extends corbaPOA{
 		}
 	}
 	
-	/**
-	 * Adds the Teacher and Student to the HashMap the function
-	 * addRecordToHashMap returns the success message, if the student / teacher
-	 * record is created successfully else returns Error message
-	 * 
-	 * @param key
-	 *            gets the key of the recordID stored in the HashMap
-	 * @param teacher
-	 *            gets the teacher object if received from createTRecord
-	 *            function
-	 * @param student
-	 *            gets the student object if received from createSRecord
-	 *            function which are received the respective functions.
-	 * 
-	 */
 
 	public synchronized String addRecordToHashMap(String key, Teacher teacher, Student student) {
 		String message = "Error";
@@ -671,14 +537,6 @@ public class DcmsServerImpl extends corbaPOA{
 		takeTheBackup();
 		return message;
 	}
-	
-	/**
-	 * The putCoursesinList function adds the newCourses to the List
-	 * 
-	 * @param newvalue
-	 *            gets the newcourses value and adds to the list
-	 *
-	 */
 
 	public synchronized List<String> putCoursesinList(String newvalue) {
 		String[] courses = newvalue.split("//");

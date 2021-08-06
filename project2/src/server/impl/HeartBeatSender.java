@@ -4,10 +4,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
-/*
- * Heart beat sender class which keeps sending to the other servers
- * in the servers list
- */
+
 public class HeartBeatSender extends Thread {
 	int port1,port2;
 	String name;
@@ -18,10 +15,6 @@ public class HeartBeatSender extends Thread {
 		this.name = name;
 		this.ds = ds;
 	}
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Thread#run()
-	 */
 	public void run() {
 		byte[] dataBytes = name.getBytes();
 		DatagramPacket dp;

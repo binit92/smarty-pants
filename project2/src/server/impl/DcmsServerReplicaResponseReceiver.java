@@ -10,10 +10,7 @@ import conf.LogManager;
 import conf.ServerCenterLocation;
 import server.frontend.TransferResponseToFE;
 
-/*
- * Thread class that receives the acknowledgement or response from the replicas 
- * and passes it on to the primary server and 
- */
+
 public class DcmsServerReplicaResponseReceiver extends Thread {
 
 	DatagramSocket serverSocket;
@@ -35,10 +32,7 @@ public class DcmsServerReplicaResponseReceiver extends Thread {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Thread#run()
-	 */
+
 	@Override
 	public synchronized void run() {
 		byte[] receiveData;

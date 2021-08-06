@@ -22,14 +22,7 @@ public class TransferReqToCurrentServer extends Thread {
 		response = null;
 		this.loggerInstance = loggerInstance;
 	}
-	
-	/**
-	 * Performs the operation based on the type of requestID by 
-	 * routing the request to the current server. 
-	 * 
-	 * After processing the data,
-	 * The respective requestID and the response is sent to the Front End
-	 */
+
 
 	public void run() {
 		String[] dataArr;
@@ -79,25 +72,12 @@ public class TransferReqToCurrentServer extends Thread {
 	public String getResponse() {
 		return response;
 	}
-	
-	/**
-	 * Retrieves the current server location based on the instance thread and returns it to the callee
-	 * @param loc
-	 * @return
-	 */
+
 
 	private synchronized DcmsServerImpl chooseServer(String loc) {
 		return DcmsServerFE.centralRepository.get(Constants.PRIMARY_SERVER_ID).get(loc);
 	}
 	
-	/**
-	 * The function receives the request from the respective thread
-	 * and forwards the message in the form of a datagram packet 
-	 * to the front End
-	 *  
-	 * @param requestId
-	 * @param response
-	 */
 
 	private void sendReply(String requestId, String response) {
 		DatagramSocket ds;

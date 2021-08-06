@@ -11,13 +11,6 @@ import conf.ServerOperations;
 
 import model.Record;
 
-/**
- * 
- * DcmsServerImpl class includes all the server operations' implementations,
- * implements all the methods in the IDL interface Performs the necessary
- * operations and returns the result/acknowledgement back to the Client.
- *
- */
 
 public class DcmsServerPrepareReplicasRequest extends corbaPOA {
 	LogManager logManager;
@@ -32,13 +25,7 @@ public class DcmsServerPrepareReplicasRequest extends corbaPOA {
 	HashMap<Integer, String> requestBuffer;
 	Integer replicaID;
 
-	/*
-	 * DcmsServerImpl Constructor to initializes the variables used for the
-	 * implementation
-	 * 
-	 * @param loc The server location for which the server implementation should
-	 * be initialized
-	 */
+
 	public DcmsServerPrepareReplicasRequest(Integer replicaID, Logger logger) {
 		recordsMap = new HashMap<>();
 		requestBuffer = new HashMap<>();
@@ -47,17 +34,6 @@ public class DcmsServerPrepareReplicasRequest extends corbaPOA {
 		this.logger = logger;
 	}
 
-	/**
-	 * Once the teacher record is created, createTRRecord function returns the
-	 * record ID of the teacher record created to the client
-	 * 
-	 * @param managerID
-	 *            gets the managerID
-	 * @param teacherField
-	 *            values of the teacher attribute concatenated by the comma
-	 *            which are received from the client
-	 * 
-	 */
 
 	private void sendMulticastRequest(String req) {
 		DcmsServerMultiCastSender sender = new DcmsServerMultiCastSender(req, logger);
@@ -78,17 +54,6 @@ public class DcmsServerPrepareReplicasRequest extends corbaPOA {
 		return managerID.substring(0, 3);
 	}
 
-	/**
-	 * Once the student record is created, the function createSRecord returns
-	 * the record ID of the student record created to the client
-	 * 
-	 * @param managerID
-	 *            gets the managerID
-	 * @param studentFields
-	 *            values of the student attribute concatenated by the comma
-	 *            which are received the client
-	 * 
-	 */
 
 	@Override
 	public String createSRecord(String managerID, String student) {
@@ -100,12 +65,6 @@ public class DcmsServerPrepareReplicasRequest extends corbaPOA {
 		return "";
 	}
 
-	/**
-	 * Invokes record count request on MTL/LVL/DDO server to get record count
-	 * from all the servers Creates UDPRequest Provider objects for each request
-	 * and creates separate thread for each request. And makes sure each thread
-	 * is complete and returns the result
-	 */
 
 	@Override
 	public String getRecordCount(String manager) {
@@ -118,20 +77,6 @@ public class DcmsServerPrepareReplicasRequest extends corbaPOA {
 		return "";
 	}
 
-	/**
-	 * The edit record function performs the edit operation on the server and
-	 * returns the appropriate message
-	 * 
-	 * @param managerID
-	 *            gets the managerID
-	 * @param recordID
-	 *            gets the recordID to be edited
-	 * @param fieldname
-	 *            gets the fieldname to be edited for the given recordID
-	 * @param newvalue
-	 *            gets the newvalue to be replaced to the given fieldname from
-	 *            the client
-	 */
 
 	@Override
 	public String editRecord(String managerID, String recordID, String fieldname, String newvalue) {
@@ -144,20 +89,7 @@ public class DcmsServerPrepareReplicasRequest extends corbaPOA {
 		return "";
 	}
 
-	/**
-	 * Performs the transfer record to the remoteCenterServer by sending the
-	 * appropriate packet to the DcmsServerUDPRequestProvider thread Creates
-	 * UDPRequest Provider objects for each request and creates separate thread
-	 * for each request. And makes sure each thread is complete and returns the
-	 * result
-	 * 
-	 * @param managerID
-	 *            gets the managerID
-	 * @param recordID
-	 *            gets the recordID to be edited
-	 * @param remoteCenterServerName
-	 *            gets the location to transfer the recordID from the client
-	 */
+
 	public String transferRecord(String managerID, String recordID, String remoteCenterServerName) {
 		String req = Integer.toString(replicaID) + Constants.RECEIVED_DATA_SEPERATOR + ServerOperations.TRANSFER_RECORD
 				+ Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(managerID) + Constants.RECEIVED_DATA_SEPERATOR

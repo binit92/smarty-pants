@@ -9,10 +9,7 @@ public class TransferResponseToFE extends Thread {
 		System.out.println("============="+this.response);
 		DcmsServerFE.receivedResponses.add(this.response);
 	}	
-	/*
-	 * Transfers the received response from primary server
-	 * to the front end
-	 */
+
 	public String getResponse() {
 		return response;
 	}

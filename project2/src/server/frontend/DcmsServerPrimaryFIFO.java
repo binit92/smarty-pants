@@ -25,13 +25,6 @@ public class DcmsServerPrimaryFIFO extends Thread {
 	int c;
 	Queue<String> FIFORequest = new LinkedList<String>();
 
-	/**
-	 * Constructor to set the incoming request with the present ArrayList
-	 * 
-	 * @param requests
-	 *            gets the request
-	 * 
-	 */
 
 	public DcmsServerPrimaryFIFO(ArrayList<TransferReqToCurrentServer> requests) {
 		try {
@@ -41,12 +34,6 @@ public class DcmsServerPrimaryFIFO extends Thread {
 			System.out.println(e.getMessage());
 		}
 	}
-
-	/**
-	 * This Thread receives the input from the Front End and adds the data to
-	 * the FIFO Queue and transfer the data to the TransferReqToCurrentServer
-	 * class
-	 */
 
 	@Override
 	public void run() {

@@ -14,14 +14,6 @@ public class DcmsServerMultiCastSender extends Thread {
 	String data;
 	Logger logger;
 
-	/**
-	 * Is a constructor that creates a Multicast socket and sets the address
-	 * 
-	 * @param request
-	 *            Is the String that holds the data to be multicasted
-	 * @param logger
-	 *            Is an object for the Logger
-	 */
 
 	public DcmsServerMultiCastSender(String request, Logger logger) {
 		try {
@@ -35,18 +27,7 @@ public class DcmsServerMultiCastSender extends Thread {
 		}
 	}
 
-	/**
-	 * 
-	 * This thread forms the Datagram Packet that is to be multicasted to the
-	 * replicas list.
-	 * 
-	 */
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Thread#run()
-	 */
 	public synchronized void run() {
 		try {
 			DatagramPacket packet = new DatagramPacket(data.getBytes(), data.length(), address,

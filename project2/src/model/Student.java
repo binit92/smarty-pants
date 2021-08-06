@@ -3,12 +3,6 @@ package model;
 import java.io.Serializable;
 import java.util.List;
 
-/**
- * Student Model Class that holds the student's attributes
- * extends the base record class, to enable
- * easy marshalling and unmarshalling between client and server
- * has the getters and setters for the attributes
- */
 public class Student extends Record implements Serializable {
 	String firstName;
 	String lastName;

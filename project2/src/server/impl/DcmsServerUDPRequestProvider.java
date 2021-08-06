@@ -14,21 +14,7 @@ public class DcmsServerUDPRequestProvider extends Thread {
 	private Record recordForTransfer;
 	Logger logger;
 
-	/**
-	 * DcmsServerUDPRequestProvider handles the incoming messages call (Get Rec ,
-	 * Trans Rec) and based on the incoming call 
-	 * Routes the packet to the necessary location 
-	 * to retreive the data
-	 * 
-	 * @param server
-	 *            serverimpl class instance
-	 * @param requestType
-	 *            UDP request type - transfer/record count
-	 * @param recordForTransfer
-	 *            The record to be transferred
-	 * @param logger 
-	 * 
-	 */
+
 	public DcmsServerUDPRequestProvider(DcmsServerImpl server, String requestType,
 			Record recordForTransfer, Logger logger) throws IOException {
 		this.server = server;
@@ -45,10 +31,7 @@ public class DcmsServerUDPRequestProvider extends Thread {
 		return transferResult;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Thread#run()
-	 */
+
 	public synchronized void run() {
 		DatagramSocket socket = null;
 		try {
@@ -59,7 +42,6 @@ public class DcmsServerUDPRequestProvider extends Thread {
 				byte[] data = "GET_RECORD_COUNT".getBytes();
 				System.out.println("data in udp req provider :: "+new String(data));
 				System.out.println("port here :: "+server.locUDPPort);
-				/*Create a datagram packet for the respective server address.*/
 				DatagramPacket packet = new DatagramPacket(data, data.length,
 						InetAddress.getByName(InetAddress.getLocalHost().getHostAddress()),
 						server.locUDPPort);
@@ -73,8 +55,7 @@ public class DcmsServerUDPRequestProvider extends Thread {
 				byte[] data1 = ("TRANSFER_RECORD" + "#"
 						+ recordForTransfer.toString()).getBytes();
 				
-				/*Create a datagram packet for the respective server address.*/
-				
+
 				DatagramPacket packet1 = new DatagramPacket(data1, data1.length,
 						InetAddress.getByName(InetAddress.getLocalHost().getHostAddress()),
 						server.locUDPPort);

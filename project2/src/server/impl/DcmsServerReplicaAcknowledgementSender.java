@@ -18,16 +18,7 @@ public class DcmsServerReplicaAcknowledgementSender extends Thread {
 		this.request = request;
 	}
 
-	/**
-	 * This thread is called to send the acknowledgement from the respective
-	 * replicas to the primary server
-	 * 
-	 */
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Thread#run()
-	 */
 	public synchronized void run() {
 		try {
 			ds = new DatagramSocket();

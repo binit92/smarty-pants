@@ -8,12 +8,7 @@ import java.util.logging.Logger;
 
 import conf.ServerCenterLocation;
 
-/**
- * 
- * DcmsServerUDPReceiver is the class that serves other servers' requests in
- * form of UDP communication with RECPAKT functionality
- *
- */
+
 
 public class DcmsServerUDPReceiver extends Thread {
 	DatagramSocket serverSocket;
@@ -27,18 +22,6 @@ public class DcmsServerUDPReceiver extends Thread {
 	int c;
 	boolean isAlive;
 
-	/**
-	 * 
-	 * DcmsServerUDPReceiver constructor initializes the UDP socket port number
-	 * of each location based on the received location input
-	 * 
-	 * @param loc
-	 *            location of UDP server
-	 * @param loggerlogger
-	 *            instance of server is used to set the log messages
-	 * @param serverImp
-	 *            object that holds the corba server instance for communication
-	 */
 
 	public DcmsServerUDPReceiver(boolean isAlive, int udpPort, ServerCenterLocation loc, Logger logger,
 			DcmsServerImpl serverImp) {
@@ -56,10 +39,7 @@ public class DcmsServerUDPReceiver extends Thread {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Thread#run()
-	 */
+
 	public synchronized void run() {
 		byte[] receiveData;
 		while (isAlive) {
@@ -77,9 +57,7 @@ public class DcmsServerUDPReceiver extends Thread {
 		}
 	}
 
-	/*
-	 * Kills the current UDP receiver by assigning the isAlive flag to false
-	 */
+
 	public void killUDPReceiver() {
 		isAlive = false;
 	}

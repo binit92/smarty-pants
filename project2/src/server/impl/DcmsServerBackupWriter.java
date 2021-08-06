@@ -8,13 +8,7 @@ import java.util.*;
 import model.Record;
 
 public class DcmsServerBackupWriter {
-	/**
-	 * Writes to the filename if file exists, If file does not exist, creates a
-	 * file and then writes the contents
-	 * 
-	 * @param filename
-	 * @param content
-	 */
+
 	File file;
 	FileWriter fw;
 	BufferedWriter bw;
@@ -25,13 +19,6 @@ public class DcmsServerBackupWriter {
 
 	}
 
-	/**
-	 * Retrieves the current Date of the system and checks for existence of the
-	 * file. If no, a new file is created and the timestamp is written to it
-	 * 
-	 * @param filename
-	 *            Has the name of the Filename stored in it.
-	 */
 
 	public DcmsServerBackupWriter(String filename) {
 		super();
@@ -57,13 +44,6 @@ public class DcmsServerBackupWriter {
 		}
 	}
 
-	/**
-	 * Receives the HashMap as a parameter and writes it to the file as a backup
-	 * along with the current timestamp
-	 * 
-	 * @param temp
-	 *            HashMap that is the repository of a server
-	 */
 
 	public void backupMap(HashMap<String, List<Record>> temp) {
 		try {

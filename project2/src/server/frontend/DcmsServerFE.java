@@ -13,13 +13,6 @@ import java.net.*;
 import model.Record;
 import server.impl.*;
 
-/**
- * 
- * DcmsServerImpl class includes all the server operations' implementations,
- * implements all the methods in the IDL interface Performs the necessary
- * operations and returns the result/acknowledgement back to the Client.
- *
- */
 
 public class DcmsServerFE extends corbaPOA {
 	LogManager ackManager;
@@ -104,11 +97,7 @@ public class DcmsServerFE extends corbaPOA {
 	public static DcmsServerBackupWriter S3_DDO = new DcmsServerBackupWriter(
 			Constants.BACKUP_DIR + "\\" + "DDO3_backup.txt");
 
-	/**
-	 * DcmsServerImpl Constructor to initializes the variables used for the
-	 * implementation
-	 * 
-	 */
+
 	public DcmsServerFE() {
 		logManager = new LogManager("ServerFE");
 
@@ -340,17 +329,7 @@ public class DcmsServerFE extends corbaPOA {
 		}
 	}
 
-	/**
-	 * Once the teacher record is created, createTRRecord function returns the
-	 * record ID of the teacher record created to the client
-	 * 
-	 * @param managerID
-	 *            gets the managerID
-	 * @param teacherField
-	 *            values of the teacher attribute concatenated by the comma
-	 *            which are received from the client
-	 * 
-	 */
+
 
 	@Override
 	public String createTRecord(String managerID, String teacher) {
@@ -364,17 +343,7 @@ public class DcmsServerFE extends corbaPOA {
 		return managerID.substring(0, 3);
 	}
 
-	/**
-	 * Once the student record is created, the function createSRecord returns
-	 * the record ID of the student record created to the client
-	 * 
-	 * @param managerID
-	 *            gets the managerID
-	 * @param studentFields
-	 *            values of the student attribute concatenated by the comma
-	 *            which are received the client
-	 * 
-	 */
+
 
 	@Override
 	public String createSRecord(String managerID, String student) {
@@ -384,15 +353,6 @@ public class DcmsServerFE extends corbaPOA {
 		return sendRequestToServer(student);
 	}
 
-	/**
-	 * Invokes record count request on MTL/LVL/DDO server to get record count
-	 * from all the servers Creates UDPRequest Provider objects for each request
-	 * and creates separate thread for each request. And makes sure each thread
-	 * is complete and returns the result
-	 * 
-	 * @param managerID
-	 *            gets the managerID
-	 */
 
 	@Override
 	public String getRecordCount(String managerID) {
@@ -402,20 +362,6 @@ public class DcmsServerFE extends corbaPOA {
 		return sendRequestToServer(req);
 	}
 
-	/**
-	 * The edit record function performs the edit operation on the server and
-	 * returns the appropriate message
-	 * 
-	 * @param managerID
-	 *            gets the managerID
-	 * @param recordID
-	 *            gets the recordID to be edited
-	 * @param fieldname
-	 *            gets the fieldname to be edited for the given recordID
-	 * @param newvalue
-	 *            gets the newvalue to be replaced to the given fieldname from
-	 *            the client
-	 */
 
 	@Override
 	public String editRecord(String managerID, String recordID, String fieldname, String newvalue) {
@@ -426,20 +372,6 @@ public class DcmsServerFE extends corbaPOA {
 		return sendRequestToServer(editData);
 	}
 
-	/**
-	 * Performs the transfer record to the remoteCenterServer by sending the
-	 * appropriate packet to the DcmsServerUDPRequestProvider thread Creates
-	 * UDPRequest Provider objects for each request and creates separate thread
-	 * for each request. And makes sure each thread is complete and returns the
-	 * result
-	 * 
-	 * @param managerID
-	 *            gets the managerID
-	 * @param recordID
-	 *            gets the recordID to be edited
-	 * @param remoteCenterServerName
-	 *            gets the location to transfer the recordID from the client
-	 */
 	public String transferRecord(String managerID, String recordID, String remoteCenterServerName) {
 		String req = ServerOperations.TRANSFER_RECORD + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(managerID)
 				+ Constants.RECEIVED_DATA_SEPERATOR + managerID + Constants.RECEIVED_DATA_SEPERATOR + recordID
@@ -479,15 +411,6 @@ public class DcmsServerFE extends corbaPOA {
 		return msg;
 	}
 
-	/**
-	 * Performs the transfer of the request to the primary server by sending the
-	 * appropriate packet request to request buffer and then waiting for the
-	 * acknowledgement to the current server.
-	 * 
-	 * @param data
-	 *            gets the data for the request from the client.
-	 * 
-	 */
 
 	public String sendRequestToServer(String data) {
 		try {
@@ -511,13 +434,6 @@ public class DcmsServerFE extends corbaPOA {
 		}
 	}
 
-	/**
-	 * Gets the requestId from the sendRequestToServer and removes the requestId
-	 * from the buffer.
-	 * 
-	 * @param requestId
-	 *            gets the requestId to be removed.
-	 **/
 
 	public String getResponse(Integer requestId) {
 		try {
@@ -529,14 +445,6 @@ public class DcmsServerFE extends corbaPOA {
 		return responses.get(requestId).getResponse();
 	}
 
-	/**
-	 * Performs the server status by checking the server_last_updated_time with
-	 * the current time to find out if the server has failed. If the failed
-	 * server is the leader, electNewLeader used to find out the new leader.
-	 * 
-	 * @param serverName
-	 *            gets the serverName to be checked for failure.
-	 */
 
 	private static synchronized void checkServerStatus(String serverName) {
 		synchronized (mapAccessor) {
@@ -555,17 +463,6 @@ public class DcmsServerFE extends corbaPOA {
 		}
 	}
 
-	/**
-	 * Performs the election process to elect the new leader using bully
-	 * election process after receiving the failed serverName from
-	 * checkServerStatus, the elected leader will act as the primary server
-	 * henceforth.
-	 * 
-	 * @param oldLeader
-	 *            gets the name of the failed leader as oldLeader
-	 * @param logManager
-	 *            gets the LogManager instance to perform logging.
-	 */
 
 	private static String electNewLeader(String oldLeader, LogManager logManager) {
 		server_leader_status.remove(oldLeader);
@@ -642,25 +539,10 @@ public class DcmsServerFE extends corbaPOA {
 				centralRepository.put(Constants.REPLICA1_SERVER_ID, replicamap);
 			}
 		}
-//		synchronized (centralRepository) {
-//			for (Map.Entry<Integer, HashMap<String, DcmsServerImpl>> entry : centralRepository.entrySet()) {
-//				System.out.println("ID :: " + entry.getKey());
-//				for (Map.Entry<String, DcmsServerImpl> entry1 : entry.getValue().entrySet()) {
-//					System.out.println("LOC :: " + entry1.getKey() + " REF :: " + entry1.getValue());
-//				}
-//			}
-//		}
 		System.out.println("Elected new leader :: " + maxEntry.getKey() + " in the location" + loc);
 		return "and elected new leader " + maxEntry.getKey() + " in the location" + loc;
 	}
 
-	/**
-	 * Performs the status check for server with the given server name.
-	 * 
-	 * @param name
-	 *            gets the name of the server to be checked.
-	 * 
-	 */
 
 	private static boolean getStatus(String name) {
 		if (name.equals("MTL1")) {

@@ -14,27 +14,10 @@ import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * DcmsClient perform operations for MTL, DDO and LVL locations by sending the
- * request calls to the server.
- * 
- * Receives the Success/Failure message for the corresponding operations and
- * forwards them to the client.
- * 
- */
-
 public class DcmsClient {
 	static corba dcmsImplMTL, dcmsImplLVL, dcmsImplDDO;
 	static LogManager logManager;
 
-	/**
-	 * Client code to get the inputs from the user for the operations and sends
-	 * calls to the corresponding server locations
-	 * 
-	 * @param args[]
-	 *            port number and IP address
-	 * 
-	 */
 	public static void main(String args[]) throws IOException {
 		ClientImp serverloc = null;
 		while (true) {

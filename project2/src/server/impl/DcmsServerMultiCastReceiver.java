@@ -13,15 +13,7 @@ public class DcmsServerMultiCastReceiver extends Thread {
 	boolean isPrimary;
 	LogManager logManager;
 
-	/**
-	 * This constructor sets the Multicast socket port number and the instance
-	 * address and stores a flag for PrimaryServer
-	 * 
-	 * @param isPrimary
-	 *            Boolean Variable for primary server
-	 * @param ackManager
-	 *            Object for the LogManager
-	 */
+
 
 	public DcmsServerMultiCastReceiver(boolean isPrimary, LogManager ackManager) {
 		try {
@@ -36,16 +28,6 @@ public class DcmsServerMultiCastReceiver extends Thread {
 
 	}
 
-	/**
-	 * 
-	 * This thread receives the multicasted data on the port and performs the
-	 * respective operation if it is a replica.
-	 * 
-	 */
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Thread#run()
-	 */
 
 	public synchronized void run() {
 		try {

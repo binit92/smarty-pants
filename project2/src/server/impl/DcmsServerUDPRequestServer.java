@@ -20,16 +20,7 @@ public class DcmsServerUDPRequestServer extends Thread {
 	private Logger loggerInstance;
 	private Object mapLock;
 
-	/**
-	 * DcmsServerUDPRequestServer forwards the request received to the
-	 * respective server port
-	 * 
-	 * @param pkt
-	 *            datagram packet that holds the packet information
-	 * @param serverImp
-	 *            server instance of the requested location
-	 * 
-	 */
+
 
 	public DcmsServerUDPRequestServer(DatagramPacket pkt, DcmsServerImpl serverImp, Logger logger) {
 		receivePacket = pkt;
@@ -43,10 +34,6 @@ public class DcmsServerUDPRequestServer extends Thread {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Thread#run()
-	 */
 
 	public void run() {
 		byte[] responseData;
@@ -77,17 +64,10 @@ public class DcmsServerUDPRequestServer extends Thread {
 				loggerInstance.log(Level.INFO, "Invalid UDP request type");
 			}
 
-			//loggerInstance.log(Level.INFO, "Received " + inputPkt + " from " + location);
 		} catch (Exception e) {
-			// System.out.println(
-			// "Exception in UDP Request server Thread :: " + e.getMessage());
 		}
 	}
 
-	/**
-	 * This method the functionality of adding the data to the respective
-	 * server's hashmap (Transfer Functionality)
-	 */
 	private synchronized String transferRecord(String recordToBeAdded) {
 		String temp[] = recordToBeAdded.split(",");
 		String managerID = temp[0];
@@ -128,12 +108,6 @@ public class DcmsServerUDPRequestServer extends Thread {
 			return message + " " + data;
 		}
 	}
-
-	/**
-	 * getRecCount is the function that returns the number of entries made in
-	 * the respective hashmap
-	 *
-	 */
 
 	private synchronized int getRecCount() {
 		int count = 0;
