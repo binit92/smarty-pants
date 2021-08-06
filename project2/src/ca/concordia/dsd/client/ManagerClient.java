@@ -2,8 +2,8 @@ package ca.concordia.dsd.client;
 
 import ca.concordia.dsd.arch.corba;
 import ca.concordia.dsd.arch.corbaHelper;
-import ca.concordia.dsd.model.Student;
-import ca.concordia.dsd.model.Teacher;
+import ca.concordia.dsd.database.Student;
+import ca.concordia.dsd.database.Teacher;
 import ca.concordia.dsd.util.Constants;
 import ca.concordia.dsd.util.LogUtil;
 import org.omg.CORBA.ORB;
@@ -29,7 +29,7 @@ public class ManagerClient implements Constants {
         System.out.println("Starting MangerClient");
         try {
             String managerId = getManagerID();
-             logUtil.log("Using managerId : " + managerId);
+            logUtil.log("Using managerId : " + managerId);
 
             takeInputForOperation(managerId);
         } catch (Exception e) {
@@ -78,7 +78,7 @@ public class ManagerClient implements Constants {
         try {
             logUtil.log("createcorba connection tag: " + tag + " name: " + name + " port: " + port);
             // Setting the host and port programmtically here
-            String args[] = new String[4];
+            String[] args = new String[4];
             args[0] = "-ORBInitialPort";
             args[1] = Integer.toString(port);
             args[2] = "-ORBInitialHost ";
@@ -101,7 +101,7 @@ public class ManagerClient implements Constants {
             server = corbaHelper.narrow(ncRef.resolve_str(tag));
 
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return true;
@@ -136,13 +136,13 @@ public class ManagerClient implements Constants {
                     System.out.println("Location of the teacher (MTL/LVL/DDO) : ");
                     String tLocation = keyboard.nextLine();
 
-                    Teacher tR = new Teacher(managerId,"unknown", tFirstName,
+                    Teacher tR = new Teacher(managerId, "unknown", tFirstName,
                             tLastName, tAddress, tPhoneNumber, tSpecialization, tLocation);
                     logUtil.log(tR.toString());
                     String tID = null;
                     try {
-                       // tID = ca.concordia.dsd.server.createTRecord(managerId,tR);
-                        tID = server.createTRecord(managerId,tFirstName,tLastName,tAddress,tPhoneNumber,tSpecialization,tLocation);
+                        // tID = ca.concordia.dsd.server.createTRecord(managerId,tR);
+                        tID = server.createTRecord(managerId, tFirstName, tLastName, tAddress, tPhoneNumber, tSpecialization, tLocation);
                     } catch (Exception e) {
                         logUtil.log(e.getMessage());
                     }
@@ -163,7 +163,7 @@ public class ManagerClient implements Constants {
                     logUtil.log("Entered Student's courses to be added " + sCourses);
                     if (sCourses.contains(",")) {
                         sCourseList = (ArrayList<String>) Arrays.asList(sCourses.split(","));
-                    }else{
+                    } else {
                         sCourseList.add(sCourses);
                     }
                     System.out.println("Status of student (Active/Inactive)");
@@ -171,14 +171,14 @@ public class ManagerClient implements Constants {
                     System.out.println("Status change date of student");
                     String sStatusChange = keyboard.nextLine();
 
-                    Student sR = new Student(managerId,"unknown", sFirstName,
+                    Student sR = new Student(managerId, "unknown", sFirstName,
                             sLastName, sCourseList, sStatus, sStatusChange);
                     logUtil.log(sR.toString());
                     String sID = null;
                     try {
                         //TODO : change sStatus to true or false, may be
                         //sID = ca.concordia.dsd.server.createSRecord(managerId,sR);
-                        sID = server.createSRecord(managerId,sFirstName,sLastName,sCourses,true,sStatusChange);
+                        sID = server.createSRecord(managerId, sFirstName, sLastName, sCourses, true, sStatusChange);
                     } catch (Exception re) {
                         logUtil.log(re.getMessage());
                     }
@@ -238,7 +238,7 @@ public class ManagerClient implements Constants {
                     try {
                         // TODO: review and fix stuffs
                         //String ret = ca.concordia.dsd.server.editRecord(managerId,recordID, fieldName, newValue);
-                        String ret = server .editRecord(managerId,recordID,fieldName,newValue);
+                        String ret = server.editRecord(managerId, recordID, fieldName, newValue);
                         //String ret = "";
                         if (!ret.contains("not found")) {
                             logUtil.log("Record updated successfully ");
@@ -254,20 +254,20 @@ public class ManagerClient implements Constants {
                     String rID = keyboard.nextLine();
                     System.out.println("Enter the ca.concordia.dsd.server name <MTL/DDO/LVL> : ");
                     String rServerName = keyboard.nextLine();
-                    String isSuccess = server.transferRecord(managerId,rID,rServerName);
-                    if("success".equalsIgnoreCase(isSuccess)){
-                        logUtil.log(rID  + " transferred to " + rServerName);
-                    }else{
+                    String isSuccess = server.transferRecord(managerId, rID, rServerName);
+                    if ("success".equalsIgnoreCase(isSuccess)) {
+                        logUtil.log(rID + " transferred to " + rServerName);
+                    } else {
                         logUtil.log(rID + " failed to tranfer to " + rServerName);
                     }
                     break;
                 case 6:
-                    System.out.println(" Request to kill primary ca.concordia.dsd.server of " + getManagerID().substring(0,3));
-                    String ret  = server.killPrimaryServer(managerId);
-                    if("success".equalsIgnoreCase(ret)){
-                        logUtil.log(" leader ca.concordia.dsd.server is killed successfully" );
-                    }else{
-                        logUtil.log(" leader ca.concordia.dsd.server is NOT killed !" );
+                    System.out.println(" Request to kill primary ca.concordia.dsd.server of " + getManagerID().substring(0, 3));
+                    String ret = server.killPrimaryServer(managerId);
+                    if ("success".equalsIgnoreCase(ret)) {
+                        logUtil.log(" leader ca.concordia.dsd.server is killed successfully");
+                    } else {
+                        logUtil.log(" leader ca.concordia.dsd.server is NOT killed !");
                     }
                     break;
 

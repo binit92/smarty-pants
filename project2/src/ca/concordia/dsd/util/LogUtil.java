@@ -5,14 +5,14 @@ import java.util.logging.*;
 
 public class LogUtil implements Constants {
 
-    private Handler fH;
-    private Logger logger;
-
     static {
         System.setProperty("java.ca.concordia.dsd.util.logging.SimpleFormatter.format",
                 "[%1$tF %1$tT] [%4$-7s] %5$s %n");
         //LOGGER = Logger.getLogger(LogWriter.class.getName());
     }
+
+    private Handler fH;
+    private final Logger logger;
 
     public LogUtil(String initiator) {
         logger = Logger.getLogger(initiator);
@@ -41,7 +41,7 @@ public class LogUtil implements Constants {
 
     public void log(String manager, String message) {
         System.out.println(message);
-        logger.log(Level.INFO, " [" + manager + "] "+message);
+        logger.log(Level.INFO, " [" + manager + "] " + message);
     }
 
     public void close() {
