@@ -28,7 +28,7 @@ public class DcmsServerBackupWriter {
 		System.out.println(this.file);
 		if (!file.exists()) {
 			try {
-				//file.mkdirs();
+
 				file.createNewFile();
 
 				fw = new FileWriter(file.getAbsoluteFile());

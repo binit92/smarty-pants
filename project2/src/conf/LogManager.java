@@ -21,7 +21,7 @@ public class LogManager {
 			logger.setLevel(Level.INFO);
 			//logger.setLevel(Level.SEVERE);
 		} catch (Exception e) {
-			logger.log(Level.SEVERE, "Exception in logger :: " + e.getMessage());
+			//logger.log(Level.SEVERE, "Exception in logger :: " + e.getMessage());
 		}
 	}
 	
@@ -37,7 +37,7 @@ public class LogManager {
 			logger.addHandler(fileHandler);
 			logger.setLevel(Level.INFO);
 		} catch (Exception e) {
-			logger.log(Level.SEVERE, "Exception in logger :: " + e.getMessage());
+			//logger.log(Level.SEVERE, "Exception in logger :: " + e.getMessage());
 		}
 	}
 }
