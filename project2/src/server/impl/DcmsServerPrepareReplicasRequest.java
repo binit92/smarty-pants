@@ -1,6 +1,6 @@
 package server.impl;
 
-import idlmodule.*;
+import arch.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -12,7 +12,8 @@ import conf.ServerOperations;
 import model.Record;
 
 
-public class DcmsServerPrepareReplicasRequest extends corbaPOA {
+//public class DcmsServerPrepareReplicasRequest extends corbaPOA {
+public class DcmsServerPrepareReplicasRequest{
 	LogManager logManager;
 	Logger logger;
 	String IPaddress;
@@ -40,7 +41,7 @@ public class DcmsServerPrepareReplicasRequest extends corbaPOA {
 		sender.start();
 	}
 
-	@Override
+	//@Override
 	public String createTRecord(String managerID, String teacher) {
 		teacher = Integer.toString(replicaID) + Constants.RECEIVED_DATA_SEPERATOR + ServerOperations.CREATE_T_RECORD
 				+ Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(managerID) + Constants.RECEIVED_DATA_SEPERATOR
@@ -55,7 +56,7 @@ public class DcmsServerPrepareReplicasRequest extends corbaPOA {
 	}
 
 
-	@Override
+	//@Override
 	public String createSRecord(String managerID, String student) {
 		student = Integer.toString(replicaID) + Constants.RECEIVED_DATA_SEPERATOR + ServerOperations.CREATE_S_RECORD
 				+ Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(managerID) + Constants.RECEIVED_DATA_SEPERATOR
@@ -66,7 +67,7 @@ public class DcmsServerPrepareReplicasRequest extends corbaPOA {
 	}
 
 
-	@Override
+	//@Override
 	public String getRecordCount(String manager) {
 		String data[] = manager.split(Constants.RECEIVED_DATA_SEPERATOR);
 		String req = Integer.toString(replicaID) + Constants.RECEIVED_DATA_SEPERATOR + ServerOperations.GET_REC_COUNT
@@ -78,12 +79,13 @@ public class DcmsServerPrepareReplicasRequest extends corbaPOA {
 	}
 
 
-	@Override
-	public String editRecord(String managerID, String recordID, String fieldname, String newvalue) {
+
+	//@Override
+	public String editRecord(String id, String recordID, String fieldName, String newValue) {
 		String editData = Integer.toString(replicaID) + Constants.RECEIVED_DATA_SEPERATOR + ServerOperations.EDIT_RECORD
-				+ Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(managerID) + Constants.RECEIVED_DATA_SEPERATOR
-				+ managerID + Constants.RECEIVED_DATA_SEPERATOR + recordID + Constants.RECEIVED_DATA_SEPERATOR
-				+ fieldname + Constants.RECEIVED_DATA_SEPERATOR + newvalue;
+				+ Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id) + Constants.RECEIVED_DATA_SEPERATOR
+				+ id + Constants.RECEIVED_DATA_SEPERATOR + recordID + Constants.RECEIVED_DATA_SEPERATOR
+				+ fieldName + Constants.RECEIVED_DATA_SEPERATOR + newValue;
 		sendMulticastRequest(editData);
 		logger.log(Level.INFO, "Preparing Multicast request for editRecord : " + editData);
 		return "";
@@ -100,8 +102,8 @@ public class DcmsServerPrepareReplicasRequest extends corbaPOA {
 		return "";
 	}
 
-	@Override
-	public String killPrimaryServer(String location) {
+	//@Override
+	public String killPrimaryServer(String id) {
 		return null;
 	}
 }

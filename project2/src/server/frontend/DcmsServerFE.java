@@ -4,7 +4,7 @@ package server.frontend;
 import java.util.*;
 import java.util.logging.Level;
 
-import idlmodule.corbaPOA;
+import arch.corbaPOA;
 import conf.Constants;
 import conf.LogManager;
 import conf.ServerCenterLocation;
@@ -22,7 +22,7 @@ public class DcmsServerFE extends corbaPOA {
 	int studentCount = 0;
 	int teacherCount = 0;
 	String recordsCount;
-	String location;
+	String id;
 	Integer requestId;
 	HashMap<Integer, String> requestBuffer;
 	ArrayList<TransferReqToCurrentServer> requests;
@@ -329,16 +329,6 @@ public class DcmsServerFE extends corbaPOA {
 		}
 	}
 
-
-
-	@Override
-	public String createTRecord(String managerID, String teacher) {
-		teacher = ServerOperations.CREATE_T_RECORD + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(managerID)
-				+ Constants.RECEIVED_DATA_SEPERATOR + managerID + Constants.RECEIVED_DATA_SEPERATOR + teacher;
-		logManager.logger.log(Level.INFO, " Sending request to Server to create Teacher record: : " + teacher);
-		return sendRequestToServer(teacher);
-	}
-
 	private String getServerLoc(String managerID) {
 		return managerID.substring(0, 3);
 	}
@@ -346,44 +336,54 @@ public class DcmsServerFE extends corbaPOA {
 
 
 	@Override
-	public String createSRecord(String managerID, String student) {
-		student = ServerOperations.CREATE_S_RECORD + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(managerID)
-				+ Constants.RECEIVED_DATA_SEPERATOR + managerID + Constants.RECEIVED_DATA_SEPERATOR + student;
+	public String createTRecord(String id, String fName, String lName, String address, String phone, String specialization, String location) {
+		String teacherStr = fName + "," + lName + ","
+				+ address + "," + phone + "," + specialization + "," + location;
+		String teacher = ServerOperations.CREATE_T_RECORD + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
+				+ Constants.RECEIVED_DATA_SEPERATOR + id + Constants.RECEIVED_DATA_SEPERATOR + teacherStr;
+		logManager.logger.log(Level.INFO, " Sending request to Server to create Teacher record: : " + teacher);
+		return sendRequestToServer(teacher);
+	}
+
+	@Override
+	public String createSRecord(String id, String fName, String lName, String courses, boolean status, String statusDate) {
+		String studentStr =fName + "," + lName + "," + courses + "," + status + "," + statusDate;
+		String student = ServerOperations.CREATE_S_RECORD + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
+				+ Constants.RECEIVED_DATA_SEPERATOR + id + Constants.RECEIVED_DATA_SEPERATOR + studentStr;
 		logManager.logger.log(Level.INFO, " Sending request to Server to create student record: : " + student);
 		return sendRequestToServer(student);
 	}
 
-
 	@Override
-	public String getRecordCount(String managerID) {
-		String req = ServerOperations.GET_REC_COUNT + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(managerID)
-				+ Constants.RECEIVED_DATA_SEPERATOR + managerID;
+	public String getRecordCounts(String id) {
+		String req = ServerOperations.GET_REC_COUNT + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
+				+ Constants.RECEIVED_DATA_SEPERATOR + id;
 		logManager.logger.log(Level.INFO, " Sending request to Server for getRecordCount: : " + req);
 		return sendRequestToServer(req);
 	}
 
-
 	@Override
-	public String editRecord(String managerID, String recordID, String fieldname, String newvalue) {
-		String editData = ServerOperations.EDIT_RECORD + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(managerID)
-				+ Constants.RECEIVED_DATA_SEPERATOR + managerID + Constants.RECEIVED_DATA_SEPERATOR + recordID
-				+ Constants.RECEIVED_DATA_SEPERATOR + fieldname + Constants.RECEIVED_DATA_SEPERATOR + newvalue;
+	public String editRecord(String id, String recordID, String fieldName, String newValue) {
+		String editData = ServerOperations.EDIT_RECORD + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
+				+ Constants.RECEIVED_DATA_SEPERATOR + id + Constants.RECEIVED_DATA_SEPERATOR + recordID
+				+ Constants.RECEIVED_DATA_SEPERATOR + fieldName + Constants.RECEIVED_DATA_SEPERATOR + newValue;
 		logManager.logger.log(Level.INFO, " Sending request to Server for editRecord: : " + editData);
 		return sendRequestToServer(editData);
 	}
 
-	public String transferRecord(String managerID, String recordID, String remoteCenterServerName) {
-		String req = ServerOperations.TRANSFER_RECORD + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(managerID)
-				+ Constants.RECEIVED_DATA_SEPERATOR + managerID + Constants.RECEIVED_DATA_SEPERATOR + recordID
+	@Override
+	public String transferRecord(String id, String recordId, String remoteCenterServerName) {
+		String req = ServerOperations.TRANSFER_RECORD + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
+				+ Constants.RECEIVED_DATA_SEPERATOR + id + Constants.RECEIVED_DATA_SEPERATOR + recordId
 				+ Constants.RECEIVED_DATA_SEPERATOR + remoteCenterServerName;
 		logManager.logger.log(Level.INFO, " Sending request to Server for transferRecord: : " + req);
 		return sendRequestToServer(req);
 	}
 
 	@Override
-	public String killPrimaryServer(String location) {
+	public String killPrimaryServer(String id) {
 		String msg = "";
-		if (location.equals("MTL")) {
+		if (this.id.equals("MTL")) {
 			if (s1_MTL_sender_isAlive && s2_MTL_sender_isAlive && s3_MTL_sender_isAlive) {
 				s1_MTL_sender_isAlive = false;
 				primaryMtlServer.heartBeatReceiver.setStatus(false);
@@ -391,7 +391,7 @@ public class DcmsServerFE extends corbaPOA {
 			} else {
 				msg = "Primary is already killed!!";
 			}
-		} else if (location.equals("LVL")) {
+		} else if (this.id.equals("LVL")) {
 			if (s1_LVL_sender_isAlive && s2_LVL_sender_isAlive && s3_LVL_sender_isAlive) {
 				s1_LVL_sender_isAlive = false;
 				primaryLvlServer.heartBeatReceiver.setStatus(false);
@@ -399,7 +399,7 @@ public class DcmsServerFE extends corbaPOA {
 			} else {
 				msg = "Primary is already killed!!";
 			}
-		} else if (location.equals("DDO")) {
+		} else if (this.id.equals("DDO")) {
 			if (s1_DDO_sender_isAlive && s2_DDO_sender_isAlive && s3_DDO_sender_isAlive) {
 				s1_DDO_sender_isAlive = false;
 				primaryDdoServer.heartBeatReceiver.setStatus(false);
@@ -410,7 +410,6 @@ public class DcmsServerFE extends corbaPOA {
 		}
 		return msg;
 	}
-
 
 	public String sendRequestToServer(String data) {
 		try {
@@ -433,7 +432,6 @@ public class DcmsServerFE extends corbaPOA {
 			return e.getMessage();
 		}
 	}
-
 
 	public String getResponse(Integer requestId) {
 		try {
@@ -462,7 +460,6 @@ public class DcmsServerFE extends corbaPOA {
 			}
 		}
 	}
-
 
 	private static String electNewLeader(String oldLeader, LogManager logManager) {
 		server_leader_status.remove(oldLeader);

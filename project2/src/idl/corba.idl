@@ -1,18 +1,12 @@
-module idlmodule
+module arch
 {
-  interface corba
-  {	  	
-	  	string createTRecord(in string managerID,in string teacher);
-	
-		string createSRecord(in string managerID,in string student);
-	
-		string getRecordCount(in string managerID);
-	
-		string editRecord(in string managerID,in string recordID, in string fieldname, in string newvalue);
-		
-		string transferRecord(in string managerID, in string recordID, in string location);
-		
-		string killPrimaryServer(in string location);
-
-  };
+interface corba{
+     string createTRecord(in string id, in string fName, in string lName, in string address, in string phone, in string specialization, in string location);
+     string createSRecord(in string id, in string fName, in string lName, in string courses, in boolean status, in string statusDate);
+     string getRecordCounts(in string id);
+     string editRecord(in string id, in string recordID, in string fieldName, in string newValue);
+     string transferRecord(in string id, in string recordId, in string remoteCenterServerName);
+     string killPrimaryServer(in string id);
+    };
 };
+

@@ -1,6 +1,6 @@
 package server.main;
 
-import idlmodule.*;
+import arch.*;
 import org.omg.CosNaming.*;
 import java.io.File;
 import java.io.IOException;

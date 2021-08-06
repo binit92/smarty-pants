@@ -1,6 +1,6 @@
 package server.impl;
 
-import idlmodule.*;
+//import arch.*;
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.util.*;
@@ -16,7 +16,8 @@ import model.Teacher;
 import server.frontend.DcmsServerFE;
 
 
-public class DcmsServerImpl extends corbaPOA{
+//public class DcmsServerImpl extends corbaPOA{
+public class DcmsServerImpl {
 	private LogManager logManager;
 	public HashMap<String, List<Record>> recordsMap;
 	public HeartBeatReceiver heartBeatReceiver;
@@ -68,7 +69,7 @@ public class DcmsServerImpl extends corbaPOA{
 	}
 
 
-	@Override
+	//@Override
 	public synchronized String createTRecord(String managerID, String teacher) {
 		if (isPrimary) {
 			for (Integer replicaId : replicas) {
@@ -105,7 +106,7 @@ public class DcmsServerImpl extends corbaPOA{
 	}
 
 
-	@Override
+	//@Override
 	public synchronized String createSRecord(String managerID, String student) {
 		if (isPrimary) {
 			for (Integer replicaId : replicas) {
@@ -150,7 +151,7 @@ public class DcmsServerImpl extends corbaPOA{
 	}
 
 
-	@Override
+	//@Override
 	public synchronized String getRecordCount(String manager) {
 		if (isPrimary) {
 			for (Integer replicaId : replicas) {
@@ -210,29 +211,28 @@ public class DcmsServerImpl extends corbaPOA{
 		return recordCount;
 	}
 
-	@Override
-	public synchronized String editRecord(String managerID, String recordID, String fieldname, String newvalue) {
+	//@Override
+	public String editRecord(String id, String recordID, String fieldName, String newValue) {
 		if (isPrimary) {
 			for (Integer replicaId : replicas) {
 				DcmsServerPrepareReplicasRequest req = new DcmsServerPrepareReplicasRequest(replicaId,
 						logManager.logger);
-				req.editRecord(managerID, recordID, fieldname, newvalue);
+				req.editRecord(id, recordID, fieldName, newValue);
 			}
 		}
-		String data[] = newvalue.split(Constants.RECEIVED_DATA_SEPERATOR);
+		String data[] = newValue.split(Constants.RECEIVED_DATA_SEPERATOR);
 		String requestID = data[1];
 		String type = recordID.substring(0, 2);
 		if (type.equals("TR")) {
-			return editTRRecord(managerID, recordID, fieldname, newvalue);
+			return editTRRecord(id, recordID, fieldName, newValue);
 		} else if (type.equals("SR")) {
-			return editSRRecord(managerID, recordID, fieldname, newvalue);
+			return editSRRecord(id, recordID, fieldName, newValue);
 		}
 		logManager.logger.log(Level.INFO, "Record edit successful for the request ID " + requestID);
 		return "Operation not performed!";
 	}
 
 	public synchronized String transferRecord(String managerID, String recordID, String data) {
-
 		if (isPrimary) {
 			for (Integer replicaId : replicas) {
 				DcmsServerPrepareReplicasRequest req = new DcmsServerPrepareReplicasRequest(replicaId,
@@ -442,8 +442,8 @@ public class DcmsServerImpl extends corbaPOA{
 		this.replicas = replicas;
 	}
 
-	@Override
-	public String killPrimaryServer(String location) {
+	//@Override
+	public String killPrimaryServer(String id) {
 		return null;
 	}
 
