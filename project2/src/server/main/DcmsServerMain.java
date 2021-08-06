@@ -1,6 +1,6 @@
 package server.main;
 
-import corba.*;
+import idlmodule.*;
 import org.omg.CosNaming.*;
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +17,7 @@ import conf.ServerCenterLocation;
  * and the server module for performing various operations
  */
 public class DcmsServerMain {
-	static Dcms fehref;
+	static corba fehref;
 
 	static {
 		try {
@@ -56,15 +56,7 @@ public class DcmsServerMain {
 		
 	}
 
-	/**
-	 * Server's main method to initialize and start the server instances Creates the
-	 * orbd objects and performs the naming service
-	 * Bind the Corba objects to
-	 * establish connection to the client module 
-	 * 
-	 * @param args[] - port number and IP address Corba server starts listening the
-	 * given port number and IP address
-	 */
+
 	public static void main(String args[]) {
 		try {
 
@@ -109,7 +101,7 @@ public class DcmsServerMain {
 			*mtlhref,lvlhref and ddohref are of type Dcms signature file
 			*created by the idl compiler*/
 			
-			fehref = DcmsHelper.narrow(feRef);
+			fehref = corbaHelper.narrow(feRef);
 
 			/*CORBA NAMING SERVICE*/
 			

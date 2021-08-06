@@ -1,6 +1,6 @@
-module DcmsApp
+module idlmodule
 {
-  interface Dcms
+  interface corba
   {	  	
 	  	string createTRecord(in string managerID,in string teacher);
 	
@@ -12,8 +12,7 @@ module DcmsApp
 		
 		string transferRecord(in string managerID, in string recordID, in string location);
 		
-		string killServer(in string location);
-
+		string killPrimaryServer(in string location);
 
   };
 };

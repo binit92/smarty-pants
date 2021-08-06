@@ -1,9 +1,10 @@
 package server.frontend;
 
-import corba.*;
+
 import java.util.*;
 import java.util.logging.Level;
 
+import idlmodule.corbaPOA;
 import conf.Constants;
 import conf.LogManager;
 import conf.ServerCenterLocation;
@@ -20,7 +21,7 @@ import server.impl.*;
  *
  */
 
-public class DcmsServerFE extends DcmsPOA {
+public class DcmsServerFE extends corbaPOA {
 	LogManager ackManager;
 	private static LogManager logManager;
 	String IPaddress;
@@ -447,6 +448,37 @@ public class DcmsServerFE extends DcmsPOA {
 		return sendRequestToServer(req);
 	}
 
+	@Override
+	public String killPrimaryServer(String location) {
+		String msg = "";
+		if (location.equals("MTL")) {
+			if (s1_MTL_sender_isAlive && s2_MTL_sender_isAlive && s3_MTL_sender_isAlive) {
+				s1_MTL_sender_isAlive = false;
+				primaryMtlServer.heartBeatReceiver.setStatus(false);
+				msg = "MTL1 Server is killed " + electNewLeader("MTL1", logManager);
+			} else {
+				msg = "Primary is already killed!!";
+			}
+		} else if (location.equals("LVL")) {
+			if (s1_LVL_sender_isAlive && s2_LVL_sender_isAlive && s3_LVL_sender_isAlive) {
+				s1_LVL_sender_isAlive = false;
+				primaryLvlServer.heartBeatReceiver.setStatus(false);
+				msg = "LVL1 Server is killed " + electNewLeader("LVL1", logManager);
+			} else {
+				msg = "Primary is already killed!!";
+			}
+		} else if (location.equals("DDO")) {
+			if (s1_DDO_sender_isAlive && s2_DDO_sender_isAlive && s3_DDO_sender_isAlive) {
+				s1_DDO_sender_isAlive = false;
+				primaryDdoServer.heartBeatReceiver.setStatus(false);
+				msg = "DDO1 Server is killed " + electNewLeader("DDO1", logManager);
+			} else {
+				msg = "Primary is already killed!!";
+			}
+		}
+		return msg;
+	}
+
 	/**
 	 * Performs the transfer of the request to the primary server by sending the
 	 * appropriate packet request to request buffer and then waiting for the
@@ -651,44 +683,5 @@ public class DcmsServerFE extends DcmsPOA {
 			return s3_DDO_sender_isAlive;
 		}
 		return false;
-	}
-
-	/**
-	 * Performs the server kill, for the given server location
-	 * 
-	 * @param location
-	 *            get the server location to be killed
-	 * 
-	 */
-
-	@Override
-	public String killServer(String location) {
-		String msg = "";
-		if (location.equals("MTL")) {
-			if (s1_MTL_sender_isAlive && s2_MTL_sender_isAlive && s3_MTL_sender_isAlive) {
-				s1_MTL_sender_isAlive = false;
-				primaryMtlServer.heartBeatReceiver.setStatus(false);
-				msg = "MTL1 Server is killed " + electNewLeader("MTL1", logManager);
-			} else {
-				msg = "Primary is already killed!!";
-			}
-		} else if (location.equals("LVL")) {
-			if (s1_LVL_sender_isAlive && s2_LVL_sender_isAlive && s3_LVL_sender_isAlive) {
-				s1_LVL_sender_isAlive = false;
-				primaryLvlServer.heartBeatReceiver.setStatus(false);
-				msg = "LVL1 Server is killed " + electNewLeader("LVL1", logManager);
-			} else {
-				msg = "Primary is already killed!!";
-			}
-		} else if (location.equals("DDO")) {
-			if (s1_DDO_sender_isAlive && s2_DDO_sender_isAlive && s3_DDO_sender_isAlive) {
-				s1_DDO_sender_isAlive = false;
-				primaryDdoServer.heartBeatReceiver.setStatus(false);
-				msg = "DDO1 Server is killed " + electNewLeader("DDO1", logManager);
-			} else {
-				msg = "Primary is already killed!!";
-			}
-		}
-		return msg;
 	}
 }

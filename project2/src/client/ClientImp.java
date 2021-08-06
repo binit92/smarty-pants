@@ -6,8 +6,7 @@ import org.omg.CORBA.ORB;
 import org.omg.CosNaming.NamingContextExt;
 import org.omg.CosNaming.NamingContextExtHelper;
 
-import corba.Dcms;
-import corba.DcmsHelper;
+import idlmodule.*;
 import conf.LogManager;
 import conf.*;
 
@@ -22,7 +21,7 @@ import conf.*;
  **/
 
 public class ClientImp {
-	Dcms serverLoc = null;
+	corba serverLoc = null;
 	static NamingContextExt ncRef = null;
 
 	LogManager logManager;
@@ -60,7 +59,7 @@ public class ClientImp {
 			 */
 			if ((location == ServerCenterLocation.MTL)|| (location == ServerCenterLocation.LVL) 
 					|| (location == ServerCenterLocation.DDO)){
-				serverLoc = DcmsHelper.narrow(ncRef.resolve_str("FE"));
+				serverLoc = corbaHelper.narrow(ncRef.resolve_str("FE"));
 			}
 			
 		} catch (Exception e) {
@@ -138,17 +137,7 @@ public class ClientImp {
 		return count;
 	}
 
-	/**
-	 * invokes edit record on the server return the appropriate message
-	 * 
-	 * @param managerID
-	 *            gets the managerID
-	 * @param recordID
-	 *            gets the recordID to be edited
-	 * @param location
-	 *            gets the location to transfer the recordID
-	 * 
-	 */
+
 	public String transferRecord(String ManagerID, String recordID, String location) {
 		String message = "";
 		logManager.logger.log(Level.INFO, "Initiating the record transfer request");
@@ -182,7 +171,7 @@ public class ClientImp {
 	public String killServer(String location) {
 		String message = "";
 		logManager.logger.log(Level.INFO, "Initiating Server Kill Request at location "+location);
-		message = serverLoc.killServer(location);
+		message = serverLoc.killPrimaryServer(location);
 		//System.out.println(message);
 		logManager.logger.log(Level.INFO, message);
 		return message;

@@ -1,6 +1,6 @@
 package server.impl;
 
-import corba.*;
+import idlmodule.*;
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.util.*;
@@ -23,7 +23,7 @@ import server.frontend.DcmsServerFE;
  *
  */
 
-public class DcmsServerImpl extends DcmsPOA {
+public class DcmsServerImpl extends corbaPOA{
 	private LogManager logManager;
 	public HashMap<String, List<Record>> recordsMap;
 	public HeartBeatReceiver heartBeatReceiver;
@@ -81,17 +81,7 @@ public class DcmsServerImpl extends DcmsPOA {
 		this.replicas = replicas;
 	}
 
-	/**
-	 * Once the teacher record is created, createTRRecord function returns the
-	 * record ID of the teacher record created to the client
-	 * 
-	 * @param managerID
-	 *            gets the managerID
-	 * @param teacherField
-	 *            values of the teacher attribute concatenated by the comma
-	 *            which are received from the client
-	 * 
-	 */
+
 	@Override
 	public synchronized String createTRecord(String managerID, String teacher) {
 		if (isPrimary) {
@@ -562,7 +552,7 @@ public class DcmsServerImpl extends DcmsPOA {
 	}
 
 	@Override
-	public String killServer(String location) {
+	public String killPrimaryServer(String location) {
 		return null;
 	}
 

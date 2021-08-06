@@ -1,6 +1,6 @@
 package server.impl;
 
-import corba.*;
+import idlmodule.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,7 +19,7 @@ import model.Record;
  *
  */
 
-public class DcmsServerPrepareReplicasRequest extends DcmsPOA {
+public class DcmsServerPrepareReplicasRequest extends corbaPOA {
 	LogManager logManager;
 	Logger logger;
 	String IPaddress;
@@ -169,7 +169,7 @@ public class DcmsServerPrepareReplicasRequest extends DcmsPOA {
 	}
 
 	@Override
-	public String killServer(String location) {
+	public String killPrimaryServer(String location) {
 		return null;
 	}
 }

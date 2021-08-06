@@ -1,6 +1,6 @@
 package client;
 
-import corba.*;
+import idlmodule.*;
 
 import conf.Constants;
 import conf.LogManager;
@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
  */
 
 public class DcmsClient {
-	static Dcms dcmsImplMTL, dcmsImplLVL, dcmsImplDDO;
+	static corba dcmsImplMTL, dcmsImplLVL, dcmsImplDDO;
 	static LogManager logManager;
 
 	/**
