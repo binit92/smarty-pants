@@ -31,9 +31,9 @@ public class ReplicaHandler {
     }
 
     public String createTRecord(String managerID, String teacher) {
-        teacher = replicaID + Constants.RECEIVED_DATA_SEPERATOR + OperationsEnum.CREATE_T_RECORD
-                + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(managerID) + Constants.RECEIVED_DATA_SEPERATOR
-                + managerID + Constants.RECEIVED_DATA_SEPERATOR + teacher;
+        teacher = replicaID + Constants.RECEIVED_SPLITTER + OperationsEnum.CREATE_TR_RECORD
+                + Constants.RECEIVED_SPLITTER + getServerLoc(managerID) + Constants.RECEIVED_SPLITTER
+                + managerID + Constants.RECEIVED_SPLITTER + teacher;
         logUtil.log(TAG + "Preparing Multicast request for Create Teacher record : " + teacher);
         sendMulticastRequest(teacher);
         return "";
@@ -44,9 +44,9 @@ public class ReplicaHandler {
     }
 
     public String createSRecord(String managerID, String student) {
-        student = replicaID + Constants.RECEIVED_DATA_SEPERATOR + OperationsEnum.CREATE_S_RECORD
-                + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(managerID) + Constants.RECEIVED_DATA_SEPERATOR
-                + managerID + Constants.RECEIVED_DATA_SEPERATOR + student;
+        student = replicaID + Constants.RECEIVED_SPLITTER + OperationsEnum.CREATE_SR_RECORD
+                + Constants.RECEIVED_SPLITTER + getServerLoc(managerID) + Constants.RECEIVED_SPLITTER
+                + managerID + Constants.RECEIVED_SPLITTER + student;
         sendMulticastRequest(student);
         logUtil.log(TAG + "Preparing Multicast request for Create Student record : " + student);
         return "";
@@ -54,9 +54,9 @@ public class ReplicaHandler {
 
 
     public String getRecordCount(String manager) {
-        String[] data = manager.split(Constants.RECEIVED_DATA_SEPERATOR);
-        String req = replicaID + Constants.RECEIVED_DATA_SEPERATOR + OperationsEnum.GET_REC_COUNT
-                + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(data[0]) + Constants.RECEIVED_DATA_SEPERATOR
+        String[] data = manager.split(Constants.RECEIVED_SPLITTER);
+        String req = replicaID + Constants.RECEIVED_SPLITTER + OperationsEnum.GET_RECORD_COUNT
+                + Constants.RECEIVED_SPLITTER + getServerLoc(data[0]) + Constants.RECEIVED_SPLITTER
                 + manager;
         sendMulticastRequest(req);
         logUtil.log(TAG + "Preparing Multicast request for get record Count :" + req);
@@ -65,10 +65,10 @@ public class ReplicaHandler {
 
 
     public String editRecord(String id, String recordID, String fieldName, String newValue) {
-        String editData = replicaID + Constants.RECEIVED_DATA_SEPERATOR + OperationsEnum.EDIT_RECORD
-                + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id) + Constants.RECEIVED_DATA_SEPERATOR
-                + id + Constants.RECEIVED_DATA_SEPERATOR + recordID + Constants.RECEIVED_DATA_SEPERATOR
-                + fieldName + Constants.RECEIVED_DATA_SEPERATOR + newValue;
+        String editData = replicaID + Constants.RECEIVED_SPLITTER + OperationsEnum.EDIT_RECORD
+                + Constants.RECEIVED_SPLITTER + getServerLoc(id) + Constants.RECEIVED_SPLITTER
+                + id + Constants.RECEIVED_SPLITTER + recordID + Constants.RECEIVED_SPLITTER
+                + fieldName + Constants.RECEIVED_SPLITTER + newValue;
         sendMulticastRequest(editData);
         logUtil.log(TAG + "Preparing Multicast request for editRecord : " + editData);
         return "";
@@ -76,9 +76,9 @@ public class ReplicaHandler {
 
 
     public String transferRecord(String managerID, String recordID, String remoteCenterServerName) {
-        String req = replicaID + Constants.RECEIVED_DATA_SEPERATOR + OperationsEnum.TRANSFER_RECORD
-                + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(managerID) + Constants.RECEIVED_DATA_SEPERATOR
-                + managerID + Constants.RECEIVED_DATA_SEPERATOR + recordID + Constants.RECEIVED_DATA_SEPERATOR
+        String req = replicaID + Constants.RECEIVED_SPLITTER + OperationsEnum.TRANSFER_RECORD
+                + Constants.RECEIVED_SPLITTER + getServerLoc(managerID) + Constants.RECEIVED_SPLITTER
+                + managerID + Constants.RECEIVED_SPLITTER + recordID + Constants.RECEIVED_SPLITTER
                 + remoteCenterServerName;
         sendMulticastRequest(req);
         logUtil.log(TAG + "Preparing Multicast request for transferRecord : " + req);

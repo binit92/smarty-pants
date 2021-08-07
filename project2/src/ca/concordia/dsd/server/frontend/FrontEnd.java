@@ -223,8 +223,8 @@ public class FrontEnd extends corbaPOA implements Constants {
     public String createTRecord(String id, String fName, String lName, String address, String phone, String specialization, String location) {
         String teacherStr = fName + "," + lName + ","
                 + address + "," + phone + "," + specialization + "," + location;
-        String teacher = OperationsEnum.CREATE_T_RECORD + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
-                + Constants.RECEIVED_DATA_SEPERATOR + id + Constants.RECEIVED_DATA_SEPERATOR + teacherStr;
+        String teacher = OperationsEnum.CREATE_TR_RECORD + Constants.RECEIVED_SPLITTER + getServerLoc(id)
+                + Constants.RECEIVED_SPLITTER + id + Constants.RECEIVED_SPLITTER + teacherStr;
         logUtil.log(TAG + "Forwarding createTRecord operation from frontend to server" + teacher);
         return dispatchRequestToCurrentServer(teacher);
     }
@@ -232,34 +232,34 @@ public class FrontEnd extends corbaPOA implements Constants {
     @Override
     public String createSRecord(String id, String fName, String lName, String courses, boolean status, String statusDate) {
         String studentStr = fName + "," + lName + "," + courses + "," + status + "," + statusDate;
-        String student = OperationsEnum.CREATE_S_RECORD + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
-                + Constants.RECEIVED_DATA_SEPERATOR + id + Constants.RECEIVED_DATA_SEPERATOR + studentStr;
+        String student = OperationsEnum.CREATE_SR_RECORD + Constants.RECEIVED_SPLITTER + getServerLoc(id)
+                + Constants.RECEIVED_SPLITTER + id + Constants.RECEIVED_SPLITTER + studentStr;
         logUtil.log(TAG + "Forwarding createSRecord operation from frontend to server " + student);
         return dispatchRequestToCurrentServer(student);
     }
 
     @Override
     public String getRecordCounts(String id) {
-        String req = OperationsEnum.GET_REC_COUNT + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
-                + Constants.RECEIVED_DATA_SEPERATOR + id;
+        String req = OperationsEnum.GET_RECORD_COUNT + Constants.RECEIVED_SPLITTER + getServerLoc(id)
+                + Constants.RECEIVED_SPLITTER + id;
         logUtil.log(TAG + "Forwarding getRecordCounts operation from frontend to server" + req);
         return dispatchRequestToCurrentServer(req);
     }
 
     @Override
     public String editRecord(String id, String recordID, String fieldName, String newValue) {
-        String editData = OperationsEnum.EDIT_RECORD + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
-                + Constants.RECEIVED_DATA_SEPERATOR + id + Constants.RECEIVED_DATA_SEPERATOR + recordID
-                + Constants.RECEIVED_DATA_SEPERATOR + fieldName + Constants.RECEIVED_DATA_SEPERATOR + newValue;
+        String editData = OperationsEnum.EDIT_RECORD + Constants.RECEIVED_SPLITTER + getServerLoc(id)
+                + Constants.RECEIVED_SPLITTER + id + Constants.RECEIVED_SPLITTER + recordID
+                + Constants.RECEIVED_SPLITTER + fieldName + Constants.RECEIVED_SPLITTER + newValue;
         logUtil.log(TAG + "Forwarding editRecord operation from frontend to server " + editData);
         return dispatchRequestToCurrentServer(editData);
     }
 
     @Override
     public String transferRecord(String id, String recordId, String remoteCenterServerName) {
-        String req = OperationsEnum.TRANSFER_RECORD + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
-                + Constants.RECEIVED_DATA_SEPERATOR + id + Constants.RECEIVED_DATA_SEPERATOR + recordId
-                + Constants.RECEIVED_DATA_SEPERATOR + remoteCenterServerName;
+        String req = OperationsEnum.TRANSFER_RECORD + Constants.RECEIVED_SPLITTER + getServerLoc(id)
+                + Constants.RECEIVED_SPLITTER + id + Constants.RECEIVED_SPLITTER + recordId
+                + Constants.RECEIVED_SPLITTER + remoteCenterServerName;
         logUtil.log(TAG + "Forwarding transferRecord operation from frontend to server" + req);
         return dispatchRequestToCurrentServer(req);
     }
@@ -299,7 +299,7 @@ public class FrontEnd extends corbaPOA implements Constants {
         try {
             requestId += 1;
             DatagramSocket ds = new DatagramSocket();
-            data = data + Constants.RECEIVED_DATA_SEPERATOR + requestId;
+            data = data + Constants.RECEIVED_SPLITTER + requestId;
             byte[] dataBytes = data.getBytes();
             DatagramPacket dp = new DatagramPacket(dataBytes, dataBytes.length,
                     InetAddress.getByName(Constants.CURRENT_SERVER_IP), Constants.CURRENT_SERVER_UDP_PORT);

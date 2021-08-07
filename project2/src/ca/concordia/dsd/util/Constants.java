@@ -66,8 +66,8 @@ public interface Constants {
     String MULTICAST_IP_ADDRESS = "224.0.0.1";
     int CURRENT_PRIMARY_PORT_FOR_REPLICAS = 2323;
     int RETRY_TIME = 5000;
-    String RECEIVED_DATA_SEPERATOR = ",";
-    String RESPONSE_DATA_SEPERATOR = "_";
+    String RECEIVED_SPLITTER = ",";
+    String RESPONSE_SPLITTER = "_";
     String PROJECT_DIR = System.getProperty("user.dir");
 
     int MTL1_PORT = 8001;

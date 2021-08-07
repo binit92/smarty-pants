@@ -46,9 +46,9 @@ public class MultiCastReceiverThread extends Thread {
                     startReplicaRequestThread(packet);
                 }
             }
-        } catch (IOException e) {
-            logUtil.log(TAG + "error " + e.getMessage());
-            System.out.println(e.getMessage());
+        } catch (Exception e) {
+            //logUtil.log(TAG + "error " + e.getMessage());
+
         }
     }
 

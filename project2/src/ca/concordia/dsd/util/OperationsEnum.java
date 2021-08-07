@@ -1,9 +1,9 @@
 package ca.concordia.dsd.util;
 
 public enum OperationsEnum {
-    CREATE_T_RECORD,
-    CREATE_S_RECORD,
-    GET_REC_COUNT,
+    CREATE_TR_RECORD,
+    CREATE_SR_RECORD,
+    GET_RECORD_COUNT,
     EDIT_RECORD,
     TRANSFER_RECORD
 }

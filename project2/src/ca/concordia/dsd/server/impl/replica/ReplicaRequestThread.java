@@ -28,7 +28,7 @@ public class ReplicaRequestThread extends Thread {
 
     public synchronized void run() {
         String[] dataArr;
-        String[] dataToBeSent = this.currentOperationData.trim().split(Constants.RECEIVED_DATA_SEPERATOR);
+        String[] dataToBeSent = this.currentOperationData.trim().split(Constants.RECEIVED_SPLITTER);
 
         Integer replicaId = Integer.parseInt(dataToBeSent[0]);
         logUtil.log(TAG + "Processing replica id : " + replicaId);
@@ -38,36 +38,36 @@ public class ReplicaRequestThread extends Thread {
         logUtil.log(TAG + "Processing request id : " + requestId);
 
         switch (oprn) {
-            case CREATE_T_RECORD:
+            case CREATE_TR_RECORD:
                 this.server = chooseServer(replicaId, dataToBeSent[2]);
                 dataArr = Arrays.copyOfRange(dataToBeSent, 4, dataToBeSent.length);
-                String teacherData = String.join(Constants.RECEIVED_DATA_SEPERATOR, dataArr);
+                String teacherData = String.join(Constants.RECEIVED_SPLITTER, dataArr);
                 response = this.server.createTRecord(dataToBeSent[3], teacherData);
                 sendReply(response);
                 break;
-            case CREATE_S_RECORD:
+            case CREATE_SR_RECORD:
                 this.server = chooseServer(replicaId, dataToBeSent[2]);
                 dataArr = Arrays.copyOfRange(dataToBeSent, 4, dataToBeSent.length);
-                String studentData = String.join(Constants.RECEIVED_DATA_SEPERATOR, dataArr);
+                String studentData = String.join(Constants.RECEIVED_SPLITTER, dataArr);
                 response = this.server.createSRecord(dataToBeSent[3], studentData);
                 sendReply(response);
                 break;
-            case GET_REC_COUNT:
+            case GET_RECORD_COUNT:
                 this.server = chooseServer(replicaId, dataToBeSent[2]);
                 response = this.server
-                        .getRecordCount(dataToBeSent[3] + Constants.RECEIVED_DATA_SEPERATOR + dataToBeSent[4]);
+                        .getRecordCount(dataToBeSent[3] + Constants.RECEIVED_SPLITTER + dataToBeSent[4]);
                 sendReply(response);
                 break;
             case EDIT_RECORD:
                 this.server = chooseServer(replicaId, dataToBeSent[2]);
-                String newdata = dataToBeSent[6] + Constants.RECEIVED_DATA_SEPERATOR + dataToBeSent[7];
+                String newdata = dataToBeSent[6] + Constants.RECEIVED_SPLITTER + dataToBeSent[7];
                 response = this.server.editRecord(dataToBeSent[3], dataToBeSent[4], dataToBeSent[5], newdata);
                 logUtil.log(TAG + " EDIT_RECORD > response " + response);
                 sendReply(response);
                 break;
             case TRANSFER_RECORD:
                 this.server = chooseServer(replicaId, dataToBeSent[2]);
-                String newdata1 = dataToBeSent[5] + Constants.RECEIVED_DATA_SEPERATOR + dataToBeSent[6];
+                String newdata1 = dataToBeSent[5] + Constants.RECEIVED_SPLITTER + dataToBeSent[6];
                 response = this.server.transferRecord(dataToBeSent[3], dataToBeSent[4], newdata1);
                 sendReply(response);
                 break;

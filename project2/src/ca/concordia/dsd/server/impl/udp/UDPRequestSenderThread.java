@@ -90,7 +90,7 @@ public class UDPRequestSenderThread extends Thread {
             String firstName = temp[2];
             String lastName = temp[3];
             String CoursesRegistered = temp[4];
-            List<String> courseList = server.putCoursesinList(CoursesRegistered);
+            List<String> courseList = server.addCoursesInList(CoursesRegistered);
             String status = temp[3];
             String statusDate = temp[5];
             Student studentObj = new Student(managerID, recordID, firstName, lastName, courseList, status, statusDate);
