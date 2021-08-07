@@ -88,16 +88,20 @@ public class FrontEnd extends corbaPOA implements Constants {
 
     private static synchronized void checkServerStatus(String serverName) {
         synchronized (lock) {
-            long currentTime = System.currentTimeMillis();
-            if (reportingMap.containsKey(serverName)) {
-                if (currentTime - reportingMap.get(serverName) > ONE_SECOND_TIMEOUT) {
-                    if (statusMap.containsKey(serverName)) {
-                        if (statusMap.get(serverName)) {
-                            logUtil.log(TAG + "<FAIL> Primary Server : " + serverName + " has not reported in last one second");
-                            bullyAlgorithm(serverName);
+            try {
+                long currentTime = System.currentTimeMillis();
+                if (reportingMap.containsKey(serverName)) {
+                    if (currentTime - reportingMap.get(serverName) > ONE_SECOND_TIMEOUT) {
+                        if (statusMap.containsKey(serverName)) {
+                            if (statusMap.get(serverName)) {
+                                logUtil.log(TAG + "<FAIL> Primary Server : " + serverName + " has not reported in last one second");
+                                bullyAlgorithm(serverName);
+                            }
                         }
                     }
                 }
+            }catch (Exception e){
+
             }
         }
     }
@@ -124,60 +128,65 @@ public class FrontEnd extends corbaPOA implements Constants {
             replaceserver = repo.get(Constants.PRIMARY_SERVER_ID);
         }
         if (maxEntry.getKey().contains("2")) {
-            ArrayList<Integer> replicas = new ArrayList<>();
-            replicas.add(Constants.REPLICA2_SERVER_ID);
-            HashMap<String, CenterServer> getnewserver = new HashMap<String, CenterServer>();
-            synchronized (repo) {
-                getnewserver = repo.get(Constants.REPLICA1_SERVER_ID);
-            }
-            CenterServer newPrimary = getnewserver.get(loc);
-            newPrimary.setPrimary(true);
-            newPrimary.setReplicas(replicas);
-            newPrimary.setServerID(Constants.PRIMARY_SERVER_ID);
+            try{
+                ArrayList<Integer> replicas = new ArrayList<>();
+                replicas.add(Constants.REPLICA2_SERVER_ID);
+                HashMap<String, CenterServer> getnewserver = new HashMap<String, CenterServer>();
+                synchronized (repo) {
+                    getnewserver = repo.get(Constants.REPLICA1_SERVER_ID);
+                }
+                CenterServer newPrimary = getnewserver.get(loc);
+                newPrimary.setPrimary(true);
+                newPrimary.setReplicas(replicas);
+                newPrimary.setServerID(Constants.PRIMARY_SERVER_ID);
 
-            replaceserver.remove(loc);
+                replaceserver.remove(loc);
 
-            replaceserver.put(loc, newPrimary);
-            synchronized (repo) {
-                repo.put(Constants.PRIMARY_SERVER_ID, replaceserver);
-            }
-            getnewserver.remove(loc);
-            synchronized (repo) {
-                repo.put(Constants.REPLICA1_SERVER_ID, getnewserver);
-            }
-            HashMap<String, CenterServer> replicamap = repo.get(Constants.REPLICA2_SERVER_ID);
-            CenterServer replica = replicamap.get(loc);
-            replica.setReplicas(replicas);
-            replicamap.put(loc, replica);
-            logUtil.log(TAG + "No replica found at location " + loc);
-            synchronized (repo) {
-                repo.put(Constants.REPLICA2_SERVER_ID, replicamap);
-            }
+                replaceserver.put(loc, newPrimary);
+                synchronized (repo) {
+                    repo.put(Constants.PRIMARY_SERVER_ID, replaceserver);
+                }
+                getnewserver.remove(loc);
+                synchronized (repo) {
+                    repo.put(Constants.REPLICA1_SERVER_ID, getnewserver);
+                }
+                HashMap<String, CenterServer> replicamap = repo.get(Constants.REPLICA2_SERVER_ID);
+                CenterServer replica = replicamap.get(loc);
+                replica.setReplicas(replicas);
+                replicamap.put(loc, replica);
+                logUtil.log(TAG + "No replica found at location " + loc);
+                synchronized (repo) {
+                    repo.put(Constants.REPLICA2_SERVER_ID, replicamap);
+                }
+            }catch (Exception e){}
 
         } else if (maxEntry.getKey().contains("3")) {
-            ArrayList<Integer> replicas = new ArrayList<>();
-            replicas.add(Constants.REPLICA1_SERVER_ID);
-            HashMap<String, CenterServer> getnewserver = repo.get(Constants.REPLICA2_SERVER_ID);
-            CenterServer newPrimary = getnewserver.get(loc);
-            newPrimary.setPrimary(true);
-            newPrimary.setReplicas(replicas);
-            newPrimary.setServerID(Constants.PRIMARY_SERVER_ID);
+            try{
+                ArrayList<Integer> replicas = new ArrayList<>();
+                replicas.add(Constants.REPLICA1_SERVER_ID);
+                HashMap<String, CenterServer> getnewserver = repo.get(Constants.REPLICA2_SERVER_ID);
+                CenterServer newPrimary = getnewserver.get(loc);
+                newPrimary.setPrimary(true);
+                newPrimary.setReplicas(replicas);
+                newPrimary.setServerID(Constants.PRIMARY_SERVER_ID);
 
-            replaceserver.put(loc, newPrimary);
-            synchronized (repo) {
-                repo.put(Constants.PRIMARY_SERVER_ID, replaceserver);
-            }
-            getnewserver.remove(loc);
-            synchronized (repo) {
-                repo.put(Constants.REPLICA2_SERVER_ID, getnewserver);
-            }
-            HashMap<String, CenterServer> replicamap = repo.get(Constants.REPLICA1_SERVER_ID);
-            CenterServer replica = replicamap.get(loc);
-            replica.setReplicas(replicas);
-            replicamap.put(loc, replica);
-            synchronized (repo) {
-                repo.put(Constants.REPLICA1_SERVER_ID, replicamap);
-            }
+                replaceserver.put(loc, newPrimary);
+                synchronized (repo) {
+                    repo.put(Constants.PRIMARY_SERVER_ID, replaceserver);
+                }
+                getnewserver.remove(loc);
+                synchronized (repo) {
+                    repo.put(Constants.REPLICA2_SERVER_ID, getnewserver);
+                }
+                HashMap<String, CenterServer> replicamap = repo.get(Constants.REPLICA1_SERVER_ID);
+                CenterServer replica = replicamap.get(loc);
+                replica.setReplicas(replicas);
+                replicamap.put(loc, replica);
+                synchronized (repo) {
+                    repo.put(Constants.REPLICA1_SERVER_ID, replicamap);
+                }
+            }catch (Exception e){}
+
         }
         return "and elected new leader " + maxEntry.getKey() + " in the location" + loc;
     }
