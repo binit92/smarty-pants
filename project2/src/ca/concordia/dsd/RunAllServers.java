@@ -14,6 +14,7 @@ import org.omg.PortableServer.POAHelper;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 
 public class RunAllServers implements Constants {
@@ -32,8 +33,20 @@ public class RunAllServers implements Constants {
 
     public static void main(String[] args) {
         try {
+
             createLogDirectories();
-            ORB orb = ORB.init(args, null);
+
+            // Setting the host and port programmtically here
+            String[] localargs = new String[4];
+            localargs[0] = "-ORBInitialPort";
+            localargs[1] = Integer.toString(Constants.ORB_INITIAL_PORT);
+            localargs[2] = "-ORBInitialHost ";
+            localargs[3] = Constants.ORB_INITIAL_HOST;
+
+            System.out.println(Arrays.toString(localargs));
+
+
+            ORB orb = ORB.init(localargs, null);
 
             POA rootpoa = POAHelper
                     .narrow(orb.resolve_initial_references("RootPOA"));
@@ -52,7 +65,7 @@ public class RunAllServers implements Constants {
             NameComponent[] fePath = ncRef.to_name("FE");
 
             ncRef.rebind(fePath, ref);
-            System.out.println(TAG + "Started CORBA front-end and all servers in all datacenters");
+            System.out.println(TAG + "Started CORBA front-end and all datacenters one by one.");
             orb.run();
         } catch (Exception e) {
             System.out.println(TAG + e.getMessage());
