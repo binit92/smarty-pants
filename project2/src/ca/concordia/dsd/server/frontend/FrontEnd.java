@@ -12,12 +12,13 @@ import ca.concordia.dsd.util.OperationsEnum;
 import ca.concordia.dsd.database.Record;
 import ca.concordia.dsd.server.impl.CenterServer;
 import ca.concordia.dsd.server.impl.multicast.MultiCastReceiverThread;
-import ca.concordia.dsd.server.impl.replica.DcmsServerReplicaResponseReceiver;
+import ca.concordia.dsd.server.impl.replica.ReplicaResponseThread;
 import ca.concordia.dsd.util.LogUtil;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,9 +58,12 @@ public class FrontEnd extends corbaPOA implements Constants {
     private HashMap<Integer, String> requestBuffer;
     private ArrayList<RequestThread> requests;
     private MultiCastReceiverThread primaryReceiver, replica1Receiver, replica2Receiver;
-    private DcmsServerReplicaResponseReceiver replicaResponseReceiver;
+    private ReplicaResponseThread replicaResponseReceiver;
+    private ArrayList<Integer> replicas = new ArrayList<>();
 
     private CenterServer primaryMtlServer,primaryLvlServer,primaryDdoServer;
+    private CenterServer replica1MtlServer, replica1LvlServer, replica1DdoServer;
+    private CenterServer replica2MtlServer, replica2LvlServer, replica2DdoServer;
 
 
     public FrontEnd() {
@@ -239,79 +243,18 @@ public class FrontEnd extends corbaPOA implements Constants {
             reportingMap.put(DDO2, System.currentTimeMillis());
             reportingMap.put(DDO3, System.currentTimeMillis());
 
-            ArrayList<Integer> replicas = new ArrayList<>();
             replicas.add(Constants.REPLICA1_SERVER_ID);
             replicas.add(Constants.REPLICA2_SERVER_ID);
 
             startFIFOThread();
             startUDPResponseThread();
             startMultiCastReceiverThread();
+            startReplicaResponseThread();
+            startReplicaOneMulticastReceiverThread();
 
-
-
-
-            replicaResponseReceiver = new DcmsServerReplicaResponseReceiver(new LogUtil("ReplicasResponse"));
-            replicaResponseReceiver.start();
-            DatagramSocket socket1 = new DatagramSocket();
-
-            primaryMtlServer = new CenterServer(Constants.PRIMARY_SERVER_ID, true, LocationEnum.MTL,
-                    9999, socket1, isMTLOneAlive, MTL1, MTL1_PORT, MTL2_PORT,
-                    MTL3_PORT, replicas, getLogInstance("PRIMARY_SERVER", LocationEnum.MTL));
-
-            primaryLvlServer = new CenterServer(Constants.PRIMARY_SERVER_ID, true, LocationEnum.LVL,
-                    7777, socket1, isLVLOneAlive, LVL1, LVL1_PORT, LVL2_PORT,
-                    LVL3_PORT, replicas, getLogInstance("PRIMARY_SERVER", LocationEnum.LVL));
-
-            primaryDdoServer = new CenterServer(Constants.PRIMARY_SERVER_ID, true, LocationEnum.DDO,
-                    6666, socket1, isDDOOneAlive, DDO1, DDO1_PORT, DDO2_PORT,
-                    DDO3_PORT, replicas, getLogInstance("PRIMARY_SERVER", LocationEnum.DDO));
-
-            primaryMap.put("MTL", primaryMtlServer);
-            primaryMap.put("LVL", primaryLvlServer);
-            primaryMap.put("DDO", primaryDdoServer);
-
-            replica1Receiver = new MultiCastReceiverThread(false, ackManager);
-            replica1Receiver.start();
-
-            DatagramSocket socket2 = new DatagramSocket();
-            CenterServer replica1MtlServer = new CenterServer(Constants.REPLICA1_SERVER_ID, false,
-                    LocationEnum.MTL, 5555, socket2, isMTLTwoAlive, MTL2, MTL2_PORT,
-                    MTL1_PORT, MTL3_PORT, replicas,
-                    getLogInstance("REPLICA1_SERVER", LocationEnum.MTL));
-
-            CenterServer replica1LvlServer = new CenterServer(Constants.REPLICA1_SERVER_ID, false,
-                    LocationEnum.LVL, 4444, socket2, isLVLTwoAlive, LVL2, LVL2_PORT,
-                    LVL1_PORT, LVL3_PORT, replicas,
-                    getLogInstance("REPLICA1_SERVER", LocationEnum.LVL));
-
-            CenterServer replica1DdoServer = new CenterServer(Constants.REPLICA1_SERVER_ID, false,
-                    LocationEnum.DDO, 2222, socket2, isDDOTwoAlive, DDO2, DDO2_PORT,
-                    DDO1_PORT, DDO3_PORT, replicas,
-                    getLogInstance("REPLICA1_SERVER", LocationEnum.DDO));
-
-            replicaOneMap.put("MTL", replica1MtlServer);
-            replicaOneMap.put("LVL", replica1LvlServer);
-            replicaOneMap.put("DDO", replica1DdoServer);
-
-            DatagramSocket socket3 = new DatagramSocket();
-            CenterServer replica2MtlServer = new CenterServer(Constants.REPLICA2_SERVER_ID, false,
-                    LocationEnum.MTL, 9878, socket3, isMTLThreeAlive, MTL3, MTL3_PORT,
-                    MTL1_PORT, MTL2_PORT, replicas,
-                    getLogInstance("REPLICA2_SERVER", LocationEnum.MTL));
-
-            CenterServer replica2LvlServer = new CenterServer(Constants.REPLICA2_SERVER_ID, false,
-                    LocationEnum.LVL, 9701, socket3, isLVLThreeAlive, LVL3, LVL3_PORT,
-                    LVL1_PORT, LVL2_PORT, replicas,
-                    getLogInstance("REPLICA2_SERVER", LocationEnum.LVL));
-
-            CenterServer replica2DdoServer = new CenterServer(Constants.REPLICA2_SERVER_ID, false,
-                    LocationEnum.DDO, 5655, socket3, isDDOThreeAlive, DDO3, DDO3_PORT,
-                    DDO1_PORT, DDO2_PORT, replicas,
-                    getLogInstance("REPLICA2_SERVER", LocationEnum.DDO));
-
-            replicaTwoMap.put("MTL", replica2MtlServer);
-            replicaTwoMap.put("LVL", replica2LvlServer);
-            replicaTwoMap.put("DDO", replica2DdoServer);
+            createPrimaryServers();
+            createReplicaOneServers();
+            createReplicaTwoServers();
 
             synchronized (repo) {
                 repo.put(Constants.PRIMARY_SERVER_ID, primaryMap);
@@ -427,6 +370,79 @@ public class FrontEnd extends corbaPOA implements Constants {
     private void startMultiCastReceiverThread(){
         primaryReceiver = new MultiCastReceiverThread(true, ackManager);
         primaryReceiver.start();
+    }
+
+    private void startReplicaResponseThread(){
+        replicaResponseReceiver = new ReplicaResponseThread(new LogUtil("ReplicasResponse"));
+        replicaResponseReceiver.start();
+    }
+
+    private void startReplicaOneMulticastReceiverThread(){
+        replica1Receiver = new MultiCastReceiverThread(false, ackManager);
+        replica1Receiver.start();
+    }
+
+    private void createPrimaryServers() throws SocketException {
+        DatagramSocket socket1 = new DatagramSocket();
+        primaryMtlServer = new CenterServer(Constants.PRIMARY_SERVER_ID, true, LocationEnum.MTL,
+                9999, socket1, isMTLOneAlive, MTL1, MTL1_PORT, MTL2_PORT,
+                MTL3_PORT, replicas, getLogInstance("PRIMARY_SERVER", LocationEnum.MTL));
+
+        primaryLvlServer = new CenterServer(Constants.PRIMARY_SERVER_ID, true, LocationEnum.LVL,
+                7777, socket1, isLVLOneAlive, LVL1, LVL1_PORT, LVL2_PORT,
+                LVL3_PORT, replicas, getLogInstance("PRIMARY_SERVER", LocationEnum.LVL));
+
+        primaryDdoServer = new CenterServer(Constants.PRIMARY_SERVER_ID, true, LocationEnum.DDO,
+                6666, socket1, isDDOOneAlive, DDO1, DDO1_PORT, DDO2_PORT,
+                DDO3_PORT, replicas, getLogInstance("PRIMARY_SERVER", LocationEnum.DDO));
+
+        primaryMap.put("MTL", primaryMtlServer);
+        primaryMap.put("LVL", primaryLvlServer);
+        primaryMap.put("DDO", primaryDdoServer);
+    }
+
+    private void createReplicaOneServers()throws SocketException{
+        DatagramSocket socket2 = new DatagramSocket();
+        replica1MtlServer = new CenterServer(Constants.REPLICA1_SERVER_ID, false,
+                LocationEnum.MTL, 5555, socket2, isMTLTwoAlive, MTL2, MTL2_PORT,
+                MTL1_PORT, MTL3_PORT, replicas,
+                getLogInstance("REPLICA1_SERVER", LocationEnum.MTL));
+
+        replica1LvlServer = new CenterServer(Constants.REPLICA1_SERVER_ID, false,
+                LocationEnum.LVL, 4444, socket2, isLVLTwoAlive, LVL2, LVL2_PORT,
+                LVL1_PORT, LVL3_PORT, replicas,
+                getLogInstance("REPLICA1_SERVER", LocationEnum.LVL));
+
+        replica1DdoServer = new CenterServer(Constants.REPLICA1_SERVER_ID, false,
+                LocationEnum.DDO, 2222, socket2, isDDOTwoAlive, DDO2, DDO2_PORT,
+                DDO1_PORT, DDO3_PORT, replicas,
+                getLogInstance("REPLICA1_SERVER", LocationEnum.DDO));
+
+        replicaOneMap.put("MTL", replica1MtlServer);
+        replicaOneMap.put("LVL", replica1LvlServer);
+        replicaOneMap.put("DDO", replica1DdoServer);
+    }
+
+    private void createReplicaTwoServers()throws SocketException{
+        DatagramSocket socket3 = new DatagramSocket();
+        replica2MtlServer = new CenterServer(Constants.REPLICA2_SERVER_ID, false,
+                LocationEnum.MTL, 9878, socket3, isMTLThreeAlive, MTL3, MTL3_PORT,
+                MTL1_PORT, MTL2_PORT, replicas,
+                getLogInstance("REPLICA2_SERVER", LocationEnum.MTL));
+
+        replica2LvlServer = new CenterServer(Constants.REPLICA2_SERVER_ID, false,
+                LocationEnum.LVL, 9701, socket3, isLVLThreeAlive, LVL3, LVL3_PORT,
+                LVL1_PORT, LVL2_PORT, replicas,
+                getLogInstance("REPLICA2_SERVER", LocationEnum.LVL));
+
+        replica2DdoServer = new CenterServer(Constants.REPLICA2_SERVER_ID, false,
+                LocationEnum.DDO, 5655, socket3, isDDOThreeAlive, DDO3, DDO3_PORT,
+                DDO1_PORT, DDO2_PORT, replicas,
+                getLogInstance("REPLICA2_SERVER", LocationEnum.DDO));
+
+        replicaTwoMap.put("MTL", replica2MtlServer);
+        replicaTwoMap.put("LVL", replica2LvlServer);
+        replicaTwoMap.put("DDO", replica2DdoServer);
     }
 
     private String getServerLoc(String managerID) {

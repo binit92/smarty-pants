@@ -7,7 +7,7 @@ import java.util.Map.Entry;
 
 import ca.concordia.dsd.server.impl.ping.PingReceiverThread;
 import ca.concordia.dsd.server.impl.ping.PingSenderThread;
-import ca.concordia.dsd.server.impl.replica.DcmsServerPrepareReplicasRequest;
+import ca.concordia.dsd.server.impl.replica.ReplicaHandler;
 import ca.concordia.dsd.server.impl.udp.UDPRequestProviderThread;
 import ca.concordia.dsd.server.impl.udp.UDPRequestReceiverThread;
 import ca.concordia.dsd.util.Constants;
@@ -77,7 +77,7 @@ public class CenterServer {
 	public synchronized String createTRecord(String managerID, String teacher) {
 		if (isPrimary) {
 			for (Integer replicaId : replicas) {
-				DcmsServerPrepareReplicasRequest req = new DcmsServerPrepareReplicasRequest(replicaId,
+				ReplicaHandler req = new ReplicaHandler(replicaId,
 						logManager);
 				req.createTRecord(managerID, teacher);
 			}
@@ -114,7 +114,7 @@ public class CenterServer {
 	public synchronized String createSRecord(String managerID, String student) {
 		if (isPrimary) {
 			for (Integer replicaId : replicas) {
-				DcmsServerPrepareReplicasRequest req = new DcmsServerPrepareReplicasRequest(replicaId,
+				ReplicaHandler req = new ReplicaHandler(replicaId,
 						logManager);
 				req.createSRecord(managerID, student);
 			}
@@ -159,7 +159,7 @@ public class CenterServer {
 	public synchronized String getRecordCount(String manager) {
 		if (isPrimary) {
 			for (Integer replicaId : replicas) {
-				DcmsServerPrepareReplicasRequest req = new DcmsServerPrepareReplicasRequest(replicaId,
+				ReplicaHandler req = new ReplicaHandler(replicaId,
 						logManager);
 				req.getRecordCount(manager);
 			}
@@ -219,7 +219,7 @@ public class CenterServer {
 	public String editRecord(String id, String recordID, String fieldName, String newValue) {
 		if (isPrimary) {
 			for (Integer replicaId : replicas) {
-				DcmsServerPrepareReplicasRequest req = new DcmsServerPrepareReplicasRequest(replicaId,
+				ReplicaHandler req = new ReplicaHandler(replicaId,
 						logManager);
 				req.editRecord(id, recordID, fieldName, newValue);
 			}
@@ -239,7 +239,7 @@ public class CenterServer {
 	public synchronized String transferRecord(String managerID, String recordID, String data) {
 		if (isPrimary) {
 			for (Integer replicaId : replicas) {
-				DcmsServerPrepareReplicasRequest req = new DcmsServerPrepareReplicasRequest(replicaId,
+				ReplicaHandler req = new ReplicaHandler(replicaId,
 						logManager);
 				req.transferRecord(managerID, recordID, data);
 			}

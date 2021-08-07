@@ -1,7 +1,7 @@
 package ca.concordia.dsd.server.impl.multicast;
 
-import ca.concordia.dsd.server.impl.replica.DcmsServerReplicaAcknowledgementSender;
-import ca.concordia.dsd.server.impl.replica.DcmsServerReplicaRequestProcessor;
+import ca.concordia.dsd.server.impl.replica.ReplicaStatusThread;
+import ca.concordia.dsd.server.impl.replica.ReplicaRequestThread;
 import ca.concordia.dsd.util.Constants;
 import ca.concordia.dsd.util.LogUtil;
 
@@ -39,13 +39,13 @@ public class MultiCastReceiverThread extends Thread {
                 multicastsocket.receive(packet);
                 if (!isPrimary) {
                     System.out.println("Received data in multicast heartBeatReceiver " + new String(packet.getData()));
-                    System.out.println("Sent the acknowledgement for the data recevied in replica to primary ca.concordia.dsd.server "
+                    System.out.println("Sent the acknowledgement for the data recevied in replica to primary server "
                             + new String(packet.getData()));
 
-                    DcmsServerReplicaAcknowledgementSender ack = new DcmsServerReplicaAcknowledgementSender(
+                    ReplicaStatusThread ack = new ReplicaStatusThread(
                             new String(packet.getData()), logManager);
                     ack.start();
-                    DcmsServerReplicaRequestProcessor req = new DcmsServerReplicaRequestProcessor(
+                    ReplicaRequestThread req = new ReplicaRequestThread(
                             new String(packet.getData()), logManager);
                     req.start();
                 }

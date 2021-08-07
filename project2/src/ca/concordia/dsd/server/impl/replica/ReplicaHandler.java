@@ -11,8 +11,8 @@ import java.util.List;
 
 
 //public class DcmsServerPrepareReplicasRequest extends corbaPOA {
-public class DcmsServerPrepareReplicasRequest {
-    private final String TAG = "|" + DcmsServerPrepareReplicasRequest.class.getSimpleName() + "| ";
+public class ReplicaHandler {
+    private final String TAG = "|" + ReplicaHandler.class.getSimpleName() + "| ";
     public HashMap<String, List<Record>> recordsMap;
     LogUtil logger;
     String IPaddress;
@@ -25,7 +25,7 @@ public class DcmsServerPrepareReplicasRequest {
     Integer replicaID;
 
 
-    public DcmsServerPrepareReplicasRequest(Integer replicaID, LogUtil logUtil) {
+    public ReplicaHandler(Integer replicaID, LogUtil logUtil) {
         recordsMap = new HashMap<>();
         requestBuffer = new HashMap<>();
         requestId = 0;

@@ -11,14 +11,14 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.Arrays;
 
-public class DcmsServerReplicaRequestProcessor extends Thread {
-
+public class ReplicaRequestThread extends Thread {
+    private final String TAG = "|" + ReplicaRequestThread.class.getSimpleName() + "| ";
     String currentOperationData;
     CenterServer server;
     String response;
     LogUtil logUtil;
 
-    public DcmsServerReplicaRequestProcessor(String operationData, LogUtil logManager) {
+    public ReplicaRequestThread(String operationData, LogUtil logManager) {
         this.currentOperationData = operationData;
         this.server = null;
         response = null;

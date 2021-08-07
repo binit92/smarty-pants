@@ -9,12 +9,14 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 
-public class DcmsServerReplicaAcknowledgementSender extends Thread {
+public class ReplicaStatusThread extends Thread {
+    private final String TAG = "|" + ReplicaStatusThread.class.getSimpleName() + "| ";
+
     String request;
     DatagramSocket ds;
     LogUtil logUtil;
 
-    public DcmsServerReplicaAcknowledgementSender(String request, LogUtil logManger) {
+    public ReplicaStatusThread(String request, LogUtil logManger) {
         request = "RECEIVED ACKNOWLEDGEMENT IN PRIMARY :: " + request;
         this.request = request;
         this.logUtil = logManger;

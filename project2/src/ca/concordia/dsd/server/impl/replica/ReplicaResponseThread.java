@@ -11,8 +11,8 @@ import java.net.SocketException;
 import java.util.HashMap;
 
 
-public class DcmsServerReplicaResponseReceiver extends Thread {
-    private final String TAG = "|" + DcmsServerReplicaResponseReceiver.class.getSimpleName() + "| ";
+public class ReplicaResponseThread extends Thread {
+    private final String TAG = "|" + ReplicaResponseThread.class.getSimpleName() + "| ";
 
     DatagramSocket serverSocket;
     DatagramPacket receivePacket;
@@ -24,7 +24,7 @@ public class DcmsServerReplicaResponseReceiver extends Thread {
     HashMap<Integer, ResponseThread> responses;
     int c;
 
-    public DcmsServerReplicaResponseReceiver(LogUtil logManager) {
+    public ReplicaResponseThread(LogUtil logManager) {
         try {
             loggerInstance = logManager;
             serverSocket = new DatagramSocket(Constants.CURRENT_PRIMARY_PORT_FOR_REPLICAS);
