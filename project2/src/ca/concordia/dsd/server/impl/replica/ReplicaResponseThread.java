@@ -14,19 +14,19 @@ import java.util.HashMap;
 public class ReplicaResponseThread extends Thread {
     private final String TAG = "|" + ReplicaResponseThread.class.getSimpleName() + "| ";
 
-    DatagramSocket serverSocket;
-    DatagramPacket receivePacket;
-    DatagramPacket sendPacket;
-    int udpPortNum;
-    LocationEnum location;
-    LogUtil logUtil;
-    String recordCount;
-    HashMap<Integer, ResponseThread> responses;
-    int c;
+    private DatagramSocket serverSocket;
+    private DatagramPacket receivePacket;
+    private DatagramPacket sendPacket;
+    private int udpPortNum;
+    private LocationEnum location;
+    private LogUtil logUtil;
+    private String recordCount;
+    private HashMap<Integer, ResponseThread> responses;
+    private int c;
 
     public ReplicaResponseThread(LogUtil logUtil) {
         try {
-            logUtil = logUtil;
+            this.logUtil = logUtil;
             serverSocket = new DatagramSocket(Constants.CURRENT_PRIMARY_PORT_FOR_REPLICAS);
         } catch (SocketException e) {
             System.out.println(e.getMessage());
@@ -45,10 +45,8 @@ public class ReplicaResponseThread extends Thread {
                 byte[] receivedData = receivePacket.getData();
                 String inputPkt = new String(receivedData).trim();
                 if (inputPkt.contains("ACKNOWLEDGEMENT")) {
-                    System.out.println(new String(receivedData));
-                    logUtil.log(TAG + inputPkt);
+                    logUtil.log(TAG + "ACK : " + inputPkt);
                 } else {
-                    System.out.println("Received response packet in PRIMARY:: " + new String(receivedData));
                     logUtil.log(TAG + "Received response in Primary " + inputPkt);
                 }
             } catch (Exception e) {

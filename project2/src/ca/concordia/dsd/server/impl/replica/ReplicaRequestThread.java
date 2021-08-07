@@ -13,10 +13,10 @@ import java.util.Arrays;
 
 public class ReplicaRequestThread extends Thread {
     private final String TAG = "|" + ReplicaRequestThread.class.getSimpleName() + "| ";
-    String currentOperationData;
-    CenterServer server;
-    String response;
-    LogUtil logUtil;
+    private String currentOperationData;
+    private CenterServer server;
+    private String response;
+    private LogUtil logUtil;
 
     public ReplicaRequestThread(String operationData, LogUtil logManager) {
         this.currentOperationData = operationData;
@@ -31,11 +31,11 @@ public class ReplicaRequestThread extends Thread {
         String[] dataToBeSent = this.currentOperationData.trim().split(Constants.RECEIVED_DATA_SEPERATOR);
 
         Integer replicaId = Integer.parseInt(dataToBeSent[0]);
-        System.out.println("====================Currently serving replica with ID :: " + replicaId);
+        logUtil.log(TAG + "Processing replica id : "+ replicaId);
         OperationsEnum oprn = OperationsEnum.valueOf(dataToBeSent[1]);
 
         String requestId = dataToBeSent[dataToBeSent.length - 1];
-        System.out.println("Currently serving request with id :: " + requestId);
+        logUtil.log(TAG + "Processing request id : " + requestId);
 
         switch (oprn) {
             case CREATE_T_RECORD:
@@ -62,7 +62,7 @@ public class ReplicaRequestThread extends Thread {
                 this.server = chooseServer(replicaId, dataToBeSent[2]);
                 String newdata = dataToBeSent[6] + Constants.RECEIVED_DATA_SEPERATOR + dataToBeSent[7];
                 response = this.server.editRecord(dataToBeSent[3], dataToBeSent[4], dataToBeSent[5], newdata);
-                //System.out.println("=======================================RESPONSE :: " + response);
+                logUtil.log(TAG + " EDIT_RECORD > response " + response);
                 sendReply(response);
                 break;
             case TRANSFER_RECORD:

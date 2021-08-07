@@ -12,22 +12,19 @@ import java.net.DatagramSocket;
 public class UDPRequestReceiverThread extends Thread {
 
     private final String TAG = "|" + UDPRequestReceiverThread.class.getSimpleName() + "| ";
-    DatagramSocket serverSocket;
-    DatagramPacket receivePacket;
-    DatagramPacket sendPacket;
-    int udpPortNum;
-    LocationEnum location;
-    String recordCount;
-    CenterServer server;
-    int c;
-    boolean isAlive;
+    private DatagramSocket serverSocket;
+    private DatagramPacket receivePacket;
+    private int udpPortNum;
+    private LocationEnum location;
+    private CenterServer server;
+    private int c;
+    private boolean isAlive;
     private LogUtil logUtil;
-
 
     public UDPRequestReceiverThread(boolean isAlive, int udpPort, LocationEnum loc, LogUtil logUtil,
                                     CenterServer serverImp) {
         location = loc;
-        logUtil = logUtil;
+        this.logUtil = logUtil;
         this.server = serverImp;
         this.isAlive = isAlive;
         c = 0;
@@ -48,11 +45,9 @@ public class UDPRequestReceiverThread extends Thread {
                 receiveData = new byte[1024];
                 receivePacket = new DatagramPacket(receiveData, receiveData.length);
                 serverSocket.receive(receivePacket);
-                System.out.println("LOc :: " + location + "1 Received pkt in udp Receiver :: "
-                        + new String(receivePacket.getData()));
                 String inputPkt = new String(receivePacket.getData()).trim();
                 new UDPRequestSenderThread(receivePacket, server, logUtil).start();
-                logUtil.log(TAG + "2 Received in udp receiver " + inputPkt + " from " + location);
+                logUtil.log(TAG + "received packet :  " + inputPkt + " from datacenter : " + location);
             } catch (Exception e) {
             }
         }

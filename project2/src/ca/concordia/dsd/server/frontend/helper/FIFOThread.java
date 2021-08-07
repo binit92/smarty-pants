@@ -33,7 +33,7 @@ public class FIFOThread extends Thread {
             this.logUtil = logUtil;
             serverSocket = new DatagramSocket(Constants.CURRENT_SERVER_UDP_PORT);
         } catch (SocketException e) {
-            System.out.println(e.getMessage());
+            logUtil.log(TAG + e.getMessage());
         }
     }
 
@@ -46,7 +46,6 @@ public class FIFOThread extends Thread {
                 receivePacket = new DatagramPacket(receiveData, receiveData.length);
                 serverSocket.receive(receivePacket);
                 byte[] receivedData = receivePacket.getData();
-                System.out.println("Received pkt :: " + new String(receivedData).trim());
                 FIFORequest.add(new String(receivedData));
                 RequestThread transferReq = new RequestThread(FIFORequest.poll().getBytes(),
                         logUtil);

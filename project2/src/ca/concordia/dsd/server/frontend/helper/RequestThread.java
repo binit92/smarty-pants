@@ -34,7 +34,7 @@ public class RequestThread extends Thread {
 
         switch (oprn) {
             case CREATE_T_RECORD:
-                System.out.println(dataToBeSent[1]);
+                logUtil.log(TAG + "CREATE_T_RECORD --> data to be sent: " + dataToBeSent[1]);
                 this.server = chooseServer(dataToBeSent[1]);
                 dataArr = Arrays.copyOfRange(dataToBeSent, 3, dataToBeSent.length);
                 String teacherData = String.join(Constants.RECEIVED_DATA_SEPERATOR, dataArr);
@@ -90,7 +90,7 @@ public class RequestThread extends Thread {
                     InetAddress.getByName(Constants.FRONT_END_IP), Constants.FRONT_END_UDP_PORT);
             ds.send(dp);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logUtil.log(TAG + e.getMessage());
         }
     }
 }

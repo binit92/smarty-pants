@@ -30,7 +30,7 @@ public class CenterServer {
     public ArrayList<Integer> replicas;
     public String location;
     public int locUDPPort = 0;
-    ca.concordia.dsd.server.impl.udp.UDPRequestReceiverThread UDPRequestReceiverThread;
+    UDPRequestReceiverThread UDPRequestReceiverThread;
     String IPaddress;
     Object recordsMapAccessorLock = new Object();
     int studentCount = 0;
@@ -95,8 +95,6 @@ public class CenterServer {
         String key = lastname.substring(0, 1);
         String message = addRecordToHashMap(key, teacherObj, null);
         if (message.equals("success")) {
-            System.out.println("teacher is added " + teacherObj + " with this key " + key + " by Manager " + managerID
-                    + " for the request ID: " + requestID);
             logManager.log(TAG + "Teacher record created " + teacherID + " by Manager : " + managerID
                     + " for the request ID: " + requestID);
         } else {

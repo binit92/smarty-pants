@@ -9,33 +9,34 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 
 public class MultiCastSenderThread extends Thread {
-    MulticastSocket multicastsocket;
-    InetAddress address;
-    String data;
-    LogUtil logUtil;
+    private final String TAG = "|" + MultiCastSenderThread.class.getSimpleName() + "| ";
 
+    private MulticastSocket socket;
+    private InetAddress addr;
+    private String data;
+    private LogUtil logUtil;
 
     public MultiCastSenderThread(String request, LogUtil logUtil) {
         try {
-            multicastsocket = new MulticastSocket(Constants.MULTICAST_PORT_NUMBER);
-            address = InetAddress.getByName(Constants.MULTICAST_IP_ADDRESS);
-            multicastsocket.joinGroup(address);
+            socket = new MulticastSocket(Constants.MULTICAST_PORT_NUMBER);
+            addr = InetAddress.getByName(Constants.MULTICAST_IP_ADDRESS);
+            socket.joinGroup(addr);
             this.logUtil = logUtil;
             this.data = request;
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            logUtil.log(TAG + "error: " + e.getMessage());
         }
     }
-
-
     public synchronized void run() {
         try {
-            DatagramPacket packet = new DatagramPacket(data.getBytes(), data.length(), address,
+            DatagramPacket packet = new DatagramPacket(data.getBytes(),
+                    data.length(),
+                    addr,
                     Constants.MULTICAST_PORT_NUMBER);
-            //logger.log(Level.INFO, "Sending Multicast request" + data);
-            multicastsocket.send(packet);
+            logUtil.log(TAG + " sending multicast, data : " + data);
+            socket.send(packet);
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            logUtil.log(TAG + "error: " + e.getMessage());
         }
     }
 }

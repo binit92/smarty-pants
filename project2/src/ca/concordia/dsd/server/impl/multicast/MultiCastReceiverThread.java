@@ -11,47 +11,56 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 
 public class MultiCastReceiverThread extends Thread {
-    MulticastSocket multicastsocket;
-    InetAddress address;
-    boolean isPrimary;
-    LogUtil logManager;
+    private final String TAG = "|" + MultiCastReceiverThread.class.getSimpleName() + "| ";
+
+    private MulticastSocket socket;
+    private InetAddress addr;
+    private boolean isPrimary;
+    private LogUtil logUtil;
 
 
     public MultiCastReceiverThread(boolean isPrimary, LogUtil ackManager) {
         try {
-            multicastsocket = new MulticastSocket(Constants.MULTICAST_PORT_NUMBER);
-            address = InetAddress.getByName(Constants.MULTICAST_IP_ADDRESS);
-            multicastsocket.joinGroup(address);
+            socket = new MulticastSocket(Constants.MULTICAST_PORT_NUMBER);
+            addr = InetAddress.getByName(Constants.MULTICAST_IP_ADDRESS);
+            socket.joinGroup(addr);
             this.isPrimary = isPrimary;
-            this.logManager = ackManager;
+            this.logUtil = ackManager;
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            logUtil.log(TAG + "error : " + e.getMessage());
         }
-
     }
-
 
     public synchronized void run() {
         try {
             while (true) {
                 byte[] mydata = new byte[100];
                 DatagramPacket packet = new DatagramPacket(mydata, mydata.length);
-                multicastsocket.receive(packet);
+                socket.receive(packet);
                 if (!isPrimary) {
-                    System.out.println("Received data in multicast heartBeatReceiver " + new String(packet.getData()));
-                    System.out.println("Sent the acknowledgement for the data recevied in replica to primary server "
-                            + new String(packet.getData()));
 
-                    ReplicaStatusThread ack = new ReplicaStatusThread(
-                            new String(packet.getData()), logManager);
-                    ack.start();
-                    ReplicaRequestThread req = new ReplicaRequestThread(
-                            new String(packet.getData()), logManager);
-                    req.start();
+                    logUtil.log(TAG + " received data in multicast received" );
+                    logUtil.log(TAG + " sending ACK back to primary server");
+
+                    startACKThread(packet);
+                    startReplicaRequestThread(packet);
                 }
             }
         } catch (IOException e) {
+            logUtil.log(TAG + "error " + e.getMessage());
             System.out.println(e.getMessage());
         }
+    }
+
+    private void startACKThread(DatagramPacket packet){
+        ReplicaStatusThread ack = new ReplicaStatusThread(
+                new String(packet.getData()), logUtil);
+        ack.start();
+    }
+
+    private void startReplicaRequestThread(DatagramPacket packet){
+        ReplicaRequestThread req = new ReplicaRequestThread(
+                new String(packet.getData()), logUtil);
+        req.start();
     }
 }

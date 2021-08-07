@@ -6,28 +6,36 @@ import java.net.InetAddress;
 
 
 public class PingSenderThread extends Thread {
-    int port1, port2;
-    String name;
-    DatagramSocket ds;
 
-    public PingSenderThread(DatagramSocket ds, String name, int port1, int port2) {
+    private final String TAG = "|" + PingSenderThread.class.getSimpleName() + "| ";
+
+    private int port1, port2;
+    private String name;
+    private DatagramSocket socket;
+
+    public PingSenderThread(DatagramSocket socket, String name, int port1, int port2) {
         this.port1 = port1;
         this.port2 = port2;
         this.name = name;
-        this.ds = ds;
+        this.socket = socket;
     }
 
     public void run() {
         byte[] dataBytes = name.getBytes();
-        DatagramPacket dp;
+        DatagramPacket packet;
         try {
-            dp = new DatagramPacket(dataBytes, dataBytes.length,
-                    InetAddress.getByName("localhost"), port1);
-            ds.send(dp);
-            dp = new DatagramPacket(dataBytes, dataBytes.length,
-                    InetAddress.getByName("localhost"), port2);
-            ds.send(dp);
+            packet = new DatagramPacket(dataBytes,
+                    dataBytes.length,
+                    InetAddress.getByName("localhost"),
+                    port1);
+            socket.send(packet);
+            packet = new DatagramPacket(dataBytes,
+                    dataBytes.length,
+                    InetAddress.getByName("localhost"),
+                    port2);
+            socket.send(packet);
         } catch (Exception e) {
+
             e.printStackTrace();
         }
     }

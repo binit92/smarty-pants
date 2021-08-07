@@ -190,7 +190,7 @@ public class ManagerClient implements Constants {
                     }
                     break;
                 case 3:
-                    logUtil.log("Getting record counts from ca.concordia.dsd.server");
+                    logUtil.log("Getting record counts from server");
                     try {
                         //TODO: add manager id here .. review and fix
                         //String numberOfRecords = ca.concordia.dsd.server.getRecordCounts(managerId);
@@ -259,7 +259,7 @@ public class ManagerClient implements Constants {
                     if ("success".equalsIgnoreCase(isSuccess)) {
                         logUtil.log(rID + " transferred to " + rServerName);
                     } else {
-                        logUtil.log(rID + " failed to tranfer to " + rServerName);
+                        logUtil.log(rID + " failed to transfer to " + rServerName);
                     }
                     break;
                 case 6:

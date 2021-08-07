@@ -14,7 +14,7 @@ public class UDPRequestProviderThread extends Thread {
     private final CenterServer server;
     private final String requestType;
     private final Record recordForTransfer;
-    LogUtil logUtil;
+    private LogUtil logUtil;
     private String recordCount = "";
     private String transferResult = "";
 
@@ -39,13 +39,12 @@ public class UDPRequestProviderThread extends Thread {
     public synchronized void run() {
         DatagramSocket socket = null;
         try {
-            System.out.println("Req type :: " + requestType);
+            logUtil.log(TAG + "request type : " + requestType);
             switch (requestType) {
                 case "GET_RECORD_COUNT":
                     socket = new DatagramSocket();
                     byte[] data = "GET_RECORD_COUNT".getBytes();
-                    System.out.println("data in udp req provider :: " + new String(data));
-                    System.out.println("port here :: " + server.locUDPPort);
+                    logUtil.log(TAG + " data : " + new String(data));
                     DatagramPacket packet = new DatagramPacket(data, data.length,
                             InetAddress.getByName(InetAddress.getLocalHost().getHostAddress()),
                             server.locUDPPort);
@@ -59,7 +58,6 @@ public class UDPRequestProviderThread extends Thread {
                     byte[] data1 = ("TRANSFER_RECORD" + "#"
                             + recordForTransfer.toString()).getBytes();
 
-
                     DatagramPacket packet1 = new DatagramPacket(data1, data1.length,
                             InetAddress.getByName(InetAddress.getLocalHost().getHostAddress()),
                             server.locUDPPort);
@@ -67,11 +65,11 @@ public class UDPRequestProviderThread extends Thread {
                     data1 = new byte[100];
                     socket.receive(new DatagramPacket(data1, data1.length));
                     transferResult = new String(data1);
-                    System.out.println("TRANSFER IN UDP PROVIDER =============" + transferResult);
+                    logUtil.log(TAG + "transfer result : " + transferResult);
                     break;
             }
         } catch (Exception e) {
-            System.out.println("Exception :::::::::::::::::::::" + e.getMessage());
+            logUtil.log(TAG + "error : " + e.getMessage());
         } finally {
             if (socket != null) {
                 socket.close();

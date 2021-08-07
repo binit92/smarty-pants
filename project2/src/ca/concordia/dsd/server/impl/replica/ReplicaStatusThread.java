@@ -12,9 +12,9 @@ import java.net.SocketException;
 public class ReplicaStatusThread extends Thread {
     private final String TAG = "|" + ReplicaStatusThread.class.getSimpleName() + "| ";
 
-    String request;
-    DatagramSocket ds;
-    LogUtil logUtil;
+    private String request;
+    private DatagramSocket ds;
+    private LogUtil logUtil;
 
     public ReplicaStatusThread(String request, LogUtil logManger) {
         request = "RECEIVED ACKNOWLEDGEMENT IN PRIMARY :: " + request;

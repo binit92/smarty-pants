@@ -11,10 +11,10 @@ import java.net.SocketException;
 public class PingReceiverThread extends Thread {
 
     private final String TAG = "|" + PingReceiverThread.class.getSimpleName() + "| ";
-    DatagramSocket ds = null;
-    String name;
-    boolean isAlive;
-    Object mapAccessor;
+    private DatagramSocket socket = null;
+    private String name;
+    private boolean isAlive;
+    private Object lock;
 
 
     public PingReceiverThread(boolean isAlive, String name, int port, LogUtil logUtil) {
@@ -22,8 +22,8 @@ public class PingReceiverThread extends Thread {
             this.isAlive = isAlive;
             this.name = name;
             logUtil.log(TAG + "Server " + name + " is receiving ping message using port : " + port);
-            ds = new DatagramSocket(port);
-            mapAccessor = new Object();
+            socket = new DatagramSocket(port);
+            lock = new Object();
         } catch (SocketException e) {
             e.printStackTrace();
         }
@@ -34,9 +34,9 @@ public class PingReceiverThread extends Thread {
         while (getStatus()) {
             try {
                 DatagramPacket dp = new DatagramPacket(data, data.length);
-                ds.receive(dp);
-                synchronized (mapAccessor) {
-                    FrontEnd.reportingMap.put(name, System.nanoTime() / 1000000);
+                socket.receive(dp);
+                synchronized (lock) {
+                    FrontEnd.reportingMap.put(name, System.currentTimeMillis());
                 }
             } catch (IOException e) {
                 e.printStackTrace();

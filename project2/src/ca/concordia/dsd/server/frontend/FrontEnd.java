@@ -116,9 +116,6 @@ public class FrontEnd extends corbaPOA implements Constants {
                 }
             }
         }
-        if (maxEntry == null) {
-            return "no server appropriate to replace as Leader right now in the location " + loc;
-        }
         statusMap.put(maxEntry.getKey(), true);
         ServerIDMap.put(maxEntry.getKey(), LEADER_ID);
         logUtil.log(TAG + "New elected leader is : " + maxEntry.getKey() + " at datacenter " + loc);
@@ -150,17 +147,14 @@ public class FrontEnd extends corbaPOA implements Constants {
             }
             HashMap<String, CenterServer> replicamap = repo.get(Constants.REPLICA2_SERVER_ID);
             CenterServer replica = replicamap.get(loc);
-            if (replica != null) {
-                replica.setReplicas(replicas);
-                replicamap.put(loc, replica);
-            } else {
-                logUtil.log(TAG + "No replica found at location " + loc);
-            }
+            replica.setReplicas(replicas);
+            replicamap.put(loc, replica);
+            logUtil.log(TAG + "No replica found at location " + loc);
             synchronized (repo) {
                 repo.put(Constants.REPLICA2_SERVER_ID, replicamap);
             }
 
-        } else if (maxEntry.getKey().contains("3")) {
+            } else if (maxEntry.getKey().contains("3")) {
             ArrayList<Integer> replicas = new ArrayList<>();
             replicas.add(Constants.REPLICA1_SERVER_ID);
             HashMap<String, CenterServer> getnewserver = repo.get(Constants.REPLICA2_SERVER_ID);
@@ -308,7 +302,7 @@ public class FrontEnd extends corbaPOA implements Constants {
             Thread.sleep(Constants.RETRY_TIME);
             return getResponse(requestId);
         } catch (Exception e) {
-            logUtil.log(TAG + e.getMessage());
+            logUtil.log(TAG + "error: " + e.getMessage());
             return e.getMessage();
         }
     }
@@ -317,7 +311,7 @@ public class FrontEnd extends corbaPOA implements Constants {
         try {
             responsesMap.get(requestId).join();
         } catch (InterruptedException e) {
-            logUtil.log(TAG + e.getMessage());
+            logUtil.log(TAG + "error: " + e.getMessage());
         }
         requestBuffer.remove(requestId);
         return responsesMap.get(requestId).getResponse();

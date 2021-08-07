@@ -20,19 +20,17 @@ public class UDPRequestSenderThread extends Thread {
     private final CenterServer server;
     private final LogUtil logUtil;
     private final Object mapLock;
-    DatagramSocket serverSocket;
-    LocationEnum location;
+    private DatagramSocket serverSocket;
 
-
-    public UDPRequestSenderThread(DatagramPacket pkt, CenterServer serverImp, LogUtil logger) {
+    public UDPRequestSenderThread(DatagramPacket pkt, CenterServer serverImp, LogUtil logUtil) {
         receivePacket = pkt;
         server = serverImp;
         mapLock = new Object();
-        this.logUtil = logger;
+        this.logUtil = logUtil;
         try {
             serverSocket = new DatagramSocket();
         } catch (SocketException e) {
-            e.printStackTrace();
+            logUtil.log(TAG + "error : " + e.getMessage());
         }
     }
 
@@ -48,28 +46,26 @@ public class UDPRequestSenderThread extends Thread {
             }
             switch (inputPkt) {
                 case "TRANSFER_RECORD":
-                    System.out.println("Transferring :: " + pktSplit[1]);
-                    logUtil.log(TAG + "Transferring :: " + pktSplit[1]);
+                    logUtil.log(TAG + "transferring record  " + pktSplit[1]);
                     responseData = transferRecord(pktSplit[1]).getBytes();
                     serverSocket.send(new DatagramPacket(responseData, responseData.length, receivePacket.getAddress(),
                             receivePacket.getPort()));
                     break;
                 case "GET_RECORD_COUNT":
                     responseData = Integer.toString(getRecCount()).getBytes();
-                    System.out.println("data in udp req ca.concordia.dsd.server :: " + getRecCount());
-                    logUtil.log(TAG + "data in udp req ca.concordia.dsd.server :: " + getRecCount());
+                    logUtil.log(TAG + "record count : " + getRecCount());
                     serverSocket.send(new DatagramPacket(responseData, responseData.length, receivePacket.getAddress(),
                             receivePacket.getPort()));
                     break;
                 default:
-                    System.out.println("Invalid UDP request type");
-                    logUtil.log(TAG + "Invalid UDP request type");
+                   logUtil.log(TAG + "request type is not identified");
             }
 
         } catch (Exception e) {
         }
     }
 
+    // TODO : check for concurrency
     private synchronized String transferRecord(String recordToBeAdded) {
         String[] temp = recordToBeAdded.split(",");
         String managerID = temp[0];
@@ -111,6 +107,7 @@ public class UDPRequestSenderThread extends Thread {
         }
     }
 
+    // TODO : check for concurrency
     private synchronized int getRecCount() {
         int count = 0;
         synchronized (mapLock) {
