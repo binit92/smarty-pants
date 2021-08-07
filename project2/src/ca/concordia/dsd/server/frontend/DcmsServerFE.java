@@ -6,7 +6,6 @@ import ca.concordia.dsd.conf.Constants;
 import ca.concordia.dsd.conf.ServerCenterLocation;
 import ca.concordia.dsd.conf.ServerOperations;
 import ca.concordia.dsd.database.Record;
-import ca.concordia.dsd.server.impl.DcmsServerBackupWriter;
 import ca.concordia.dsd.server.impl.DcmsServerImpl;
 import ca.concordia.dsd.server.impl.DcmsServerMultiCastReceiver;
 import ca.concordia.dsd.server.impl.DcmsServerReplicaResponseReceiver;
@@ -29,24 +28,7 @@ public class DcmsServerFE extends corbaPOA {
     public static HashMap<Integer, HashMap<String, DcmsServerImpl>> centralRepository;
     public static HashMap<String, Boolean> server_leader_status = new HashMap<>();
     public static HashMap<String, Long> server_last_updated_time = new HashMap<>();
-    public static DcmsServerBackupWriter S1_MTL = new DcmsServerBackupWriter(
-            Constants.BACKUP_DIR + "\\" + "MTL1_backup.txt");
-    public static DcmsServerBackupWriter S2_MTL = new DcmsServerBackupWriter(
-            Constants.BACKUP_DIR + "\\" + "MTL2_backup.txt");
-    public static DcmsServerBackupWriter S3_MTL = new DcmsServerBackupWriter(
-            Constants.BACKUP_DIR + "\\" + "MTL3_backup.txt");
-    public static DcmsServerBackupWriter S1_LVL = new DcmsServerBackupWriter(
-            Constants.BACKUP_DIR + "\\" + "LVL1_backup.txt");
-    public static DcmsServerBackupWriter S2_LVL = new DcmsServerBackupWriter(
-            Constants.BACKUP_DIR + "\\" + "LVL2_backup.txt");
-    public static DcmsServerBackupWriter S3_LVL = new DcmsServerBackupWriter(
-            Constants.BACKUP_DIR + "\\" + "LVL3_backup.txt");
-    public static DcmsServerBackupWriter S1_DDO = new DcmsServerBackupWriter(
-            Constants.BACKUP_DIR + "\\" + "DDO1_backup.txt");
-    public static DcmsServerBackupWriter S2_DDO = new DcmsServerBackupWriter(
-            Constants.BACKUP_DIR + "\\" + "DDO2_backup.txt");
-    public static DcmsServerBackupWriter S3_DDO = new DcmsServerBackupWriter(
-            Constants.BACKUP_DIR + "\\" + "DDO3_backup.txt");
+
     static boolean s1_MTL_sender_isAlive = true;
     static boolean s2_MTL_sender_isAlive = true;
     static boolean s3_MTL_sender_isAlive = true;
