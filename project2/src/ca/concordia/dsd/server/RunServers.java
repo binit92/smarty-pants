@@ -1,10 +1,10 @@
-package ca.concordia.dsd.server.main;
+package ca.concordia.dsd.server;
 
 import ca.concordia.dsd.arch.corba;
 import ca.concordia.dsd.arch.corbaHelper;
 import ca.concordia.dsd.util.Constants;
-import ca.concordia.dsd.conf.ServerCenterLocation;
-import ca.concordia.dsd.server.frontend.DcmsServerFE;
+import ca.concordia.dsd.util.LocationEnum;
+import ca.concordia.dsd.server.frontend.FrontEnd;
 import org.omg.CORBA.ORB;
 import org.omg.CosNaming.NameComponent;
 import org.omg.CosNaming.NamingContextExt;
@@ -16,7 +16,7 @@ import java.io.File;
 import java.io.IOException;
 
 
-public class DcmsServerMain {
+public class RunServers {
     static corba fehref;
 
     static {
@@ -35,19 +35,19 @@ public class DcmsServerMain {
         new File(Constants.LOG_DIR + File.separator + "ReplicasResponse").mkdir();
 
         new File(Constants.LOG_DIR + File.separator + "PRIMARY_SERVER").mkdir();
-        new File(Constants.LOG_DIR + File.separator + "PRIMARY_SERVER" + "\\" + ServerCenterLocation.MTL).mkdir();
-        new File(Constants.LOG_DIR + File.separator + "PRIMARY_SERVER" + "\\" + ServerCenterLocation.LVL).mkdir();
-        new File(Constants.LOG_DIR + File.separator + "PRIMARY_SERVER" + "\\" + ServerCenterLocation.DDO).mkdir();
+        new File(Constants.LOG_DIR + File.separator + "PRIMARY_SERVER" + "\\" + LocationEnum.MTL).mkdir();
+        new File(Constants.LOG_DIR + File.separator + "PRIMARY_SERVER" + "\\" + LocationEnum.LVL).mkdir();
+        new File(Constants.LOG_DIR + File.separator + "PRIMARY_SERVER" + "\\" + LocationEnum.DDO).mkdir();
 
         new File(Constants.LOG_DIR + File.separator + "REPLICA1_SERVER").mkdir();
-        new File(Constants.LOG_DIR + File.separator + "REPLICA1_SERVER" + "\\" + ServerCenterLocation.MTL).mkdir();
-        new File(Constants.LOG_DIR + File.separator + "REPLICA1_SERVER" + "\\" + ServerCenterLocation.LVL).mkdir();
-        new File(Constants.LOG_DIR + File.separator + "REPLICA1_SERVER" + "\\" + ServerCenterLocation.DDO).mkdir();
+        new File(Constants.LOG_DIR + File.separator + "REPLICA1_SERVER" + "\\" + LocationEnum.MTL).mkdir();
+        new File(Constants.LOG_DIR + File.separator + "REPLICA1_SERVER" + "\\" + LocationEnum.LVL).mkdir();
+        new File(Constants.LOG_DIR + File.separator + "REPLICA1_SERVER" + "\\" + LocationEnum.DDO).mkdir();
 
         new File(Constants.LOG_DIR + File.separator + "REPLICA2_SERVER").mkdir();
-        new File(Constants.LOG_DIR + File.separator + "REPLICA2_SERVER" + "\\" + ServerCenterLocation.MTL).mkdir();
-        new File(Constants.LOG_DIR + File.separator + "REPLICA2_SERVER" + "\\" + ServerCenterLocation.LVL).mkdir();
-        new File(Constants.LOG_DIR + File.separator + "REPLICA2_SERVER" + "\\" + ServerCenterLocation.DDO).mkdir();
+        new File(Constants.LOG_DIR + File.separator + "REPLICA2_SERVER" + "\\" + LocationEnum.MTL).mkdir();
+        new File(Constants.LOG_DIR + File.separator + "REPLICA2_SERVER" + "\\" + LocationEnum.LVL).mkdir();
+        new File(Constants.LOG_DIR + File.separator + "REPLICA2_SERVER" + "\\" + LocationEnum.DDO).mkdir();
 
     }
 
@@ -65,7 +65,7 @@ public class DcmsServerMain {
             rootpoa.the_POAManager().activate();
 
 
-            DcmsServerFE serverFE = new DcmsServerFE();
+            FrontEnd serverFE = new FrontEnd();
 
 
             org.omg.CORBA.Object feRef = rootpoa.servant_to_reference(serverFE);

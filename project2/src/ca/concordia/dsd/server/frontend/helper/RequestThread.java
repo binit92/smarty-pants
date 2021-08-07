@@ -1,8 +1,9 @@
-package ca.concordia.dsd.server.frontend;
+package ca.concordia.dsd.server.frontend.helper;
 
+import ca.concordia.dsd.server.frontend.FrontEnd;
 import ca.concordia.dsd.util.Constants;
-import ca.concordia.dsd.conf.ServerOperations;
-import ca.concordia.dsd.server.impl.DcmsServerImpl;
+import ca.concordia.dsd.util.OperationsEnum;
+import ca.concordia.dsd.server.impl.CenterServer;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -10,13 +11,13 @@ import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
-public class TransferReqToCurrentServer extends Thread {
+public class RequestThread extends Thread {
     String currentOperationData;
-    DcmsServerImpl server;
+    CenterServer server;
     String response;
     Logger loggerInstance;
 
-    public TransferReqToCurrentServer(byte[] operationData, Logger loggerInstance) {
+    public RequestThread(byte[] operationData, Logger loggerInstance) {
         this.currentOperationData = new String(operationData);
         this.server = null;
         response = null;
@@ -27,7 +28,7 @@ public class TransferReqToCurrentServer extends Thread {
     public void run() {
         String[] dataArr;
         String[] dataToBeSent = this.currentOperationData.trim().split(Constants.RECEIVED_DATA_SEPERATOR);
-        ServerOperations oprn = ServerOperations.valueOf(dataToBeSent[0]);
+        OperationsEnum oprn = OperationsEnum.valueOf(dataToBeSent[0]);
         String requestId = dataToBeSent[dataToBeSent.length - 1];
         System.out.println("Currently serving request with id :: " + requestId);
 
@@ -74,8 +75,8 @@ public class TransferReqToCurrentServer extends Thread {
     }
 
 
-    private synchronized DcmsServerImpl chooseServer(String loc) {
-        return DcmsServerFE.centralRepository.get(Constants.PRIMARY_SERVER_ID).get(loc);
+    private synchronized CenterServer chooseServer(String loc) {
+        return FrontEnd.centralRepository.get(Constants.PRIMARY_SERVER_ID).get(loc);
     }
 
 

@@ -1,4 +1,4 @@
-package ca.concordia.dsd.server.impl;
+package ca.concordia.dsd.server.impl.multicast;
 
 import ca.concordia.dsd.util.Constants;
 import ca.concordia.dsd.util.LogUtil;
@@ -8,14 +8,14 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 
-public class DcmsServerMultiCastSender extends Thread {
+public class MultiCastSenderThread extends Thread {
     MulticastSocket multicastsocket;
     InetAddress address;
     String data;
     LogUtil logger;
 
 
-    public DcmsServerMultiCastSender(String request, LogUtil logger) {
+    public MultiCastSenderThread(String request, LogUtil logger) {
         try {
             multicastsocket = new MulticastSocket(Constants.MULTICAST_PORT_NUMBER);
             address = InetAddress.getByName(Constants.MULTICAST_IP_ADDRESS);

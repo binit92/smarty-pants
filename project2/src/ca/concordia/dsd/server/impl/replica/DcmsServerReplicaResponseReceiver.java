@@ -1,8 +1,8 @@
-package ca.concordia.dsd.server.impl;
+package ca.concordia.dsd.server.impl.replica;
 
 import ca.concordia.dsd.util.Constants;
-import ca.concordia.dsd.conf.ServerCenterLocation;
-import ca.concordia.dsd.server.frontend.TransferResponseToFE;
+import ca.concordia.dsd.util.LocationEnum;
+import ca.concordia.dsd.server.frontend.helper.ResponseThread;
 import ca.concordia.dsd.util.LogUtil;
 
 import java.net.DatagramPacket;
@@ -18,10 +18,10 @@ public class DcmsServerReplicaResponseReceiver extends Thread {
     DatagramPacket receivePacket;
     DatagramPacket sendPacket;
     int udpPortNum;
-    ServerCenterLocation location;
+    LocationEnum location;
     LogUtil loggerInstance;
     String recordCount;
-    HashMap<Integer, TransferResponseToFE> responses;
+    HashMap<Integer, ResponseThread> responses;
     int c;
 
     public DcmsServerReplicaResponseReceiver(LogUtil logManager) {

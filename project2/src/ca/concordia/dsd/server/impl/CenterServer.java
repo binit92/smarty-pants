@@ -5,36 +5,41 @@ import java.net.DatagramSocket;
 import java.util.*;
 import java.util.Map.Entry;
 
+import ca.concordia.dsd.server.impl.ping.PingReceiverThread;
+import ca.concordia.dsd.server.impl.ping.PingSenderThread;
+import ca.concordia.dsd.server.impl.replica.DcmsServerPrepareReplicasRequest;
+import ca.concordia.dsd.server.impl.udp.UDPRequestProviderThread;
+import ca.concordia.dsd.server.impl.udp.UDPRequestReceiverThread;
 import ca.concordia.dsd.util.Constants;
-import ca.concordia.dsd.conf.ServerCenterLocation;
+import ca.concordia.dsd.util.LocationEnum;
 import ca.concordia.dsd.database.Record;
 import ca.concordia.dsd.database.Student;
 import ca.concordia.dsd.database.Teacher;
-import ca.concordia.dsd.server.frontend.DcmsServerFE;
+import ca.concordia.dsd.server.frontend.FrontEnd;
 import ca.concordia.dsd.util.LogUtil;
 
 
 //public class DcmsServerImpl extends corbaPOA{
-public class DcmsServerImpl {
-	private final String TAG = "|"+DcmsServerImpl.class.getSimpleName()+"| ";
+public class CenterServer {
+	private final String TAG = "|"+ CenterServer.class.getSimpleName()+"| ";
 	private LogUtil logManager;
 	public HashMap<String, List<Record>> recordsMap;
-	public HeartBeatReceiver heartBeatReceiver;
+	public PingReceiverThread pingReceiverThread;
 	public ArrayList<Integer> replicas;
 
-	DcmsServerUDPReceiver dcmsServerUDPReceiver;
+	ca.concordia.dsd.server.impl.udp.UDPRequestReceiverThread UDPRequestReceiverThread;
 	String IPaddress;
 	Object recordsMapAccessorLock = new Object();
 
 	int studentCount = 0;
 	int teacherCount = 0;
 	String recordsCount;
-	String location;
-	int locUDPPort = 0;
+	public String location;
+	public int locUDPPort = 0;
 	boolean isPrimary;
 	Integer serverID = 0;
 
-	HeartBeatSender heartBeatSender;
+	PingSenderThread pingSenderThread;
 	String name;
 	int port1, port2;
 	boolean isAlive;
@@ -44,16 +49,16 @@ public class DcmsServerImpl {
 		return this.locUDPPort;
 	}
 
-	public DcmsServerImpl(int serverID, boolean isPrimary, ServerCenterLocation loc, int locUDPPort, DatagramSocket ds,
-			boolean isAlive, String name, int receivePort, int port1, int port2, ArrayList<Integer> replicas,
-			LogUtil logger) {
+	public CenterServer(int serverID, boolean isPrimary, LocationEnum loc, int locUDPPort, DatagramSocket ds,
+						boolean isAlive, String name, int receivePort, int port1, int port2, ArrayList<Integer> replicas,
+						LogUtil logger) {
 		logManager = logger;
 		synchronized (recordsMapAccessorLock) {
 			recordsMap = new HashMap<>();
 		}
 		this.locUDPPort = locUDPPort;
-		dcmsServerUDPReceiver = new DcmsServerUDPReceiver(true, locUDPPort, loc, logManager, this);
-		dcmsServerUDPReceiver.start();
+		UDPRequestReceiverThread = new UDPRequestReceiverThread(true, locUDPPort, loc, logManager, this);
+		UDPRequestReceiverThread.start();
 		location = loc.toString();
 		this.isPrimary = isPrimary;
 		this.serverID = serverID;
@@ -61,8 +66,8 @@ public class DcmsServerImpl {
 		this.port1 = port1;
 		this.port2 = port2;
 		this.isAlive = isAlive;
-		heartBeatReceiver = new HeartBeatReceiver(isAlive, name, receivePort, logManager);
-		heartBeatReceiver.start();
+		pingReceiverThread = new PingReceiverThread(isAlive, name, receivePort, logManager);
+		pingReceiverThread.start();
 		this.ds = ds;
 		this.replicas = replicas;
 	}
@@ -163,7 +168,7 @@ public class DcmsServerImpl {
 		String managerID = data[0];
 		String requestID = data[1];
 		String recordCount = null;
-		DcmsServerUDPRequestProvider[] req = new DcmsServerUDPRequestProvider[2];
+		UDPRequestProviderThread[] req = new UDPRequestProviderThread[2];
 		int counter = 0;
 		ArrayList<String> locList = new ArrayList<>();
 		locList.add("MTL");
@@ -184,8 +189,8 @@ public class DcmsServerImpl {
 						e.printStackTrace();
 					}
 					System.out.println("Server id :: " + serverID);
-					req[counter] = new DcmsServerUDPRequestProvider(
-							DcmsServerFE.centralRepository.get(serverID).get(loc), "GET_RECORD_COUNT", null,
+					req[counter] = new UDPRequestProviderThread(
+							FrontEnd.centralRepository.get(serverID).get(loc), "GET_RECORD_COUNT", null,
 							logManager);
 				} catch (IOException e) {
 					System.out.println("Exception in get rec count :: " + e.getMessage());
@@ -195,7 +200,7 @@ public class DcmsServerImpl {
 				counter++;
 			}
 		}
-		for (DcmsServerUDPRequestProvider request : req) {
+		for (UDPRequestProviderThread request : req) {
 			try {
 				request.join();
 			} catch (InterruptedException e) {
@@ -243,8 +248,8 @@ public class DcmsServerImpl {
 		String remoteCenterServerName = parsedata[0];
 		String requestID = parsedata[1];
 		String type = recordID.substring(0, 2);
-		DcmsServerUDPRequestProvider req = null;
-		DcmsServerUDPRequestProvider req1 = null;
+		UDPRequestProviderThread req = null;
+		UDPRequestProviderThread req1 = null;
 		try {
 			Record record = getRecordForTransfer(recordID);
 			if (record == null) {
@@ -252,13 +257,13 @@ public class DcmsServerImpl {
 			} else if (remoteCenterServerName.equals(this.location)) {
 				return "Please enter a valid location to transfer. The record is already present in " + location;
 			}
-			req = new DcmsServerUDPRequestProvider(
-					DcmsServerFE.centralRepository.get(serverID).get(remoteCenterServerName.trim()), "TRANSFER_RECORD",
+			req = new UDPRequestProviderThread(
+					FrontEnd.centralRepository.get(serverID).get(remoteCenterServerName.trim()), "TRANSFER_RECORD",
 					record, logManager);
 
 			if (isPrimary && this.replicas.size() == Constants.TOTAL_REPLICAS_COUNT - 1) {
 				System.out.println("Replicas size is ::::::::::: 1" + remoteCenterServerName);
-				req1 = new DcmsServerUDPRequestProvider(DcmsServerFE.centralRepository.get(Constants.REPLICA2_SERVER_ID)
+				req1 = new UDPRequestProviderThread(FrontEnd.centralRepository.get(Constants.REPLICA2_SERVER_ID)
 						.get(remoteCenterServerName.trim()), "TRANSFER_RECORD", record, logManager);
 				req1.start();
 				try {
@@ -412,8 +417,8 @@ public class DcmsServerImpl {
 
 
 	public void send() {
-		heartBeatSender = new HeartBeatSender(ds, name, port1, port2);
-		heartBeatSender.start();
+		pingSenderThread = new PingSenderThread(ds, name, port1, port2);
+		pingSenderThread.start();
 	}
 
 	public boolean isPrimary() {

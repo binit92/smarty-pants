@@ -1,6 +1,7 @@
-package ca.concordia.dsd.server.impl;
+package ca.concordia.dsd.server.impl.udp;
 
-import ca.concordia.dsd.conf.ServerCenterLocation;
+import ca.concordia.dsd.server.impl.CenterServer;
+import ca.concordia.dsd.util.LocationEnum;
 import ca.concordia.dsd.util.LogUtil;
 
 import java.io.IOException;
@@ -8,23 +9,23 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
 
-public class DcmsServerUDPReceiver extends Thread {
+public class UDPRequestReceiverThread extends Thread {
 
-    private final String TAG = "|" + DcmsServerUDPReceiver.class.getSimpleName() + "| ";
+    private final String TAG = "|" + UDPRequestReceiverThread.class.getSimpleName() + "| ";
     DatagramSocket serverSocket;
     DatagramPacket receivePacket;
     DatagramPacket sendPacket;
     int udpPortNum;
-    ServerCenterLocation location;
+    LocationEnum location;
     String recordCount;
-    DcmsServerImpl server;
+    CenterServer server;
     int c;
     boolean isAlive;
     private final LogUtil loggerInstance;
 
 
-    public DcmsServerUDPReceiver(boolean isAlive, int udpPort, ServerCenterLocation loc, LogUtil logger,
-                                 DcmsServerImpl serverImp) {
+    public UDPRequestReceiverThread(boolean isAlive, int udpPort, LocationEnum loc, LogUtil logger,
+                                    CenterServer serverImp) {
         location = loc;
         loggerInstance = logger;
         this.server = serverImp;
@@ -50,7 +51,7 @@ public class DcmsServerUDPReceiver extends Thread {
                 System.out.println("LOc :: " + location + "1 Received pkt in udp Receiver :: "
                         + new String(receivePacket.getData()));
                 String inputPkt = new String(receivePacket.getData()).trim();
-                new DcmsServerUDPRequestServer(receivePacket, server, loggerInstance).start();
+                new UDPRequestSenderThread(receivePacket, server, loggerInstance).start();
                 loggerInstance.log(TAG + "2 Received in udp receiver " + inputPkt + " from " + location);
             } catch (Exception e) {
             }

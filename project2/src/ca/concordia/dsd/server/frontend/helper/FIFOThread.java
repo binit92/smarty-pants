@@ -1,7 +1,7 @@
-package ca.concordia.dsd.server.frontend;
+package ca.concordia.dsd.server.frontend.helper;
 
 import ca.concordia.dsd.util.Constants;
-import ca.concordia.dsd.conf.ServerCenterLocation;
+import ca.concordia.dsd.util.LocationEnum;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -12,21 +12,21 @@ import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class DcmsServerPrimaryFIFO extends Thread {
+public class FIFOThread extends Thread {
 
     DatagramSocket serverSocket;
     DatagramPacket receivePacket;
     DatagramPacket sendPacket;
     int udpPortNum;
-    ServerCenterLocation location;
+    LocationEnum location;
     Logger loggerInstance;
     String recordCount;
-    ArrayList<TransferReqToCurrentServer> requests;
+    ArrayList<RequestThread> requests;
     int c;
     Queue<String> FIFORequest = new LinkedList<String>();
 
 
-    public DcmsServerPrimaryFIFO(ArrayList<TransferReqToCurrentServer> requests) {
+    public FIFOThread(ArrayList<RequestThread> requests) {
         try {
             this.requests = requests;
             serverSocket = new DatagramSocket(Constants.CURRENT_SERVER_UDP_PORT);
@@ -46,7 +46,7 @@ public class DcmsServerPrimaryFIFO extends Thread {
                 byte[] receivedData = receivePacket.getData();
                 System.out.println("Received pkt :: " + new String(receivedData));
                 FIFORequest.add(new String(receivedData));
-                TransferReqToCurrentServer transferReq = new TransferReqToCurrentServer(FIFORequest.poll().getBytes(),
+                RequestThread transferReq = new RequestThread(FIFORequest.poll().getBytes(),
                         loggerInstance);
                 transferReq.start();
                 requests.add(transferReq);

@@ -1,6 +1,6 @@
-package ca.concordia.dsd.conf;
+package ca.concordia.dsd.util;
 
-public enum ServerOperations {
+public enum OperationsEnum {
     CREATE_T_RECORD,
     CREATE_S_RECORD,
     GET_REC_COUNT,

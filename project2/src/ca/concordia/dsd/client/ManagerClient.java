@@ -262,8 +262,9 @@ public class ManagerClient implements Constants {
                     }
                     break;
                 case 6:
-                    System.out.println(" Request to kill primary ca.concordia.dsd.server of " + getManagerID().substring(0, 3));
-                    String ret = server.killPrimaryServer(managerId);
+                    System.out.println("Which leader server you want to kill ? <MTL,LVL,DDO>");
+                    String leaderServerName = keyboard.nextLine();
+                    String ret = server.killPrimaryServer(leaderServerName);
                     if ("success".equalsIgnoreCase(ret)) {
                         logUtil.log(" leader ca.concordia.dsd.server is killed successfully");
                     } else {

@@ -1,4 +1,4 @@
-package ca.concordia.dsd.server.impl;
+package ca.concordia.dsd.server.impl.replica;
 
 import ca.concordia.dsd.util.Constants;
 import ca.concordia.dsd.util.LogUtil;

@@ -1,6 +1,7 @@
-package ca.concordia.dsd.server.impl;
+package ca.concordia.dsd.server.impl.udp;
 
-import ca.concordia.dsd.conf.ServerCenterLocation;
+import ca.concordia.dsd.server.impl.CenterServer;
+import ca.concordia.dsd.util.LocationEnum;
 import ca.concordia.dsd.database.Record;
 import ca.concordia.dsd.database.Student;
 import ca.concordia.dsd.database.Teacher;
@@ -12,18 +13,18 @@ import java.net.SocketException;
 import java.util.List;
 import java.util.Map;
 
-public class DcmsServerUDPRequestServer extends Thread {
+public class UDPRequestSenderThread extends Thread {
 
-    private final String TAG = "|" + DcmsServerUDPRequestServer.class.getSimpleName() + "| ";
+    private final String TAG = "|" + UDPRequestSenderThread.class.getSimpleName() + "| ";
     DatagramSocket serverSocket;
-    ServerCenterLocation location;
+    LocationEnum location;
     private final DatagramPacket receivePacket;
-    private final DcmsServerImpl server;
+    private final CenterServer server;
     private final LogUtil loggerInstance;
     private final Object mapLock;
 
 
-    public DcmsServerUDPRequestServer(DatagramPacket pkt, DcmsServerImpl serverImp, LogUtil logger) {
+    public UDPRequestSenderThread(DatagramPacket pkt, CenterServer serverImp, LogUtil logger) {
         receivePacket = pkt;
         server = serverImp;
         mapLock = new Object();

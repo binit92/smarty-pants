@@ -1,8 +1,9 @@
-package ca.concordia.dsd.server.impl;
+package ca.concordia.dsd.server.impl.replica;
 
+import ca.concordia.dsd.server.impl.CenterServer;
 import ca.concordia.dsd.util.Constants;
-import ca.concordia.dsd.conf.ServerOperations;
-import ca.concordia.dsd.server.frontend.DcmsServerFE;
+import ca.concordia.dsd.util.OperationsEnum;
+import ca.concordia.dsd.server.frontend.FrontEnd;
 import ca.concordia.dsd.util.LogUtil;
 
 import java.net.DatagramPacket;
@@ -13,7 +14,7 @@ import java.util.Arrays;
 public class DcmsServerReplicaRequestProcessor extends Thread {
 
     String currentOperationData;
-    DcmsServerImpl server;
+    CenterServer server;
     String response;
     LogUtil logUtil;
 
@@ -31,7 +32,7 @@ public class DcmsServerReplicaRequestProcessor extends Thread {
 
         Integer replicaId = Integer.parseInt(dataToBeSent[0]);
         System.out.println("====================Currently serving replica with ID :: " + replicaId);
-        ServerOperations oprn = ServerOperations.valueOf(dataToBeSent[1]);
+        OperationsEnum oprn = OperationsEnum.valueOf(dataToBeSent[1]);
 
         String requestId = dataToBeSent[dataToBeSent.length - 1];
         System.out.println("Currently serving request with id :: " + requestId);
@@ -77,8 +78,8 @@ public class DcmsServerReplicaRequestProcessor extends Thread {
         return response;
     }
 
-    private synchronized DcmsServerImpl chooseServer(int replicaId, String loc) {
-        return DcmsServerFE.centralRepository.get(replicaId).get(loc);
+    private synchronized CenterServer chooseServer(int replicaId, String loc) {
+        return FrontEnd.centralRepository.get(replicaId).get(loc);
     }
 
     private synchronized void sendReply(String response) {

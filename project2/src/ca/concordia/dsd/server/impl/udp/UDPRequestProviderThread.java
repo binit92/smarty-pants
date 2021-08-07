@@ -1,6 +1,7 @@
-package ca.concordia.dsd.server.impl;
+package ca.concordia.dsd.server.impl.udp;
 
 import ca.concordia.dsd.database.Record;
+import ca.concordia.dsd.server.impl.CenterServer;
 import ca.concordia.dsd.util.LogUtil;
 
 import java.io.IOException;
@@ -8,17 +9,17 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
-public class DcmsServerUDPRequestProvider extends Thread {
+public class UDPRequestProviderThread extends Thread {
     LogUtil logger;
     private String recordCount = "";
     private String transferResult = "";
-    private final DcmsServerImpl server;
+    private final CenterServer server;
     private final String requestType;
     private final Record recordForTransfer;
 
 
-    public DcmsServerUDPRequestProvider(DcmsServerImpl server, String requestType,
-                                        Record recordForTransfer, LogUtil logger) throws IOException {
+    public UDPRequestProviderThread(CenterServer server, String requestType,
+                                    Record recordForTransfer, LogUtil logger) throws IOException {
         this.server = server;
         this.requestType = requestType;
         this.recordForTransfer = recordForTransfer;

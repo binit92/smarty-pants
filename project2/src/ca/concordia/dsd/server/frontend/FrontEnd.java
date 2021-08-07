@@ -2,13 +2,17 @@ package ca.concordia.dsd.server.frontend;
 
 
 import ca.concordia.dsd.arch.corbaPOA;
+import ca.concordia.dsd.server.frontend.helper.FIFOThread;
+import ca.concordia.dsd.server.frontend.helper.RequestThread;
+import ca.concordia.dsd.server.frontend.helper.ResponseThread;
+import ca.concordia.dsd.server.frontend.helper.UDPResponseThread;
 import ca.concordia.dsd.util.Constants;
-import ca.concordia.dsd.conf.ServerCenterLocation;
-import ca.concordia.dsd.conf.ServerOperations;
+import ca.concordia.dsd.util.LocationEnum;
+import ca.concordia.dsd.util.OperationsEnum;
 import ca.concordia.dsd.database.Record;
-import ca.concordia.dsd.server.impl.DcmsServerImpl;
-import ca.concordia.dsd.server.impl.DcmsServerMultiCastReceiver;
-import ca.concordia.dsd.server.impl.DcmsServerReplicaResponseReceiver;
+import ca.concordia.dsd.server.impl.CenterServer;
+import ca.concordia.dsd.server.impl.multicast.MultiCastReceiverThread;
+import ca.concordia.dsd.server.impl.replica.DcmsServerReplicaResponseReceiver;
 import ca.concordia.dsd.util.LogUtil;
 
 import java.net.DatagramPacket;
@@ -20,12 +24,12 @@ import java.util.List;
 import java.util.Map;
 
 
-public class DcmsServerFE extends corbaPOA {
-    private static final String TAG = "|" + DcmsServerFE.class.getSimpleName() + "| ";
-    public static HashMap<Integer, TransferResponseToFE> responses;
+public class FrontEnd extends corbaPOA {
+    private static final String TAG = "|" + FrontEnd.class.getSimpleName() + "| ";
+    public static HashMap<Integer, ResponseThread> responses;
     public static ArrayList<String> receivedResponses;
-    public static HashMap<String, DcmsServerImpl> primaryServerMap, replica1ServerMap, replica2ServerMap;
-    public static HashMap<Integer, HashMap<String, DcmsServerImpl>> centralRepository;
+    public static HashMap<String, CenterServer> primaryServerMap, replica1ServerMap, replica2ServerMap;
+    public static HashMap<Integer, HashMap<String, CenterServer>> centralRepository;
     public static HashMap<String, Boolean> server_leader_status = new HashMap<>();
     public static HashMap<String, Long> server_last_updated_time = new HashMap<>();
 
@@ -55,14 +59,14 @@ public class DcmsServerFE extends corbaPOA {
     String id;
     Integer requestId;
     HashMap<Integer, String> requestBuffer;
-    ArrayList<TransferReqToCurrentServer> requests;
-    DcmsServerMultiCastReceiver primaryReceiver, replica1Receiver, replica2Receiver;
+    ArrayList<RequestThread> requests;
+    MultiCastReceiverThread primaryReceiver, replica1Receiver, replica2Receiver;
     DcmsServerReplicaResponseReceiver replicaResponseReceiver;
     Object crlock = new Object();
-    DcmsServerImpl s1, s2, s3;
-    DcmsServerImpl primaryMtlServer;
-    DcmsServerImpl primaryLvlServer;
-    DcmsServerImpl primaryDdoServer;
+    CenterServer s1, s2, s3;
+    CenterServer primaryMtlServer;
+    CenterServer primaryLvlServer;
+    CenterServer primaryDdoServer;
     int s1_MTL_receive_port = 5431;
     int s2_MTL_receive_port = 5432;
     int s3_MTL_receive_port = 5433;
@@ -83,7 +87,7 @@ public class DcmsServerFE extends corbaPOA {
     String DDOserverName3 = "DDO3";
 
 
-    public DcmsServerFE() {
+    public FrontEnd() {
         logManager = new LogUtil("ServerFE");
 
         recordsMap = new HashMap<>();
@@ -91,9 +95,9 @@ public class DcmsServerFE extends corbaPOA {
         responses = new HashMap<>();
         requestBuffer = new HashMap<>();
         receivedResponses = new ArrayList<>();
-        DcmsServerPrimaryFIFO udpReceiverFromFE = new DcmsServerPrimaryFIFO(requests);
+        FIFOThread udpReceiverFromFE = new FIFOThread(requests);
         udpReceiverFromFE.start();
-        UDPResponseReceiver udpResponse = new UDPResponseReceiver(responses);
+        UDPResponseThread udpResponse = new UDPResponseThread(responses);
         udpResponse.start();
 
         centralRepository = new HashMap<>();
@@ -135,7 +139,7 @@ public class DcmsServerFE extends corbaPOA {
         init();
     }
 
-    private static LogUtil getLogInstance(String serverName, ServerCenterLocation loc) {
+    private static LogUtil getLogInstance(String serverName, LocationEnum loc) {
 
         return new LogUtil(serverName);
     }
@@ -173,18 +177,18 @@ public class DcmsServerFE extends corbaPOA {
         server_leader_status.put(maxEntry.getKey(), true);
         currentIds.put(maxEntry.getKey(), LEADER_ID);
         logManager.log(TAG + "++++Elected new leader :: " + maxEntry.getKey() + " in the location" + loc);
-        HashMap<String, DcmsServerImpl> replaceserver = new HashMap<String, DcmsServerImpl>();
+        HashMap<String, CenterServer> replaceserver = new HashMap<String, CenterServer>();
         synchronized (centralRepository) {
             replaceserver = centralRepository.get(Constants.PRIMARY_SERVER_ID);
         }
         if (maxEntry.getKey().contains("2")) {
             ArrayList<Integer> replicas = new ArrayList<>();
             replicas.add(Constants.REPLICA2_SERVER_ID);
-            HashMap<String, DcmsServerImpl> getnewserver = new HashMap<String, DcmsServerImpl>();
+            HashMap<String, CenterServer> getnewserver = new HashMap<String, CenterServer>();
             synchronized (centralRepository) {
                 getnewserver = centralRepository.get(Constants.REPLICA1_SERVER_ID);
             }
-            DcmsServerImpl newPrimary = getnewserver.get(loc);
+            CenterServer newPrimary = getnewserver.get(loc);
             newPrimary.setPrimary(true);
             newPrimary.setReplicas(replicas);
             newPrimary.setServerID(Constants.PRIMARY_SERVER_ID);
@@ -199,8 +203,8 @@ public class DcmsServerFE extends corbaPOA {
             synchronized (centralRepository) {
                 centralRepository.put(Constants.REPLICA1_SERVER_ID, getnewserver);
             }
-            HashMap<String, DcmsServerImpl> replicamap = centralRepository.get(Constants.REPLICA2_SERVER_ID);
-            DcmsServerImpl replica = replicamap.get(loc);
+            HashMap<String, CenterServer> replicamap = centralRepository.get(Constants.REPLICA2_SERVER_ID);
+            CenterServer replica = replicamap.get(loc);
             replica.setReplicas(replicas);
             replicamap.put(loc, replica);
             synchronized (centralRepository) {
@@ -210,8 +214,8 @@ public class DcmsServerFE extends corbaPOA {
         } else if (maxEntry.getKey().contains("3")) {
             ArrayList<Integer> replicas = new ArrayList<>();
             replicas.add(Constants.REPLICA1_SERVER_ID);
-            HashMap<String, DcmsServerImpl> getnewserver = centralRepository.get(Constants.REPLICA2_SERVER_ID);
-            DcmsServerImpl newPrimary = getnewserver.get(loc);
+            HashMap<String, CenterServer> getnewserver = centralRepository.get(Constants.REPLICA2_SERVER_ID);
+            CenterServer newPrimary = getnewserver.get(loc);
             newPrimary.setPrimary(true);
             newPrimary.setReplicas(replicas);
             newPrimary.setServerID(Constants.PRIMARY_SERVER_ID);
@@ -224,8 +228,8 @@ public class DcmsServerFE extends corbaPOA {
             synchronized (centralRepository) {
                 centralRepository.put(Constants.REPLICA2_SERVER_ID, getnewserver);
             }
-            HashMap<String, DcmsServerImpl> replicamap = centralRepository.get(Constants.REPLICA1_SERVER_ID);
-            DcmsServerImpl replica = replicamap.get(loc);
+            HashMap<String, CenterServer> replicamap = centralRepository.get(Constants.REPLICA1_SERVER_ID);
+            CenterServer replica = replicamap.get(loc);
             replica.setReplicas(replicas);
             replicamap.put(loc, replica);
             synchronized (centralRepository) {
@@ -266,67 +270,67 @@ public class DcmsServerFE extends corbaPOA {
             replicas.add(Constants.REPLICA1_SERVER_ID);
             replicas.add(Constants.REPLICA2_SERVER_ID);
             boolean isPrimary = true;
-            primaryReceiver = new DcmsServerMultiCastReceiver(isPrimary, ackManager);
+            primaryReceiver = new MultiCastReceiverThread(isPrimary, ackManager);
             primaryReceiver.start();
 
             replicaResponseReceiver = new DcmsServerReplicaResponseReceiver(new LogUtil("ReplicasResponse"));
             replicaResponseReceiver.start();
             DatagramSocket socket1 = new DatagramSocket();
 
-            primaryMtlServer = new DcmsServerImpl(Constants.PRIMARY_SERVER_ID, isPrimary, ServerCenterLocation.MTL,
+            primaryMtlServer = new CenterServer(Constants.PRIMARY_SERVER_ID, isPrimary, LocationEnum.MTL,
                     9999, socket1, s1_MTL_sender_isAlive, MTLserverName1, s1_MTL_receive_port, s2_MTL_receive_port,
-                    s3_MTL_receive_port, replicas, getLogInstance("PRIMARY_SERVER", ServerCenterLocation.MTL));
+                    s3_MTL_receive_port, replicas, getLogInstance("PRIMARY_SERVER", LocationEnum.MTL));
 
-            primaryLvlServer = new DcmsServerImpl(Constants.PRIMARY_SERVER_ID, isPrimary, ServerCenterLocation.LVL,
+            primaryLvlServer = new CenterServer(Constants.PRIMARY_SERVER_ID, isPrimary, LocationEnum.LVL,
                     7777, socket1, s1_LVL_sender_isAlive, LVLserverName1, s1_LVL_receive_port, s2_LVL_receive_port,
-                    s3_LVL_receive_port, replicas, getLogInstance("PRIMARY_SERVER", ServerCenterLocation.LVL));
+                    s3_LVL_receive_port, replicas, getLogInstance("PRIMARY_SERVER", LocationEnum.LVL));
 
-            primaryDdoServer = new DcmsServerImpl(Constants.PRIMARY_SERVER_ID, isPrimary, ServerCenterLocation.DDO,
+            primaryDdoServer = new CenterServer(Constants.PRIMARY_SERVER_ID, isPrimary, LocationEnum.DDO,
                     6666, socket1, s1_DDO_sender_isAlive, DDOserverName1, s1_DDO_receive_port, s2_DDO_receive_port,
-                    s3_DDO_receive_port, replicas, getLogInstance("PRIMARY_SERVER", ServerCenterLocation.DDO));
+                    s3_DDO_receive_port, replicas, getLogInstance("PRIMARY_SERVER", LocationEnum.DDO));
 
             primaryServerMap.put("MTL", primaryMtlServer);
             primaryServerMap.put("LVL", primaryLvlServer);
             primaryServerMap.put("DDO", primaryDdoServer);
 
-            replica1Receiver = new DcmsServerMultiCastReceiver(false, ackManager);
+            replica1Receiver = new MultiCastReceiverThread(false, ackManager);
             replica1Receiver.start();
 
             DatagramSocket socket2 = new DatagramSocket();
-            DcmsServerImpl replica1MtlServer = new DcmsServerImpl(Constants.REPLICA1_SERVER_ID, false,
-                    ServerCenterLocation.MTL, 5555, socket2, s2_MTL_sender_isAlive, MTLserverName2, s2_MTL_receive_port,
+            CenterServer replica1MtlServer = new CenterServer(Constants.REPLICA1_SERVER_ID, false,
+                    LocationEnum.MTL, 5555, socket2, s2_MTL_sender_isAlive, MTLserverName2, s2_MTL_receive_port,
                     s1_MTL_receive_port, s3_MTL_receive_port, replicas,
-                    getLogInstance("REPLICA1_SERVER", ServerCenterLocation.MTL));
+                    getLogInstance("REPLICA1_SERVER", LocationEnum.MTL));
 
-            DcmsServerImpl replica1LvlServer = new DcmsServerImpl(Constants.REPLICA1_SERVER_ID, false,
-                    ServerCenterLocation.LVL, 4444, socket2, s2_LVL_sender_isAlive, LVLserverName2, s2_LVL_receive_port,
+            CenterServer replica1LvlServer = new CenterServer(Constants.REPLICA1_SERVER_ID, false,
+                    LocationEnum.LVL, 4444, socket2, s2_LVL_sender_isAlive, LVLserverName2, s2_LVL_receive_port,
                     s1_LVL_receive_port, s3_LVL_receive_port, replicas,
-                    getLogInstance("REPLICA1_SERVER", ServerCenterLocation.LVL));
+                    getLogInstance("REPLICA1_SERVER", LocationEnum.LVL));
 
-            DcmsServerImpl replica1DdoServer = new DcmsServerImpl(Constants.REPLICA1_SERVER_ID, false,
-                    ServerCenterLocation.DDO, 2222, socket2, s2_DDO_sender_isAlive, DDOserverName2, s2_DDO_receive_port,
+            CenterServer replica1DdoServer = new CenterServer(Constants.REPLICA1_SERVER_ID, false,
+                    LocationEnum.DDO, 2222, socket2, s2_DDO_sender_isAlive, DDOserverName2, s2_DDO_receive_port,
                     s1_DDO_receive_port, s3_DDO_receive_port, replicas,
-                    getLogInstance("REPLICA1_SERVER", ServerCenterLocation.DDO));
+                    getLogInstance("REPLICA1_SERVER", LocationEnum.DDO));
 
             replica1ServerMap.put("MTL", replica1MtlServer);
             replica1ServerMap.put("LVL", replica1LvlServer);
             replica1ServerMap.put("DDO", replica1DdoServer);
 
             DatagramSocket socket3 = new DatagramSocket();
-            DcmsServerImpl replica2MtlServer = new DcmsServerImpl(Constants.REPLICA2_SERVER_ID, false,
-                    ServerCenterLocation.MTL, 9878, socket3, s3_MTL_sender_isAlive, MTLserverName3, s3_MTL_receive_port,
+            CenterServer replica2MtlServer = new CenterServer(Constants.REPLICA2_SERVER_ID, false,
+                    LocationEnum.MTL, 9878, socket3, s3_MTL_sender_isAlive, MTLserverName3, s3_MTL_receive_port,
                     s1_MTL_receive_port, s2_MTL_receive_port, replicas,
-                    getLogInstance("REPLICA2_SERVER", ServerCenterLocation.MTL));
+                    getLogInstance("REPLICA2_SERVER", LocationEnum.MTL));
 
-            DcmsServerImpl replica2LvlServer = new DcmsServerImpl(Constants.REPLICA2_SERVER_ID, false,
-                    ServerCenterLocation.LVL, 9701, socket3, s3_LVL_sender_isAlive, LVLserverName3, s3_LVL_receive_port,
+            CenterServer replica2LvlServer = new CenterServer(Constants.REPLICA2_SERVER_ID, false,
+                    LocationEnum.LVL, 9701, socket3, s3_LVL_sender_isAlive, LVLserverName3, s3_LVL_receive_port,
                     s1_LVL_receive_port, s2_LVL_receive_port, replicas,
-                    getLogInstance("REPLICA2_SERVER", ServerCenterLocation.LVL));
+                    getLogInstance("REPLICA2_SERVER", LocationEnum.LVL));
 
-            DcmsServerImpl replica2DdoServer = new DcmsServerImpl(Constants.REPLICA2_SERVER_ID, false,
-                    ServerCenterLocation.DDO, 5655, socket3, s3_DDO_sender_isAlive, DDOserverName3, s3_DDO_receive_port,
+            CenterServer replica2DdoServer = new CenterServer(Constants.REPLICA2_SERVER_ID, false,
+                    LocationEnum.DDO, 5655, socket3, s3_DDO_sender_isAlive, DDOserverName3, s3_DDO_receive_port,
                     s1_DDO_receive_port, s2_DDO_receive_port, replicas,
-                    getLogInstance("REPLICA2_SERVER", ServerCenterLocation.DDO));
+                    getLogInstance("REPLICA2_SERVER", LocationEnum.DDO));
 
             replica2ServerMap.put("MTL", replica2MtlServer);
             replica2ServerMap.put("LVL", replica2LvlServer);
@@ -441,7 +445,7 @@ public class DcmsServerFE extends corbaPOA {
     public String createTRecord(String id, String fName, String lName, String address, String phone, String specialization, String location) {
         String teacherStr = fName + "," + lName + ","
                 + address + "," + phone + "," + specialization + "," + location;
-        String teacher = ServerOperations.CREATE_T_RECORD + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
+        String teacher = OperationsEnum.CREATE_T_RECORD + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
                 + Constants.RECEIVED_DATA_SEPERATOR + id + Constants.RECEIVED_DATA_SEPERATOR + teacherStr;
         logManager.log(TAG + " Sending request to Server to create Teacher record: : " + teacher);
         return sendRequestToServer(teacher);
@@ -450,7 +454,7 @@ public class DcmsServerFE extends corbaPOA {
     @Override
     public String createSRecord(String id, String fName, String lName, String courses, boolean status, String statusDate) {
         String studentStr = fName + "," + lName + "," + courses + "," + status + "," + statusDate;
-        String student = ServerOperations.CREATE_S_RECORD + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
+        String student = OperationsEnum.CREATE_S_RECORD + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
                 + Constants.RECEIVED_DATA_SEPERATOR + id + Constants.RECEIVED_DATA_SEPERATOR + studentStr;
         logManager.log(TAG + " Sending request to Server to create student record: : " + student);
         return sendRequestToServer(student);
@@ -458,7 +462,7 @@ public class DcmsServerFE extends corbaPOA {
 
     @Override
     public String getRecordCounts(String id) {
-        String req = ServerOperations.GET_REC_COUNT + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
+        String req = OperationsEnum.GET_REC_COUNT + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
                 + Constants.RECEIVED_DATA_SEPERATOR + id;
         logManager.log(TAG + " Sending request to Server for getRecordCount: : " + req);
         return sendRequestToServer(req);
@@ -466,7 +470,7 @@ public class DcmsServerFE extends corbaPOA {
 
     @Override
     public String editRecord(String id, String recordID, String fieldName, String newValue) {
-        String editData = ServerOperations.EDIT_RECORD + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
+        String editData = OperationsEnum.EDIT_RECORD + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
                 + Constants.RECEIVED_DATA_SEPERATOR + id + Constants.RECEIVED_DATA_SEPERATOR + recordID
                 + Constants.RECEIVED_DATA_SEPERATOR + fieldName + Constants.RECEIVED_DATA_SEPERATOR + newValue;
         logManager.log(TAG + " Sending request to Server for editRecord: : " + editData);
@@ -475,7 +479,7 @@ public class DcmsServerFE extends corbaPOA {
 
     @Override
     public String transferRecord(String id, String recordId, String remoteCenterServerName) {
-        String req = ServerOperations.TRANSFER_RECORD + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
+        String req = OperationsEnum.TRANSFER_RECORD + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
                 + Constants.RECEIVED_DATA_SEPERATOR + id + Constants.RECEIVED_DATA_SEPERATOR + recordId
                 + Constants.RECEIVED_DATA_SEPERATOR + remoteCenterServerName;
         logManager.log(TAG + " Sending request to Server for transferRecord: : " + req);
@@ -488,7 +492,7 @@ public class DcmsServerFE extends corbaPOA {
         if (this.id.equals("MTL")) {
             if (s1_MTL_sender_isAlive && s2_MTL_sender_isAlive && s3_MTL_sender_isAlive) {
                 s1_MTL_sender_isAlive = false;
-                primaryMtlServer.heartBeatReceiver.setStatus(false);
+                primaryMtlServer.pingReceiverThread.setStatus(false);
                 msg = "MTL1 Server is killed " + electNewLeader("MTL1", logManager);
             } else {
                 msg = "Primary is already killed!!";
@@ -496,7 +500,7 @@ public class DcmsServerFE extends corbaPOA {
         } else if (this.id.equals("LVL")) {
             if (s1_LVL_sender_isAlive && s2_LVL_sender_isAlive && s3_LVL_sender_isAlive) {
                 s1_LVL_sender_isAlive = false;
-                primaryLvlServer.heartBeatReceiver.setStatus(false);
+                primaryLvlServer.pingReceiverThread.setStatus(false);
                 msg = "LVL1 Server is killed " + electNewLeader("LVL1", logManager);
             } else {
                 msg = "Primary is already killed!!";
@@ -504,7 +508,7 @@ public class DcmsServerFE extends corbaPOA {
         } else if (this.id.equals("DDO")) {
             if (s1_DDO_sender_isAlive && s2_DDO_sender_isAlive && s3_DDO_sender_isAlive) {
                 s1_DDO_sender_isAlive = false;
-                primaryDdoServer.heartBeatReceiver.setStatus(false);
+                primaryDdoServer.pingReceiverThread.setStatus(false);
                 msg = "DDO1 Server is killed " + electNewLeader("DDO1", logManager);
             } else {
                 msg = "Primary is already killed!!";

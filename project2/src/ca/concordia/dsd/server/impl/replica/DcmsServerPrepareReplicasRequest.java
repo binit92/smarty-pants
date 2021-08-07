@@ -1,7 +1,8 @@
-package ca.concordia.dsd.server.impl;
+package ca.concordia.dsd.server.impl.replica;
 
+import ca.concordia.dsd.server.impl.multicast.MultiCastSenderThread;
 import ca.concordia.dsd.util.Constants;
-import ca.concordia.dsd.conf.ServerOperations;
+import ca.concordia.dsd.util.OperationsEnum;
 import ca.concordia.dsd.database.Record;
 import ca.concordia.dsd.util.LogUtil;
 
@@ -34,13 +35,13 @@ public class DcmsServerPrepareReplicasRequest {
 
 
     private void sendMulticastRequest(String req) {
-        DcmsServerMultiCastSender sender = new DcmsServerMultiCastSender(req, logger);
+        MultiCastSenderThread sender = new MultiCastSenderThread(req, logger);
         sender.start();
     }
 
     //@Override
     public String createTRecord(String managerID, String teacher) {
-        teacher = replicaID + Constants.RECEIVED_DATA_SEPERATOR + ServerOperations.CREATE_T_RECORD
+        teacher = replicaID + Constants.RECEIVED_DATA_SEPERATOR + OperationsEnum.CREATE_T_RECORD
                 + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(managerID) + Constants.RECEIVED_DATA_SEPERATOR
                 + managerID + Constants.RECEIVED_DATA_SEPERATOR + teacher;
         logger.log(TAG + "Preparing Multicast request for Create Teacher record : " + teacher);
@@ -55,7 +56,7 @@ public class DcmsServerPrepareReplicasRequest {
 
     //@Override
     public String createSRecord(String managerID, String student) {
-        student = replicaID + Constants.RECEIVED_DATA_SEPERATOR + ServerOperations.CREATE_S_RECORD
+        student = replicaID + Constants.RECEIVED_DATA_SEPERATOR + OperationsEnum.CREATE_S_RECORD
                 + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(managerID) + Constants.RECEIVED_DATA_SEPERATOR
                 + managerID + Constants.RECEIVED_DATA_SEPERATOR + student;
         sendMulticastRequest(student);
@@ -67,7 +68,7 @@ public class DcmsServerPrepareReplicasRequest {
     //@Override
     public String getRecordCount(String manager) {
         String[] data = manager.split(Constants.RECEIVED_DATA_SEPERATOR);
-        String req = replicaID + Constants.RECEIVED_DATA_SEPERATOR + ServerOperations.GET_REC_COUNT
+        String req = replicaID + Constants.RECEIVED_DATA_SEPERATOR + OperationsEnum.GET_REC_COUNT
                 + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(data[0]) + Constants.RECEIVED_DATA_SEPERATOR
                 + manager;
         sendMulticastRequest(req);
@@ -78,7 +79,7 @@ public class DcmsServerPrepareReplicasRequest {
 
     //@Override
     public String editRecord(String id, String recordID, String fieldName, String newValue) {
-        String editData = replicaID + Constants.RECEIVED_DATA_SEPERATOR + ServerOperations.EDIT_RECORD
+        String editData = replicaID + Constants.RECEIVED_DATA_SEPERATOR + OperationsEnum.EDIT_RECORD
                 + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id) + Constants.RECEIVED_DATA_SEPERATOR
                 + id + Constants.RECEIVED_DATA_SEPERATOR + recordID + Constants.RECEIVED_DATA_SEPERATOR
                 + fieldName + Constants.RECEIVED_DATA_SEPERATOR + newValue;
@@ -89,7 +90,7 @@ public class DcmsServerPrepareReplicasRequest {
 
 
     public String transferRecord(String managerID, String recordID, String remoteCenterServerName) {
-        String req = replicaID + Constants.RECEIVED_DATA_SEPERATOR + ServerOperations.TRANSFER_RECORD
+        String req = replicaID + Constants.RECEIVED_DATA_SEPERATOR + OperationsEnum.TRANSFER_RECORD
                 + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(managerID) + Constants.RECEIVED_DATA_SEPERATOR
                 + managerID + Constants.RECEIVED_DATA_SEPERATOR + recordID + Constants.RECEIVED_DATA_SEPERATOR
                 + remoteCenterServerName;

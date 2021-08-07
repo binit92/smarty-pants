@@ -1,6 +1,6 @@
-package ca.concordia.dsd.server.impl;
+package ca.concordia.dsd.server.impl.ping;
 
-import ca.concordia.dsd.server.frontend.DcmsServerFE;
+import ca.concordia.dsd.server.frontend.FrontEnd;
 import ca.concordia.dsd.util.LogUtil;
 
 import java.io.IOException;
@@ -8,16 +8,16 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 
-public class HeartBeatReceiver extends Thread {
+public class PingReceiverThread extends Thread {
 
-    private final String TAG = "|" + HeartBeatReceiver.class.getSimpleName() + "| ";
+    private final String TAG = "|" + PingReceiverThread.class.getSimpleName() + "| ";
     DatagramSocket ds = null;
     String name;
     boolean isAlive;
     Object mapAccessor;
 
 
-    public HeartBeatReceiver(boolean isAlive, String name, int port, LogUtil logUtil) {
+    public PingReceiverThread(boolean isAlive, String name, int port, LogUtil logUtil) {
         try {
             this.isAlive = isAlive;
             this.name = name;
@@ -36,7 +36,7 @@ public class HeartBeatReceiver extends Thread {
                 DatagramPacket dp = new DatagramPacket(data, data.length);
                 ds.receive(dp);
                 synchronized (mapAccessor) {
-                    DcmsServerFE.server_last_updated_time.put(name, System.nanoTime() / 1000000);
+                    FrontEnd.server_last_updated_time.put(name, System.nanoTime() / 1000000);
                 }
             } catch (IOException e) {
                 e.printStackTrace();

@@ -1,16 +1,16 @@
-package ca.concordia.dsd.server.impl;
+package ca.concordia.dsd.server.impl.ping;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 
-public class HeartBeatSender extends Thread {
+public class PingSenderThread extends Thread {
     int port1, port2;
     String name;
     DatagramSocket ds;
 
-    public HeartBeatSender(DatagramSocket ds, String name, int port1, int port2) {
+    public PingSenderThread(DatagramSocket ds, String name, int port1, int port2) {
         this.port1 = port1;
         this.port2 = port2;
         this.name = name;
