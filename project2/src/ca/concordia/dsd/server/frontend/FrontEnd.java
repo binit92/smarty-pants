@@ -262,96 +262,9 @@ public class FrontEnd extends corbaPOA implements Constants {
                 repo.put(Constants.REPLICA2_SERVER_ID, replicaTwoMap);
             }
 
-            Thread thread1 = new Thread() {
-                public void run() {
-                    while (getStatus(MTL1)) {
-                        primaryMtlServer.send();
-                    }
-                }
-            };
-            Thread thread2 = new Thread() {
-                public void run() {
-                    while (getStatus(MTL2)) {
-                        replica1MtlServer.send();
-                    }
-                }
-            };
-            Thread thread3 = new Thread() {
-                public void run() {
-                    while (getStatus(MTL3)) {
-                        replica2MtlServer.send();
-                    }
-                }
-            };
-            Thread thread4 = new Thread() {
-                public void run() {
-                    while (getStatus(LVL1)) {
-                        primaryLvlServer.send();
-                    }
-                }
-            };
-            Thread thread5 = new Thread() {
-                public void run() {
-                    while (getStatus(LVL2)) {
-                        replica1LvlServer.send();
-                    }
-                }
-            };
-            Thread thread6 = new Thread() {
-                public void run() {
-                    while (getStatus(LVL3)) {
-                        replica2LvlServer.send();
-                    }
-                }
-            };
-            Thread thread7 = new Thread() {
-                public void run() {
-                    while (getStatus(DDO1)) {
-                        primaryDdoServer.send();
-                    }
-                }
-            };
-            Thread thread8 = new Thread() {
-                public void run() {
-                    while (getStatus(DDO2)) {
-                        replica1DdoServer.send();
-                    }
-                }
-            };
-            Thread thread9 = new Thread() {
-                public void run() {
-                    while (getStatus(DDO3)) {
-                        replica2DdoServer.send();
-                    }
-                }
-            };
-            thread1.start();
-            thread2.start();
-            thread3.start();
-            thread4.start();
-            thread5.start();
-            thread6.start();
-            thread7.start();
-            thread8.start();
-            thread9.start();
+            startPingFromAllServers();
+            startWatcherThread();
 
-            Thread statusChecker = new Thread() {
-                public void run() {
-                    while (true) {
-                        checkServerStatus("MTL1");
-                        checkServerStatus("MTL2");
-                        checkServerStatus("MTL3");
-                        checkServerStatus("LVL1");
-                        checkServerStatus("LVL2");
-                        checkServerStatus("LVL3");
-                        checkServerStatus("DDO1");
-                        checkServerStatus("DDO2");
-                        checkServerStatus("DDO3");
-                    }
-                }
-            };
-
-            statusChecker.start();
         } catch (Exception e) {
 
         }
@@ -445,6 +358,100 @@ public class FrontEnd extends corbaPOA implements Constants {
         replicaTwoMap.put("DDO", replica2DdoServer);
     }
 
+    private void startPingFromAllServers(){
+        Thread thread1 = new Thread() {
+            public void run() {
+                while (getStatus(MTL1)) {
+                    primaryMtlServer.ping();
+                }
+            }
+        };
+        Thread thread2 = new Thread() {
+            public void run() {
+                while (getStatus(MTL2)) {
+                    replica1MtlServer.ping();
+                }
+            }
+        };
+        Thread thread3 = new Thread() {
+            public void run() {
+                while (getStatus(MTL3)) {
+                    replica2MtlServer.ping();
+                }
+            }
+        };
+        Thread thread4 = new Thread() {
+            public void run() {
+                while (getStatus(LVL1)) {
+                    primaryLvlServer.ping();
+                }
+            }
+        };
+        Thread thread5 = new Thread() {
+            public void run() {
+                while (getStatus(LVL2)) {
+                    replica1LvlServer.ping();
+                }
+            }
+        };
+        Thread thread6 = new Thread() {
+            public void run() {
+                while (getStatus(LVL3)) {
+                    replica2LvlServer.ping();
+                }
+            }
+        };
+        Thread thread7 = new Thread() {
+            public void run() {
+                while (getStatus(DDO1)) {
+                    primaryDdoServer.ping();
+                }
+            }
+        };
+        Thread thread8 = new Thread() {
+            public void run() {
+                while (getStatus(DDO2)) {
+                    replica1DdoServer.ping();
+                }
+            }
+        };
+        Thread thread9 = new Thread() {
+            public void run() {
+                while (getStatus(DDO3)) {
+                    replica2DdoServer.ping();
+                }
+            }
+        };
+        thread1.start();
+        thread2.start();
+        thread3.start();
+        thread4.start();
+        thread5.start();
+        thread6.start();
+        thread7.start();
+        thread8.start();
+        thread9.start();
+    }
+
+    private void startWatcherThread(){
+        Thread statusChecker = new Thread() {
+            public void run() {
+                while (true) {
+                    checkServerStatus("MTL1");
+                    checkServerStatus("MTL2");
+                    checkServerStatus("MTL3");
+                    checkServerStatus("LVL1");
+                    checkServerStatus("LVL2");
+                    checkServerStatus("LVL3");
+                    checkServerStatus("DDO1");
+                    checkServerStatus("DDO2");
+                    checkServerStatus("DDO3");
+                }
+            }
+        };
+        statusChecker.start();
+    }
+
     private String getServerLoc(String managerID) {
         return managerID.substring(0, 3);
     }
@@ -534,8 +541,8 @@ public class FrontEnd extends corbaPOA implements Constants {
             DatagramPacket dp = new DatagramPacket(dataBytes, dataBytes.length,
                     InetAddress.getByName(Constants.CURRENT_SERVER_IP), Constants.CURRENT_SERVER_UDP_PORT);
             ds.send(dp);
-            System.out.println("Adding request to request buffer with req id..." + requestId);
-            logUtil.log(TAG + "Adding request to request buffer with req id..." + requestId);
+
+            logUtil.log(TAG + "New request in buffer with request id : " + requestId);
             requestBuffer.put(requestId, data);
             System.out.println("Waiting for acknowledgement from current ca.concordia.dsd.server...");
             logUtil.log(TAG + "Waiting for acknowledgement from current ca.concordia.dsd.server...");

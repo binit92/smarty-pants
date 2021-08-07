@@ -416,7 +416,7 @@ public class CenterServer {
 
 
 
-	public void send() {
+	public void ping() {
 		pingSenderThread = new PingSenderThread(ds, name, port1, port2);
 		pingSenderThread.start();
 	}
