@@ -2,7 +2,7 @@ package ca.concordia.dsd.server.main;
 
 import ca.concordia.dsd.arch.corba;
 import ca.concordia.dsd.arch.corbaHelper;
-import ca.concordia.dsd.conf.Constants;
+import ca.concordia.dsd.util.Constants;
 import ca.concordia.dsd.conf.ServerCenterLocation;
 import ca.concordia.dsd.server.frontend.DcmsServerFE;
 import org.omg.CORBA.ORB;
@@ -31,23 +31,23 @@ public class DcmsServerMain {
     }
 
     private static void init() {
-        new File(Constants.LOG_DIR + "ServerFE").mkdir();
-        new File(Constants.LOG_DIR + "ReplicasResponse").mkdir();
+        new File(Constants.LOG_DIR + File.separator + "ServerFE").mkdir();
+        new File(Constants.LOG_DIR + File.separator + "ReplicasResponse").mkdir();
 
-        new File(Constants.LOG_DIR + "PRIMARY_SERVER").mkdir();
-        new File(Constants.LOG_DIR + "PRIMARY_SERVER" + "\\" + ServerCenterLocation.MTL).mkdir();
-        new File(Constants.LOG_DIR + "PRIMARY_SERVER" + "\\" + ServerCenterLocation.LVL).mkdir();
-        new File(Constants.LOG_DIR + "PRIMARY_SERVER" + "\\" + ServerCenterLocation.DDO).mkdir();
+        new File(Constants.LOG_DIR + File.separator + "PRIMARY_SERVER").mkdir();
+        new File(Constants.LOG_DIR + File.separator + "PRIMARY_SERVER" + "\\" + ServerCenterLocation.MTL).mkdir();
+        new File(Constants.LOG_DIR + File.separator + "PRIMARY_SERVER" + "\\" + ServerCenterLocation.LVL).mkdir();
+        new File(Constants.LOG_DIR + File.separator + "PRIMARY_SERVER" + "\\" + ServerCenterLocation.DDO).mkdir();
 
-        new File(Constants.LOG_DIR + "REPLICA1_SERVER").mkdir();
-        new File(Constants.LOG_DIR + "REPLICA1_SERVER" + "\\" + ServerCenterLocation.MTL).mkdir();
-        new File(Constants.LOG_DIR + "REPLICA1_SERVER" + "\\" + ServerCenterLocation.LVL).mkdir();
-        new File(Constants.LOG_DIR + "REPLICA1_SERVER" + "\\" + ServerCenterLocation.DDO).mkdir();
+        new File(Constants.LOG_DIR + File.separator + "REPLICA1_SERVER").mkdir();
+        new File(Constants.LOG_DIR + File.separator + "REPLICA1_SERVER" + "\\" + ServerCenterLocation.MTL).mkdir();
+        new File(Constants.LOG_DIR + File.separator + "REPLICA1_SERVER" + "\\" + ServerCenterLocation.LVL).mkdir();
+        new File(Constants.LOG_DIR + File.separator + "REPLICA1_SERVER" + "\\" + ServerCenterLocation.DDO).mkdir();
 
-        new File(Constants.LOG_DIR + "REPLICA2_SERVER").mkdir();
-        new File(Constants.LOG_DIR + "REPLICA2_SERVER" + "\\" + ServerCenterLocation.MTL).mkdir();
-        new File(Constants.LOG_DIR + "REPLICA2_SERVER" + "\\" + ServerCenterLocation.LVL).mkdir();
-        new File(Constants.LOG_DIR + "REPLICA2_SERVER" + "\\" + ServerCenterLocation.DDO).mkdir();
+        new File(Constants.LOG_DIR + File.separator + "REPLICA2_SERVER").mkdir();
+        new File(Constants.LOG_DIR + File.separator + "REPLICA2_SERVER" + "\\" + ServerCenterLocation.MTL).mkdir();
+        new File(Constants.LOG_DIR + File.separator + "REPLICA2_SERVER" + "\\" + ServerCenterLocation.LVL).mkdir();
+        new File(Constants.LOG_DIR + File.separator + "REPLICA2_SERVER" + "\\" + ServerCenterLocation.DDO).mkdir();
 
     }
 

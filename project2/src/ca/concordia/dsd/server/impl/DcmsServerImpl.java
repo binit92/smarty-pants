@@ -5,7 +5,7 @@ import java.net.DatagramSocket;
 import java.util.*;
 import java.util.Map.Entry;
 
-import ca.concordia.dsd.conf.Constants;
+import ca.concordia.dsd.util.Constants;
 import ca.concordia.dsd.conf.ServerCenterLocation;
 import ca.concordia.dsd.database.Record;
 import ca.concordia.dsd.database.Student;

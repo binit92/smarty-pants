@@ -2,7 +2,7 @@ package ca.concordia.dsd.server.frontend;
 
 
 import ca.concordia.dsd.arch.corbaPOA;
-import ca.concordia.dsd.conf.Constants;
+import ca.concordia.dsd.util.Constants;
 import ca.concordia.dsd.conf.ServerCenterLocation;
 import ca.concordia.dsd.conf.ServerOperations;
 import ca.concordia.dsd.database.Record;

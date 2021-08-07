@@ -1,6 +1,6 @@
 package ca.concordia.dsd.server.frontend;
 
-import ca.concordia.dsd.conf.Constants;
+import ca.concordia.dsd.util.Constants;
 import ca.concordia.dsd.conf.ServerCenterLocation;
 
 import java.net.DatagramPacket;

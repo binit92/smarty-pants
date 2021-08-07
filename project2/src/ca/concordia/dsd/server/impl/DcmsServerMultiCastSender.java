@@ -1,6 +1,6 @@
 package ca.concordia.dsd.server.impl;
 
-import ca.concordia.dsd.conf.Constants;
+import ca.concordia.dsd.util.Constants;
 import ca.concordia.dsd.util.LogUtil;
 
 import java.io.IOException;

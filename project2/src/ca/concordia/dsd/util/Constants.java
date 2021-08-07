@@ -7,16 +7,12 @@ public interface Constants {
     String PROJ_DIR = System.getProperty("user.dir");
     String LOG_DIR = PROJ_DIR + File.separator + "logs";
 
-    int MULTICAST_PORT_NUMBER = 6779;
-    String MULTICAST_IP_ADDRESS = "224.0.0.1";
-    int CURRENT_PRIMARY_PORT_FOR_REPLICAS = 2323;
-
     // use this to run all ca.concordia.dsd.server (DDO, LVL and MTL)
     int ORB_INITIAL_PORT = 5555;
     String ORB_INITIAL_HOST = "localhost";
 
-    String FRONT_END_UDP_HOST = "localhost";
-    int FRONT_END_UDP_PORT = 7717;
+    String FRONTEND_UDP_HOST = "localhost";
+    int FRONTEND_UDP_PORT = 7717;
 
     String MTL_TAG = "MTL";
     String MTL_SERVER_HOST = "localhost";
@@ -50,10 +46,28 @@ public interface Constants {
 
     String RESPONSE_DATA_SPLITTER = "#";
     int LEADER_ID = 100;
-    int PRIMARY_SERVER_ID = 0;
+    int PRIMARY_ID = 0;
     int REPLICA1_ID = 1;
     int REPLICA2_ID = 2;
 
     int LEADER_DOWN_TIME_LIMIT = 1000;
+
+
+    public static int TOTAL_SERVERS_COUNT = 3;
+    public static int TOTAL_REPLICAS_COUNT = TOTAL_SERVERS_COUNT - 1;
+    public static int PRIMARY_SERVER_ID = 1;
+    public static int REPLICA1_SERVER_ID = 2;
+    public static int REPLICA2_SERVER_ID = 3;
+    public static String CURRENT_SERVER_IP = "localhost";
+    public static int CURRENT_SERVER_UDP_PORT = 3333;
+    public static String FRONT_END_IP = "localhost";
+    public static int FRONT_END_UDP_PORT = 3232;
+    public static int MULTICAST_PORT_NUMBER = 6779;
+    public static String MULTICAST_IP_ADDRESS = "224.0.0.1";
+    public static int CURRENT_PRIMARY_PORT_FOR_REPLICAS = 2323;
+    public static int RETRY_TIME = 5000;
+    public static String RECEIVED_DATA_SEPERATOR = ",";
+    public static String RESPONSE_DATA_SEPERATOR = "_";
+    public static String PROJECT_DIR = System.getProperty("user.dir");
 
 }

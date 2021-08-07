@@ -1,6 +1,6 @@
 package ca.concordia.dsd.server.impl;
 
-import ca.concordia.dsd.conf.Constants;
+import ca.concordia.dsd.util.Constants;
 import ca.concordia.dsd.conf.ServerCenterLocation;
 import ca.concordia.dsd.server.frontend.TransferResponseToFE;
 import ca.concordia.dsd.util.LogUtil;

@@ -1,6 +1,6 @@
 package ca.concordia.dsd.server.impl;
 
-import ca.concordia.dsd.conf.Constants;
+import ca.concordia.dsd.util.Constants;
 import ca.concordia.dsd.conf.ServerOperations;
 import ca.concordia.dsd.database.Record;
 import ca.concordia.dsd.util.LogUtil;
