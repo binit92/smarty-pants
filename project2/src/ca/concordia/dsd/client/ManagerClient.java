@@ -25,11 +25,6 @@ public class ManagerClient implements Constants {
         System.out.println("Initiating ManagerClient ");
     }
 
-    public static void main(String[] args) {
-        System.out.println("Running Manager Client to connect to one of the server (MTL,LVL,DDO)");
-        ManagerClient client = new ManagerClient();
-        client.start();
-    }
 
     public void start() {
         System.out.println("Starting MangerClient");

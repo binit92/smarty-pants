@@ -21,7 +21,7 @@ public class PingReceiverThread extends Thread {
         try {
             this.isAlive = isAlive;
             this.name = name;
-            System.out.println(name + "listening in :: " + port);
+            logUtil.log(TAG + "Server " + name + " is receiving ping message using port : " + port);
             ds = new DatagramSocket(port);
             mapAccessor = new Object();
         } catch (SocketException e) {

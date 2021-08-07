@@ -70,15 +70,15 @@ public interface Constants {
     public static String RESPONSE_DATA_SEPERATOR = "_";
     public static String PROJECT_DIR = System.getProperty("user.dir");
 
-    public static int MTL1_PORT = 5431;
-    public static int MTL2_PORT = 5432;
-    public static int MTL3_PORT = 5433;
-    public static int LVL1_PORT = 5441;
-    public static int LVL2_PORT = 5442;
-    public static int LVL3_PORT = 5443;
-    public static int DDO1_PORT = 5451;
-    public static int DDO2_PORT = 5452;
-    public static int DDO3_PORT = 5453;
+    public static int MTL1_PORT = 8001;
+    public static int MTL2_PORT = 8002;
+    public static int MTL3_PORT = 8003;
+    public static int LVL1_PORT = 8004;
+    public static int LVL2_PORT = 8005;
+    public static int LVL3_PORT = 8006;
+    public static int DDO1_PORT = 8007;
+    public static int DDO2_PORT = 8008;
+    public static int DDO3_PORT = 8009;
     public static String MTL1 = "MTL1";
     public static String MTL2 = "MTL2";
     public static String MTL3 = "MTL3";
@@ -89,5 +89,9 @@ public interface Constants {
     public static String DDO2 = "DDO2";
     public static String DDO3 = "DDO3";
 
-
+    public static String FRONTEND_TAG = "FRONTEND";
+    public static String REPLICA_RESPONSE_TAG = "RESPONSE";
+    public static String LEADER_TAG = "LEADER";
+    public static String REPLICA1_TAG = "REPLICA1";
+    public static String REPLICA2_TAG = "REPLICA2";
 }

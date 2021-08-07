@@ -1,6 +1,5 @@
 package ca.concordia.dsd.server.frontend;
 
-
 import ca.concordia.dsd.arch.corbaPOA;
 import ca.concordia.dsd.server.frontend.helper.FIFOThread;
 import ca.concordia.dsd.server.frontend.helper.RequestThread;
@@ -67,7 +66,7 @@ public class FrontEnd extends corbaPOA implements Constants {
 
 
     public FrontEnd() {
-        logUtil = new LogUtil("ServerFE");
+        logUtil = new LogUtil("FrontEnd");
 
         recordsMap = new HashMap<>();
         requests = new ArrayList<>();
@@ -81,13 +80,10 @@ public class FrontEnd extends corbaPOA implements Constants {
         replicaTwoMap = new HashMap<>();
         requestId = 0;
 
-
-
         init();
     }
 
     private static LogUtil getLogInstance(String serverName, LocationEnum loc) {
-
         return new LogUtil(serverName);
     }
 
@@ -98,9 +94,8 @@ public class FrontEnd extends corbaPOA implements Constants {
                 if (currentTime - reportingMap.get(serverName) > ONE_SECOND_TIMEOUT) {
                     if (statusMap.containsKey(serverName)) {
                         if (statusMap.get(serverName)) {
-                            System.out.println(serverName + " Leader Failed Found!!!");
-                            logUtil.log(TAG + serverName + " Leader Failed Found!!!");
-                            electNewLeader(serverName, logUtil);
+                            logUtil.log(TAG + "<FAIL> Primary Server : " + serverName + " has not reported in last one second");
+                            bullyAlgorithm(serverName);
                         }
                     }
                 }
@@ -108,7 +103,7 @@ public class FrontEnd extends corbaPOA implements Constants {
         }
     }
 
-    private static String electNewLeader(String oldLeader, LogUtil logManager) {
+    private static String bullyAlgorithm(String oldLeader) {
         statusMap.remove(oldLeader);
         reportingMap.remove(oldLeader);
         ServerIDMap.remove(oldLeader);
@@ -123,7 +118,7 @@ public class FrontEnd extends corbaPOA implements Constants {
         }
         statusMap.put(maxEntry.getKey(), true);
         ServerIDMap.put(maxEntry.getKey(), LEADER_ID);
-        logManager.log(TAG + "++++Elected new leader :: " + maxEntry.getKey() + " in the location" + loc);
+        logUtil.log(TAG + "New elected leader is : " + maxEntry.getKey() + " at datacenter " + loc);
         HashMap<String, CenterServer> replaceserver = new HashMap<String, CenterServer>();
         synchronized (repo) {
             replaceserver = repo.get(Constants.PRIMARY_SERVER_ID);
@@ -183,7 +178,6 @@ public class FrontEnd extends corbaPOA implements Constants {
                 repo.put(Constants.REPLICA1_SERVER_ID, replicamap);
             }
         }
-        System.out.println("Elected new leader :: " + maxEntry.getKey() + " in the location" + loc);
         return "and elected new leader " + maxEntry.getKey() + " in the location" + loc;
     }
 
@@ -208,6 +202,118 @@ public class FrontEnd extends corbaPOA implements Constants {
             return isDDOThreeAlive;
         }
         return false;
+    }
+
+
+    private String getServerLoc(String managerID) {
+        return managerID.substring(0, 3);
+    }
+
+    @Override
+    public String createTRecord(String id, String fName, String lName, String address, String phone, String specialization, String location) {
+        String teacherStr = fName + "," + lName + ","
+                + address + "," + phone + "," + specialization + "," + location;
+        String teacher = OperationsEnum.CREATE_T_RECORD + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
+                + Constants.RECEIVED_DATA_SEPERATOR + id + Constants.RECEIVED_DATA_SEPERATOR + teacherStr;
+        logUtil.log(TAG + "Forwarding createTRecord operation from frontend to server" + teacher);
+        return dispatchRequestToCurrentServer(teacher);
+    }
+
+    @Override
+    public String createSRecord(String id, String fName, String lName, String courses, boolean status, String statusDate) {
+        String studentStr = fName + "," + lName + "," + courses + "," + status + "," + statusDate;
+        String student = OperationsEnum.CREATE_S_RECORD + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
+                + Constants.RECEIVED_DATA_SEPERATOR + id + Constants.RECEIVED_DATA_SEPERATOR + studentStr;
+        logUtil.log(TAG + "Forwarding createSRecord operation from frontend to server " + student);
+        return dispatchRequestToCurrentServer(student);
+    }
+
+    @Override
+    public String getRecordCounts(String id) {
+        String req = OperationsEnum.GET_REC_COUNT + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
+                + Constants.RECEIVED_DATA_SEPERATOR + id;
+        logUtil.log(TAG + "Forwarding getRecordCounts operation from frontend to server" + req);
+        return dispatchRequestToCurrentServer(req);
+    }
+
+    @Override
+    public String editRecord(String id, String recordID, String fieldName, String newValue) {
+        String editData = OperationsEnum.EDIT_RECORD + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
+                + Constants.RECEIVED_DATA_SEPERATOR + id + Constants.RECEIVED_DATA_SEPERATOR + recordID
+                + Constants.RECEIVED_DATA_SEPERATOR + fieldName + Constants.RECEIVED_DATA_SEPERATOR + newValue;
+        logUtil.log(TAG + "Forwarding editRecord operation from frontend to server " + editData);
+        return dispatchRequestToCurrentServer(editData);
+    }
+
+    @Override
+    public String transferRecord(String id, String recordId, String remoteCenterServerName) {
+        String req = OperationsEnum.TRANSFER_RECORD + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
+                + Constants.RECEIVED_DATA_SEPERATOR + id + Constants.RECEIVED_DATA_SEPERATOR + recordId
+                + Constants.RECEIVED_DATA_SEPERATOR + remoteCenterServerName;
+        logUtil.log(TAG + "Forwarding transferRecord operation from frontend to server" + req);
+        return dispatchRequestToCurrentServer(req);
+    }
+
+    @Override
+    public String killPrimaryServer(String id) {
+        String msg = "";
+        if (id.equals("MTL")) {
+            if (isMTLOneAlive && isMTLTwoAlive && isMTLThreeAlive) {
+                isMTLOneAlive = false;
+                primaryMtlServer.pingReceiverThread.setStatus(false);
+                msg = "killing MTL1 Server " + bullyAlgorithm("MTL1");
+            } else {
+                msg = "primary server is found killed";
+            }
+        } else if (id.equals("LVL")) {
+            if (isLVLOneAlive && isLVLTwoAlive && isLVLThreeAlive) {
+                isLVLOneAlive = false;
+                primaryLvlServer.pingReceiverThread.setStatus(false);
+                msg = "killing LVL1 Server " + bullyAlgorithm("LVL1");
+            } else {
+                msg = "primary server is found killed";
+            }
+        } else if (id.equals("DDO")) {
+            if (isDDOOneAlive && isDDOTwoAlive && isDDOThreeAlive) {
+                isDDOOneAlive = false;
+                primaryDdoServer.pingReceiverThread.setStatus(false);
+                msg = "killing DDO1 server" + bullyAlgorithm("DDO1");
+            } else {
+                msg = "primary server is found killed";
+            }
+        }
+        return msg;
+    }
+
+    public String dispatchRequestToCurrentServer(String data) {
+        try {
+            requestId += 1;
+            DatagramSocket ds = new DatagramSocket();
+            data = data + Constants.RECEIVED_DATA_SEPERATOR + requestId;
+            byte[] dataBytes = data.getBytes();
+            DatagramPacket dp = new DatagramPacket(dataBytes, dataBytes.length,
+                    InetAddress.getByName(Constants.CURRENT_SERVER_IP), Constants.CURRENT_SERVER_UDP_PORT);
+            ds.send(dp);
+
+            logUtil.log(TAG + "New request in buffer with request id : " + requestId);
+            requestBuffer.put(requestId, data);
+            logUtil.log(TAG + "Waiting for ACK reply from server: "+ CURRENT_SERVER_IP + " : " + CURRENT_SERVER_UDP_PORT);
+            Thread.sleep(Constants.RETRY_TIME);
+            return getResponse(requestId);
+        } catch (Exception e) {
+            logUtil.log(TAG + e.getMessage());
+            return e.getMessage();
+        }
+    }
+
+    public String getResponse(Integer requestId) {
+        try {
+            responsesMap.get(requestId).join();
+        } catch (InterruptedException e) {
+            logUtil.log(TAG + e.getMessage());
+        }
+        requestBuffer.remove(requestId);
+        return responsesMap.get(requestId).getResponse();
     }
 
     public void init() {
@@ -452,115 +558,4 @@ public class FrontEnd extends corbaPOA implements Constants {
         statusChecker.start();
     }
 
-    private String getServerLoc(String managerID) {
-        return managerID.substring(0, 3);
-    }
-
-    @Override
-    public String createTRecord(String id, String fName, String lName, String address, String phone, String specialization, String location) {
-        String teacherStr = fName + "," + lName + ","
-                + address + "," + phone + "," + specialization + "," + location;
-        String teacher = OperationsEnum.CREATE_T_RECORD + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
-                + Constants.RECEIVED_DATA_SEPERATOR + id + Constants.RECEIVED_DATA_SEPERATOR + teacherStr;
-        logUtil.log(TAG + " Sending request to Server to create Teacher record: : " + teacher);
-        return sendRequestToServer(teacher);
-    }
-
-    @Override
-    public String createSRecord(String id, String fName, String lName, String courses, boolean status, String statusDate) {
-        String studentStr = fName + "," + lName + "," + courses + "," + status + "," + statusDate;
-        String student = OperationsEnum.CREATE_S_RECORD + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
-                + Constants.RECEIVED_DATA_SEPERATOR + id + Constants.RECEIVED_DATA_SEPERATOR + studentStr;
-        logUtil.log(TAG + " Sending request to Server to create student record: : " + student);
-        return sendRequestToServer(student);
-    }
-
-    @Override
-    public String getRecordCounts(String id) {
-        String req = OperationsEnum.GET_REC_COUNT + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
-                + Constants.RECEIVED_DATA_SEPERATOR + id;
-        logUtil.log(TAG + " Sending request to Server for getRecordCount: : " + req);
-        return sendRequestToServer(req);
-    }
-
-    @Override
-    public String editRecord(String id, String recordID, String fieldName, String newValue) {
-        String editData = OperationsEnum.EDIT_RECORD + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
-                + Constants.RECEIVED_DATA_SEPERATOR + id + Constants.RECEIVED_DATA_SEPERATOR + recordID
-                + Constants.RECEIVED_DATA_SEPERATOR + fieldName + Constants.RECEIVED_DATA_SEPERATOR + newValue;
-        logUtil.log(TAG + " Sending request to Server for editRecord: : " + editData);
-        return sendRequestToServer(editData);
-    }
-
-    @Override
-    public String transferRecord(String id, String recordId, String remoteCenterServerName) {
-        String req = OperationsEnum.TRANSFER_RECORD + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
-                + Constants.RECEIVED_DATA_SEPERATOR + id + Constants.RECEIVED_DATA_SEPERATOR + recordId
-                + Constants.RECEIVED_DATA_SEPERATOR + remoteCenterServerName;
-        logUtil.log(TAG + " Sending request to Server for transferRecord: : " + req);
-        return sendRequestToServer(req);
-    }
-
-    @Override
-    public String killPrimaryServer(String id) {
-        String msg = "";
-        if (id.equals("MTL")) {
-            if (isMTLOneAlive && isMTLTwoAlive && isMTLThreeAlive) {
-                isMTLOneAlive = false;
-                primaryMtlServer.pingReceiverThread.setStatus(false);
-                msg = "MTL1 Server is killed " + electNewLeader("MTL1", logUtil);
-            } else {
-                msg = "Primary is already killed!!";
-            }
-        } else if (id.equals("LVL")) {
-            if (isLVLOneAlive && isLVLTwoAlive && isLVLThreeAlive) {
-                isLVLOneAlive = false;
-                primaryLvlServer.pingReceiverThread.setStatus(false);
-                msg = "LVL1 Server is killed " + electNewLeader("LVL1", logUtil);
-            } else {
-                msg = "Primary is already killed!!";
-            }
-        } else if (id.equals("DDO")) {
-            if (isDDOOneAlive && isDDOTwoAlive && isDDOThreeAlive) {
-                isDDOOneAlive = false;
-                primaryDdoServer.pingReceiverThread.setStatus(false);
-                msg = "DDO1 Server is killed " + electNewLeader("DDO1", logUtil);
-            } else {
-                msg = "Primary is already killed!!";
-            }
-        }
-        return msg;
-    }
-
-    public String sendRequestToServer(String data) {
-        try {
-            requestId += 1;
-            DatagramSocket ds = new DatagramSocket();
-            data = data + Constants.RECEIVED_DATA_SEPERATOR + requestId;
-            byte[] dataBytes = data.getBytes();
-            DatagramPacket dp = new DatagramPacket(dataBytes, dataBytes.length,
-                    InetAddress.getByName(Constants.CURRENT_SERVER_IP), Constants.CURRENT_SERVER_UDP_PORT);
-            ds.send(dp);
-
-            logUtil.log(TAG + "New request in buffer with request id : " + requestId);
-            requestBuffer.put(requestId, data);
-            System.out.println("Waiting for acknowledgement from current ca.concordia.dsd.server...");
-            logUtil.log(TAG + "Waiting for acknowledgement from current ca.concordia.dsd.server...");
-            Thread.sleep(Constants.RETRY_TIME);
-            return getResponse(requestId);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return e.getMessage();
-        }
-    }
-
-    public String getResponse(Integer requestId) {
-        try {
-            responsesMap.get(requestId).join();
-        } catch (InterruptedException e) {
-            System.out.println(e.getMessage());
-        }
-        requestBuffer.remove(requestId);
-        return responsesMap.get(requestId).getResponse();
-    }
 }
