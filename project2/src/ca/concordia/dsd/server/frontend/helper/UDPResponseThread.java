@@ -12,14 +12,14 @@ import java.util.HashMap;
 public class UDPResponseThread extends Thread {
 
     private static final String TAG = "|" + UDPResponseThread.class.getSimpleName() + "| ";
-    DatagramSocket serverSocket;
-    DatagramPacket receivePacket;
-    DatagramPacket sendPacket;
-    int udpPortNum;
-    LocationEnum location;
-    String recordCount;
-    HashMap<Integer, ResponseThread> responses;
-    int c;
+    private DatagramSocket serverSocket;
+    private DatagramPacket receivePacket;
+    private DatagramPacket sendPacket;
+    private int udpPortNum;
+    private LocationEnum location;
+    private String recordCount;
+    private HashMap<Integer, ResponseThread> responses;
+    private int c;
     private LogUtil logUtil;
 
     public UDPResponseThread(HashMap<Integer, ResponseThread> responses, LogUtil logUtil) {
@@ -42,9 +42,8 @@ public class UDPResponseThread extends Thread {
                 serverSocket.receive(receivePacket);
                 byte[] receivedData = receivePacket.getData();
                 String inputPkt = new String(receivedData).trim();
-                logUtil.log(TAG + "Received :: " + new String(receivedData));
                 String[] data = inputPkt.split(Constants.RESPONSE_DATA_SEPERATOR);
-                ResponseThread transferResponse = new ResponseThread(data[0]);
+                ResponseThread transferResponse = new ResponseThread(data[0],logUtil);
                 transferResponse.start();
                 responses.put(Integer.parseInt(data[1]), transferResponse);
                 logUtil.log(TAG + "Received " + inputPkt + " from " + location);

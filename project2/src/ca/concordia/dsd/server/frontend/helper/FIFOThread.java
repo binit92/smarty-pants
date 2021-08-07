@@ -14,15 +14,16 @@ import java.util.Queue;
 public class FIFOThread extends Thread {
     private final String TAG = "|" + FIFOThread.class.getSimpleName() + "| ";
 
-    DatagramSocket serverSocket;
-    DatagramPacket receivePacket;
-    DatagramPacket sendPacket;
-    int udpPortNum;
-    LocationEnum location;
-    String recordCount;
-    ArrayList<RequestThread> requests;
-    int c;
-    Queue<String> FIFORequest = new LinkedList<String>();
+    private DatagramSocket serverSocket;
+    private DatagramPacket receivePacket;
+    private DatagramPacket sendPacket;
+    private int udpPortNum;
+    private LocationEnum location;
+    private String recordCount;
+    private ArrayList<RequestThread> requests;
+    private int c;
+    // First In - First Out queue
+    private Queue<String> FIFORequest = new LinkedList<String>();
     private LogUtil logUtil;
 
 

@@ -20,39 +20,9 @@ public class RunAllServers implements Constants {
     private static final String TAG = "|" + RunAllServers.class.getSimpleName() + "| ";
     static corba ref;
 
-    static {
-        try {
-            Runtime.getRuntime()
-                    .exec("orbd -ORBInitialPort 5555 -ORBInitialHost localhost");
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-    }
-
-    private static void init() {
-        new File(Constants.LOG_DIR + File.separator + FRONTEND_TAG).mkdir();
-        new File(Constants.LOG_DIR + File.separator + REPLICA_RESPONSE_TAG).mkdir();
-
-        new File(Constants.LOG_DIR + File.separator + LEADER_TAG).mkdir();
-        new File(Constants.LOG_DIR + File.separator + LEADER_TAG + File.separator + LocationEnum.MTL).mkdir();
-        new File(Constants.LOG_DIR + File.separator + LEADER_TAG + File.separator + LocationEnum.LVL).mkdir();
-        new File(Constants.LOG_DIR + File.separator + LEADER_TAG + File.separator + LocationEnum.DDO).mkdir();
-
-        new File(Constants.LOG_DIR + File.separator + REPLICA1_TAG).mkdir();
-        new File(Constants.LOG_DIR + File.separator + REPLICA1_TAG + File.separator + LocationEnum.MTL).mkdir();
-        new File(Constants.LOG_DIR + File.separator + REPLICA1_TAG + File.separator + LocationEnum.LVL).mkdir();
-        new File(Constants.LOG_DIR + File.separator + REPLICA1_TAG + "\\" + LocationEnum.DDO).mkdir();
-
-        new File(Constants.LOG_DIR + File.separator + REPLICA2_TAG).mkdir();
-        new File(Constants.LOG_DIR + File.separator + REPLICA2_TAG + File.separator + LocationEnum.MTL).mkdir();
-        new File(Constants.LOG_DIR + File.separator + REPLICA2_TAG + File.separator + LocationEnum.LVL).mkdir();
-        new File(Constants.LOG_DIR + File.separator + REPLICA2_TAG + File.separator + LocationEnum.DDO).mkdir();
-    }
-
     public static void main(String[] args) {
         try {
-            init();
+            createLogDirectories();
             ORB orb = ORB.init(args, null);
 
             POA rootpoa = POAHelper
@@ -78,4 +48,36 @@ public class RunAllServers implements Constants {
             System.out.println(TAG + e.getMessage());
         }
     }
+
+
+    static {
+        try {
+            Runtime.getRuntime()
+                    .exec("orbd -ORBInitialPort 5555 -ORBInitialHost localhost");
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
+    private static void createLogDirectories() {
+        new File(Constants.LOG_DIR + File.separator + FRONTEND_TAG).mkdir();
+        new File(Constants.LOG_DIR + File.separator + REPLICA_RESPONSE_TAG).mkdir();
+
+        new File(Constants.LOG_DIR + File.separator + LEADER_TAG).mkdir();
+        new File(Constants.LOG_DIR + File.separator + LEADER_TAG + File.separator + LocationEnum.MTL).mkdir();
+        new File(Constants.LOG_DIR + File.separator + LEADER_TAG + File.separator + LocationEnum.LVL).mkdir();
+        new File(Constants.LOG_DIR + File.separator + LEADER_TAG + File.separator + LocationEnum.DDO).mkdir();
+
+        new File(Constants.LOG_DIR + File.separator + REPLICA1_TAG).mkdir();
+        new File(Constants.LOG_DIR + File.separator + REPLICA1_TAG + File.separator + LocationEnum.MTL).mkdir();
+        new File(Constants.LOG_DIR + File.separator + REPLICA1_TAG + File.separator + LocationEnum.LVL).mkdir();
+        new File(Constants.LOG_DIR + File.separator + REPLICA1_TAG + "\\" + LocationEnum.DDO).mkdir();
+
+        new File(Constants.LOG_DIR + File.separator + REPLICA2_TAG).mkdir();
+        new File(Constants.LOG_DIR + File.separator + REPLICA2_TAG + File.separator + LocationEnum.MTL).mkdir();
+        new File(Constants.LOG_DIR + File.separator + REPLICA2_TAG + File.separator + LocationEnum.LVL).mkdir();
+        new File(Constants.LOG_DIR + File.separator + REPLICA2_TAG + File.separator + LocationEnum.DDO).mkdir();
+    }
+
 }

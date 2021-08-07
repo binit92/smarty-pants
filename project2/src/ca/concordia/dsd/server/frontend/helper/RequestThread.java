@@ -12,10 +12,11 @@ import java.net.InetAddress;
 import java.util.Arrays;
 
 public class RequestThread extends Thread {
-    String currentOperationData;
-    CenterServer server;
-    String response;
-    LogUtil logUtil;
+    private static final String TAG = "|" + RequestThread.class.getSimpleName() + "| ";
+    private String currentOperationData;
+    private CenterServer server;
+    private String response;
+    private LogUtil logUtil;
 
     public RequestThread(byte[] operationData, LogUtil logUtil) {
         this.currentOperationData = new String(operationData);
@@ -24,13 +25,12 @@ public class RequestThread extends Thread {
         this.logUtil = logUtil;
     }
 
-
     public void run() {
         String[] dataArr;
         String[] dataToBeSent = this.currentOperationData.trim().split(Constants.RECEIVED_DATA_SEPERATOR);
         OperationsEnum oprn = OperationsEnum.valueOf(dataToBeSent[0]);
         String requestId = dataToBeSent[dataToBeSent.length - 1];
-        System.out.println("Currently serving request with id :: " + requestId);
+        logUtil.log(TAG + "Processing request id : " + requestId);
 
         switch (oprn) {
             case CREATE_T_RECORD:
@@ -52,7 +52,7 @@ public class RequestThread extends Thread {
                 this.server = chooseServer(dataToBeSent[1]);
                 response = this.server
                         .getRecordCount(dataToBeSent[2] + Constants.RECEIVED_DATA_SEPERATOR + dataToBeSent[3]);
-                System.out.println("Received response here ::::::::::::::::::::::: " + response);
+                logUtil.log(TAG + " GET_REC_COUNT --> response " + response);
                 sendReply(requestId, response);
                 break;
             case EDIT_RECORD:
