@@ -1,0 +1,16 @@
+Aug 07, 2021 3:49:11 AM ca.concordia.dsd.util.LogUtil log
+INFO: createcorba connection tag: MTL name: localhost port: 5555
+Aug 07, 2021 3:49:12 AM ca.concordia.dsd.util.LogUtil log
+INFO: Using managerId : MTL1111
+Aug 07, 2021 3:49:27 AM ca.concordia.dsd.util.LogUtil log
+INFO: MTL1111,unknown,binit,kumar,montreal,123-123-1231,maths,MTL
+Aug 07, 2021 3:49:33 AM ca.concordia.dsd.util.LogUtil log
+INFO: teacher id : TR1 is recorded.
+Aug 07, 2021 3:49:38 AM ca.concordia.dsd.util.LogUtil log
+INFO: Getting record counts from server
+Aug 07, 2021 3:49:43 AM ca.concordia.dsd.util.LogUtil log
+INFO: total number of record : MTL 1 , LVL 0 , DDO 0
+Aug 07, 2021 3:49:43 AM ca.concordia.dsd.util.LogUtil log
+INFO: record count returned
+Aug 07, 2021 3:49:47 AM ca.concordia.dsd.util.LogUtil log
+INFO:  leader server is killed successfully

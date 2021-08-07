@@ -1,0 +1,68 @@
+Aug 07, 2021 3:25:27 AM ca.concordia.dsd.util.LogUtil log
+INFO: |FrontEnd| <FAIL> Primary Server : LVL1 has not reported in last one second
+Aug 07, 2021 3:25:27 AM ca.concordia.dsd.util.LogUtil log
+INFO: |FrontEnd| New elected leader is : LVL3 at datacenter LVL
+Aug 07, 2021 3:25:27 AM ca.concordia.dsd.util.LogUtil log
+INFO: |FrontEnd| <FAIL> Primary Server : LVL3 has not reported in last one second
+Aug 07, 2021 3:25:27 AM ca.concordia.dsd.util.LogUtil log
+INFO: |FrontEnd| New elected leader is : LVL2 at datacenter LVL
+Aug 07, 2021 3:25:29 AM ca.concordia.dsd.util.LogUtil log
+INFO: |FrontEnd| <FAIL> Primary Server : LVL2 has not reported in last one second
+Aug 07, 2021 3:25:29 AM ca.concordia.dsd.util.LogUtil log
+INFO: |FrontEnd| <FAIL> Primary Server : DDO1 has not reported in last one second
+Aug 07, 2021 3:25:29 AM ca.concordia.dsd.util.LogUtil log
+INFO: |FrontEnd| New elected leader is : DDO3 at datacenter DDO
+Aug 07, 2021 3:25:29 AM ca.concordia.dsd.util.LogUtil log
+INFO: |FrontEnd| <FAIL> Primary Server : DDO3 has not reported in last one second
+Aug 07, 2021 3:25:29 AM ca.concordia.dsd.util.LogUtil log
+INFO: |FrontEnd| New elected leader is : DDO2 at datacenter DDO
+Aug 07, 2021 3:25:29 AM ca.concordia.dsd.util.LogUtil log
+INFO: |FrontEnd| <FAIL> Primary Server : MTL1 has not reported in last one second
+Aug 07, 2021 3:25:29 AM ca.concordia.dsd.util.LogUtil log
+INFO: |FrontEnd| New elected leader is : MTL3 at datacenter MTL
+Aug 07, 2021 3:25:29 AM ca.concordia.dsd.util.LogUtil log
+INFO: |FrontEnd| <FAIL> Primary Server : MTL3 has not reported in last one second
+Aug 07, 2021 3:25:29 AM ca.concordia.dsd.util.LogUtil log
+INFO: |FrontEnd| New elected leader is : MTL2 at datacenter MTL
+Aug 07, 2021 3:25:29 AM ca.concordia.dsd.util.LogUtil log
+INFO: |FrontEnd| <FAIL> Primary Server : DDO2 has not reported in last one second
+Aug 07, 2021 3:25:29 AM ca.concordia.dsd.util.LogUtil log
+INFO: |FrontEnd| <FAIL> Primary Server : MTL2 has not reported in last one second
+Aug 07, 2021 3:49:28 AM ca.concordia.dsd.util.LogUtil log
+INFO: |FrontEnd| Forwarding createTRecord operation from frontend to serverCREATE_TR_RECORD,MTL,MTL1111,binit,kumar,montreal,123-123-1231,maths,MTL
+Aug 07, 2021 3:49:28 AM ca.concordia.dsd.util.LogUtil log
+INFO: |FrontEnd| New request in buffer with request id : 1
+Aug 07, 2021 3:49:28 AM ca.concordia.dsd.util.LogUtil log
+INFO: |FrontEnd| Waiting for ACK reply from server: localhost : 3333
+Aug 07, 2021 3:49:28 AM ca.concordia.dsd.util.LogUtil log
+INFO: |FIFOThread| Received CREATE_TR_RECORD,MTL,MTL1111,binit,kumar,montreal,123-123-1231,maths,MTL,1 from null
+Aug 07, 2021 3:49:28 AM ca.concordia.dsd.util.LogUtil log
+INFO: |RequestThread| Processing request id : 1
+Aug 07, 2021 3:49:28 AM ca.concordia.dsd.util.LogUtil log
+INFO: |RequestThread| CREATE_T_RECORD --> data to be sent: MTL
+Aug 07, 2021 3:49:28 AM ca.concordia.dsd.util.LogUtil log
+INFO: |RequestThread| sendReply: requestId: 1 response: TR1
+Aug 07, 2021 3:49:28 AM ca.concordia.dsd.util.LogUtil log
+INFO: |UDPResponseThread| Received TR1_1
+Aug 07, 2021 3:49:28 AM ca.concordia.dsd.util.LogUtil log
+INFO: |ResponseThread|  response: TR1
+Aug 07, 2021 3:49:38 AM ca.concordia.dsd.util.LogUtil log
+INFO: |FrontEnd| Forwarding getRecordCounts operation from frontend to serverGET_RECORD_COUNT,MTL,MTL1111
+Aug 07, 2021 3:49:38 AM ca.concordia.dsd.util.LogUtil log
+INFO: |FrontEnd| New request in buffer with request id : 2
+Aug 07, 2021 3:49:38 AM ca.concordia.dsd.util.LogUtil log
+INFO: |FrontEnd| Waiting for ACK reply from server: localhost : 3333
+Aug 07, 2021 3:49:38 AM ca.concordia.dsd.util.LogUtil log
+INFO: |FIFOThread| Received GET_RECORD_COUNT,MTL,MTL1111,2 from null
+Aug 07, 2021 3:49:38 AM ca.concordia.dsd.util.LogUtil log
+INFO: |RequestThread| Processing request id : 2
+Aug 07, 2021 3:49:41 AM ca.concordia.dsd.util.LogUtil log
+INFO: |RequestThread|  GET_REC_COUNT --> response MTL 1 , LVL 0 , DDO 0
+Aug 07, 2021 3:49:41 AM ca.concordia.dsd.util.LogUtil log
+INFO: |RequestThread| sendReply: requestId: 2 response: MTL 1 , LVL 0 , DDO 0
+Aug 07, 2021 3:49:41 AM ca.concordia.dsd.util.LogUtil log
+INFO: |UDPResponseThread| Received MTL 1 , LVL 0 , DDO 0_2
+Aug 07, 2021 3:49:41 AM ca.concordia.dsd.util.LogUtil log
+INFO: |ResponseThread|  response: MTL 1 , LVL 0 , DDO 0
+Aug 07, 2021 3:49:47 AM ca.concordia.dsd.util.LogUtil log
+INFO: |FrontEnd| New elected leader is : MTL3 at datacenter MTL
