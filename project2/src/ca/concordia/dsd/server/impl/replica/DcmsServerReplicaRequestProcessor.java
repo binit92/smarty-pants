@@ -79,7 +79,7 @@ public class DcmsServerReplicaRequestProcessor extends Thread {
     }
 
     private synchronized CenterServer chooseServer(int replicaId, String loc) {
-        return FrontEnd.centralRepository.get(replicaId).get(loc);
+        return FrontEnd.repo.get(replicaId).get(loc);
     }
 
     private synchronized void sendReply(String response) {

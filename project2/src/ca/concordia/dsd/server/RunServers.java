@@ -22,7 +22,7 @@ public class RunServers {
     static {
         try {
             Runtime.getRuntime()
-                    .exec("orbd -ORBInitialPort 1050 -ORBInitialHost localhost");
+                    .exec("orbd -ORBInitialPort 5555 -ORBInitialHost localhost");
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);

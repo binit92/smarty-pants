@@ -30,7 +30,7 @@ public class DcmsServerPrepareReplicasRequest {
         requestBuffer = new HashMap<>();
         requestId = 0;
         this.replicaID = replicaID;
-        this.logger = logger;
+        this.logger = logUtil;
     }
 
 

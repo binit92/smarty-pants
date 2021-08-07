@@ -11,7 +11,7 @@ public class ResponseThread extends Thread {
 
     public void run() {
         System.out.println("=============" + this.response);
-        FrontEnd.receivedResponses.add(this.response);
+        FrontEnd.receivedResponsesArraylist.add(this.response);
     }
 
     public String getResponse() {

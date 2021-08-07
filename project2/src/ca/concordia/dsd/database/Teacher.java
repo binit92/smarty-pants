@@ -3,44 +3,29 @@ package ca.concordia.dsd.database;
 import java.io.Serializable;
 
 public class Teacher extends Record implements Serializable {
-    String firstName;
-    String lastName;
-    String Address;
-    String phone;
-    String specilization;
-    String location;
-    String TeacherID;
-    String ManagerID;
-
-    public Teacher() {
-
-    }
-
-    public Teacher(String managerID, String teacherID, String firstName,
-                   String lastname, String address, String phone, String Specialization,
-                   String location) {
-        super(teacherID, firstName, lastname);
-        this.setManagerID(managerID);
-        this.setAddress(address);
-        this.setPhone(phone);
-        this.setSpecilization(Specialization);
-        this.setLocation(location);
-    }
+    private String FirstName;
+    private String LastName;
+    private String Address;
+    private String Phone;
+    private String Specialization;
+    private String Location;
+    private String TeacherID;
+    private String ManagerID;
 
     public String getFirstName() {
-        return firstName;
+        return FirstName;
     }
 
     public void setFirstName(String firstName) {
-        this.firstName = firstName;
+        this.FirstName = firstName;
     }
 
     public String getLastName() {
-        return lastName;
+        return LastName;
     }
 
     public void setLastName(String lastName) {
-        this.lastName = lastName;
+        this.LastName = lastName;
     }
 
     public String getAddress() {
@@ -52,35 +37,27 @@ public class Teacher extends Record implements Serializable {
     }
 
     public String getPhone() {
-        return phone;
+        return Phone;
     }
 
     public void setPhone(String phone) {
-        this.phone = phone;
+        this.Phone = phone;
     }
 
-    public String getSpecilization() {
-        return specilization;
+    public String getSpecialization() {
+        return Specialization;
     }
 
-    public void setSpecilization(String specilization) {
-        this.specilization = specilization;
+    public void setSpecialization(String specialization) {
+        this.Specialization = specialization;
     }
 
     public String getLocation() {
-        return location;
+        return Location;
     }
 
     public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public String getTeacherID() {
-        return TeacherID;
-    }
-
-    public void setTeacherID(String teacherID) {
-        TeacherID = teacherID;
+        this.Location = location;
     }
 
     public String getManagerID() {
@@ -93,16 +70,24 @@ public class Teacher extends Record implements Serializable {
 
     @Override
     public String toString() {
-        return this.getManagerID() + "," + this.getRecordID() + ","
-                + this.getFirstName() + "," + this.getLastName() + ","
-                + this.getAddress() + "," + this.getPhone() + ","
-                + this.getSpecilization() + "," + this.getLocation();
+        return this.getManagerID() + ","
+                + this.getRecordID() + ","
+                + this.getFirstName() + ","
+                + this.getLastName() + ","
+                + this.getAddress() + ","
+                + this.getPhone() + ","
+                + this.getSpecialization() + ","
+                + this.getLocation();
     }
 
-    public String serialize() {
-        return "Teacher" + getManagerID() + getRecordID() + "," + getFirstName()
-                + "," + getLastName() + "," + getAddress() + "," + getPhone() + ","
-                + getSpecilization() + "," + getLocation();
+    public Teacher(String managerID, String teacherID, String firstName,
+                   String lastname, String address, String phone, String Specialization,
+                   String location) {
+        super(teacherID, firstName, lastname);
+        this.setManagerID(managerID);
+        this.setAddress(address);
+        this.setPhone(phone);
+        this.setSpecialization(Specialization);
+        this.setLocation(location);
     }
-
 }

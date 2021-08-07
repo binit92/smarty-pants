@@ -24,117 +24,60 @@ import java.util.List;
 import java.util.Map;
 
 
-public class FrontEnd extends corbaPOA {
+public class FrontEnd extends corbaPOA implements Constants {
     private static final String TAG = "|" + FrontEnd.class.getSimpleName() + "| ";
-    public static HashMap<Integer, ResponseThread> responses;
-    public static ArrayList<String> receivedResponses;
-    public static HashMap<String, CenterServer> primaryServerMap, replica1ServerMap, replica2ServerMap;
-    public static HashMap<Integer, HashMap<String, CenterServer>> centralRepository;
-    public static HashMap<String, Boolean> server_leader_status = new HashMap<>();
-    public static HashMap<String, Long> server_last_updated_time = new HashMap<>();
+    public static HashMap<Integer, ResponseThread> responsesMap;
+    public static ArrayList<String> receivedResponsesArraylist;
+    public static HashMap<String, CenterServer> primaryMap, replicaOneMap, replicaTwoMap;
+    public static HashMap<Integer, HashMap<String, CenterServer>> repo;
+    public static HashMap<String, Boolean> statusMap = new HashMap<>();
+    public static HashMap<String, Long> reportingMap = new HashMap<>();
 
-    static boolean s1_MTL_sender_isAlive = true;
-    static boolean s2_MTL_sender_isAlive = true;
-    static boolean s3_MTL_sender_isAlive = true;
-    static boolean s1_LVL_sender_isAlive = true;
-    static boolean s2_LVL_sender_isAlive = true;
-    static boolean s3_LVL_sender_isAlive = true;
-    static boolean s1_DDO_sender_isAlive = true;
-    static boolean s2_DDO_sender_isAlive = true;
-    static boolean s3_DDO_sender_isAlive = true;
-    static int TIME_OUT = 1000;
-    static int LEADER_ID = 100;
-    static int S1_ID = 1;
-    static int S2_ID = 2;
-    static int S3_ID = 3;
-    static Object mapAccessor = new Object();
-    static HashMap<String, Integer> currentIds = new HashMap<>();
-    private static LogUtil logManager;
+    private static boolean isMTLOneAlive = true;
+    private static boolean isMTLTwoAlive = true;
+    private static boolean isMTLThreeAlive = true;
+    private static boolean isLVLOneAlive = true;
+    private static boolean isLVLTwoAlive = true;
+    private static boolean isLVLThreeAlive = true;
+    private static boolean isDDOOneAlive = true;
+    private static boolean isDDOTwoAlive = true;
+    private static boolean isDDOThreeAlive = true;
+    private static int ONE_SECOND_TIMEOUT = 1000;
+    private static int LEADER_ID = 100;
+    private static int S1_ID = 1;
+    private static int S2_ID = 2;
+    private static int S3_ID = 3;
+    private static Object lock = new Object();
+    private static HashMap<String, Integer> ServerIDMap = new HashMap<>();
+    private static LogUtil logUtil;
+    private LogUtil ackManager;
     public HashMap<String, List<Record>> recordsMap;
-    LogUtil ackManager;
-    String IPaddress;
-    int studentCount = 0;
-    int teacherCount = 0;
-    String recordsCount;
-    String id;
-    Integer requestId;
-    HashMap<Integer, String> requestBuffer;
-    ArrayList<RequestThread> requests;
-    MultiCastReceiverThread primaryReceiver, replica1Receiver, replica2Receiver;
-    DcmsServerReplicaResponseReceiver replicaResponseReceiver;
-    Object crlock = new Object();
-    CenterServer s1, s2, s3;
-    CenterServer primaryMtlServer;
-    CenterServer primaryLvlServer;
-    CenterServer primaryDdoServer;
-    int s1_MTL_receive_port = 5431;
-    int s2_MTL_receive_port = 5432;
-    int s3_MTL_receive_port = 5433;
-    int s1_LVL_receive_port = 5441;
-    int s2_LVL_receive_port = 5442;
-    int s3_LVL_receive_port = 5443;
-    int s1_DDO_receive_port = 5451;
-    int s2_DDO_receive_port = 5452;
-    int s3_DDO_receive_port = 5453;
-    String MTLserverName1 = "MTL1";
-    String MTLserverName2 = "MTL2";
-    String MTLserverName3 = "MTL3";
-    String LVLserverName1 = "LVL1";
-    String LVLserverName2 = "LVL2";
-    String LVLserverName3 = "LVL3";
-    String DDOserverName1 = "DDO1";
-    String DDOserverName2 = "DDO2";
-    String DDOserverName3 = "DDO3";
+
+    private Integer requestId;
+    private HashMap<Integer, String> requestBuffer;
+    private ArrayList<RequestThread> requests;
+    private MultiCastReceiverThread primaryReceiver, replica1Receiver, replica2Receiver;
+    private DcmsServerReplicaResponseReceiver replicaResponseReceiver;
+
+    private CenterServer primaryMtlServer,primaryLvlServer,primaryDdoServer;
 
 
     public FrontEnd() {
-        logManager = new LogUtil("ServerFE");
+        logUtil = new LogUtil("ServerFE");
 
         recordsMap = new HashMap<>();
         requests = new ArrayList<>();
-        responses = new HashMap<>();
+        responsesMap = new HashMap<>();
         requestBuffer = new HashMap<>();
-        receivedResponses = new ArrayList<>();
-        FIFOThread udpReceiverFromFE = new FIFOThread(requests);
-        udpReceiverFromFE.start();
-        UDPResponseThread udpResponse = new UDPResponseThread(responses);
-        udpResponse.start();
+        receivedResponsesArraylist = new ArrayList<>();
 
-        centralRepository = new HashMap<>();
-        primaryServerMap = new HashMap<>();
-        replica1ServerMap = new HashMap<>();
-        replica2ServerMap = new HashMap<>();
+        repo = new HashMap<>();
+        primaryMap = new HashMap<>();
+        replicaOneMap = new HashMap<>();
+        replicaTwoMap = new HashMap<>();
         requestId = 0;
 
-        server_leader_status.put(MTLserverName1, true);
-        server_leader_status.put(LVLserverName1, true);
-        server_leader_status.put(DDOserverName1, true);
-        server_leader_status.put(MTLserverName2, false);
-        server_leader_status.put(LVLserverName2, false);
-        server_leader_status.put(DDOserverName2, false);
-        server_leader_status.put(MTLserverName3, false);
-        server_leader_status.put(LVLserverName3, false);
-        server_leader_status.put(DDOserverName3, false);
 
-        currentIds.put(MTLserverName1, LEADER_ID);
-        currentIds.put(MTLserverName2, S2_ID);
-        currentIds.put(MTLserverName3, S3_ID);
-        currentIds.put(LVLserverName1, LEADER_ID);
-        currentIds.put(LVLserverName2, S2_ID);
-        currentIds.put(LVLserverName3, S3_ID);
-        currentIds.put(DDOserverName1, LEADER_ID);
-        currentIds.put(DDOserverName2, S2_ID);
-        currentIds.put(DDOserverName3, S3_ID);
-
-        server_last_updated_time.put(MTLserverName1, System.nanoTime() / 1000000);
-        server_last_updated_time.put(MTLserverName2, System.nanoTime() / 1000000);
-        server_last_updated_time.put(MTLserverName3, System.nanoTime() / 1000000);
-        server_last_updated_time.put(LVLserverName1, System.nanoTime() / 1000000);
-        server_last_updated_time.put(LVLserverName2, System.nanoTime() / 1000000);
-        server_last_updated_time.put(LVLserverName3, System.nanoTime() / 1000000);
-        server_last_updated_time.put(DDOserverName1, System.nanoTime() / 1000000);
-        server_last_updated_time.put(DDOserverName2, System.nanoTime() / 1000000);
-        server_last_updated_time.put(DDOserverName3, System.nanoTime() / 1000000);
 
         init();
     }
@@ -145,15 +88,15 @@ public class FrontEnd extends corbaPOA {
     }
 
     private static synchronized void checkServerStatus(String serverName) {
-        synchronized (mapAccessor) {
-            long currentTime = System.nanoTime() / 1000000;
-            if (server_last_updated_time.containsKey(serverName)) {
-                if (currentTime - server_last_updated_time.get(serverName) > TIME_OUT) {
-                    if (server_leader_status.containsKey(serverName)) {
-                        if (server_leader_status.get(serverName)) {
+        synchronized (lock) {
+            long currentTime = System.currentTimeMillis();
+            if (reportingMap.containsKey(serverName)) {
+                if (currentTime - reportingMap.get(serverName) > ONE_SECOND_TIMEOUT) {
+                    if (statusMap.containsKey(serverName)) {
+                        if (statusMap.get(serverName)) {
                             System.out.println(serverName + " Leader Failed Found!!!");
-                            logManager.log(TAG + serverName + " Leader Failed Found!!!");
-                            electNewLeader(serverName, logManager);
+                            logUtil.log(TAG + serverName + " Leader Failed Found!!!");
+                            electNewLeader(serverName, logUtil);
                         }
                     }
                 }
@@ -162,31 +105,31 @@ public class FrontEnd extends corbaPOA {
     }
 
     private static String electNewLeader(String oldLeader, LogUtil logManager) {
-        server_leader_status.remove(oldLeader);
-        server_last_updated_time.remove(oldLeader);
-        currentIds.remove(oldLeader);
+        statusMap.remove(oldLeader);
+        reportingMap.remove(oldLeader);
+        ServerIDMap.remove(oldLeader);
         String loc = oldLeader.substring(0, 3);
         Map.Entry<String, Integer> maxEntry = null;
-        for (Map.Entry<String, Integer> entry : currentIds.entrySet()) {
+        for (Map.Entry<String, Integer> entry : ServerIDMap.entrySet()) {
             if (entry.getKey().contains(loc)) {
                 if (maxEntry == null || entry.getValue().compareTo(maxEntry.getValue()) > 0) {
                     maxEntry = entry;
                 }
             }
         }
-        server_leader_status.put(maxEntry.getKey(), true);
-        currentIds.put(maxEntry.getKey(), LEADER_ID);
+        statusMap.put(maxEntry.getKey(), true);
+        ServerIDMap.put(maxEntry.getKey(), LEADER_ID);
         logManager.log(TAG + "++++Elected new leader :: " + maxEntry.getKey() + " in the location" + loc);
         HashMap<String, CenterServer> replaceserver = new HashMap<String, CenterServer>();
-        synchronized (centralRepository) {
-            replaceserver = centralRepository.get(Constants.PRIMARY_SERVER_ID);
+        synchronized (repo) {
+            replaceserver = repo.get(Constants.PRIMARY_SERVER_ID);
         }
         if (maxEntry.getKey().contains("2")) {
             ArrayList<Integer> replicas = new ArrayList<>();
             replicas.add(Constants.REPLICA2_SERVER_ID);
             HashMap<String, CenterServer> getnewserver = new HashMap<String, CenterServer>();
-            synchronized (centralRepository) {
-                getnewserver = centralRepository.get(Constants.REPLICA1_SERVER_ID);
+            synchronized (repo) {
+                getnewserver = repo.get(Constants.REPLICA1_SERVER_ID);
             }
             CenterServer newPrimary = getnewserver.get(loc);
             newPrimary.setPrimary(true);
@@ -196,44 +139,44 @@ public class FrontEnd extends corbaPOA {
             replaceserver.remove(loc);
 
             replaceserver.put(loc, newPrimary);
-            synchronized (centralRepository) {
-                centralRepository.put(Constants.PRIMARY_SERVER_ID, replaceserver);
+            synchronized (repo) {
+                repo.put(Constants.PRIMARY_SERVER_ID, replaceserver);
             }
             getnewserver.remove(loc);
-            synchronized (centralRepository) {
-                centralRepository.put(Constants.REPLICA1_SERVER_ID, getnewserver);
+            synchronized (repo) {
+                repo.put(Constants.REPLICA1_SERVER_ID, getnewserver);
             }
-            HashMap<String, CenterServer> replicamap = centralRepository.get(Constants.REPLICA2_SERVER_ID);
+            HashMap<String, CenterServer> replicamap = repo.get(Constants.REPLICA2_SERVER_ID);
             CenterServer replica = replicamap.get(loc);
             replica.setReplicas(replicas);
             replicamap.put(loc, replica);
-            synchronized (centralRepository) {
-                centralRepository.put(Constants.REPLICA2_SERVER_ID, replicamap);
+            synchronized (repo) {
+                repo.put(Constants.REPLICA2_SERVER_ID, replicamap);
             }
 
         } else if (maxEntry.getKey().contains("3")) {
             ArrayList<Integer> replicas = new ArrayList<>();
             replicas.add(Constants.REPLICA1_SERVER_ID);
-            HashMap<String, CenterServer> getnewserver = centralRepository.get(Constants.REPLICA2_SERVER_ID);
+            HashMap<String, CenterServer> getnewserver = repo.get(Constants.REPLICA2_SERVER_ID);
             CenterServer newPrimary = getnewserver.get(loc);
             newPrimary.setPrimary(true);
             newPrimary.setReplicas(replicas);
             newPrimary.setServerID(Constants.PRIMARY_SERVER_ID);
 
             replaceserver.put(loc, newPrimary);
-            synchronized (centralRepository) {
-                centralRepository.put(Constants.PRIMARY_SERVER_ID, replaceserver);
+            synchronized (repo) {
+                repo.put(Constants.PRIMARY_SERVER_ID, replaceserver);
             }
             getnewserver.remove(loc);
-            synchronized (centralRepository) {
-                centralRepository.put(Constants.REPLICA2_SERVER_ID, getnewserver);
+            synchronized (repo) {
+                repo.put(Constants.REPLICA2_SERVER_ID, getnewserver);
             }
-            HashMap<String, CenterServer> replicamap = centralRepository.get(Constants.REPLICA1_SERVER_ID);
+            HashMap<String, CenterServer> replicamap = repo.get(Constants.REPLICA1_SERVER_ID);
             CenterServer replica = replicamap.get(loc);
             replica.setReplicas(replicas);
             replicamap.put(loc, replica);
-            synchronized (centralRepository) {
-                centralRepository.put(Constants.REPLICA1_SERVER_ID, replicamap);
+            synchronized (repo) {
+                repo.put(Constants.REPLICA1_SERVER_ID, replicamap);
             }
         }
         System.out.println("Elected new leader :: " + maxEntry.getKey() + " in the location" + loc);
@@ -242,23 +185,23 @@ public class FrontEnd extends corbaPOA {
 
     private static boolean getStatus(String name) {
         if (name.equals("MTL1")) {
-            return s1_MTL_sender_isAlive;
+            return isMTLOneAlive;
         } else if (name.equals("MTL2")) {
-            return s2_MTL_sender_isAlive;
+            return isMTLTwoAlive;
         } else if (name.equals("MTL3")) {
-            return s3_MTL_sender_isAlive;
+            return isMTLThreeAlive;
         } else if (name.equals("LVL1")) {
-            return s1_LVL_sender_isAlive;
+            return isLVLOneAlive;
         } else if (name.equals("LVL2")) {
-            return s2_LVL_sender_isAlive;
+            return isLVLTwoAlive;
         } else if (name.equals("LVL3")) {
-            return s3_LVL_sender_isAlive;
+            return isLVLThreeAlive;
         } else if (name.equals("DDO1")) {
-            return s1_DDO_sender_isAlive;
+            return isDDOOneAlive;
         } else if (name.equals("DDO2")) {
-            return s2_DDO_sender_isAlive;
+            return isDDOTwoAlive;
         } else if (name.equals("DDO3")) {
-            return s3_DDO_sender_isAlive;
+            return isDDOThreeAlive;
         }
         return false;
     }
@@ -266,141 +209,175 @@ public class FrontEnd extends corbaPOA {
     public void init() {
         try {
 
+            statusMap.put(MTL1, true);
+            statusMap.put(LVL1, true);
+            statusMap.put(DDO1, true);
+            statusMap.put(MTL2, false);
+            statusMap.put(LVL2, false);
+            statusMap.put(DDO2, false);
+            statusMap.put(MTL3, false);
+            statusMap.put(LVL3, false);
+            statusMap.put(DDO3, false);
+
+            ServerIDMap.put(MTL1, LEADER_ID);
+            ServerIDMap.put(MTL2, S2_ID);
+            ServerIDMap.put(MTL3, S3_ID);
+            ServerIDMap.put(LVL1, LEADER_ID);
+            ServerIDMap.put(LVL2, S2_ID);
+            ServerIDMap.put(LVL3, S3_ID);
+            ServerIDMap.put(DDO1, LEADER_ID);
+            ServerIDMap.put(DDO2, S2_ID);
+            ServerIDMap.put(DDO3, S3_ID);
+
+            reportingMap.put(MTL1, System.currentTimeMillis());
+            reportingMap.put(MTL2, System.currentTimeMillis());
+            reportingMap.put(MTL3, System.currentTimeMillis());
+            reportingMap.put(LVL1, System.currentTimeMillis());
+            reportingMap.put(LVL2, System.currentTimeMillis());
+            reportingMap.put(LVL3, System.currentTimeMillis());
+            reportingMap.put(DDO1, System.currentTimeMillis());
+            reportingMap.put(DDO2, System.currentTimeMillis());
+            reportingMap.put(DDO3, System.currentTimeMillis());
+
             ArrayList<Integer> replicas = new ArrayList<>();
             replicas.add(Constants.REPLICA1_SERVER_ID);
             replicas.add(Constants.REPLICA2_SERVER_ID);
-            boolean isPrimary = true;
-            primaryReceiver = new MultiCastReceiverThread(isPrimary, ackManager);
-            primaryReceiver.start();
+
+            startFIFOThread();
+            startUDPResponseThread();
+            startMultiCastReceiverThread();
+
+
+
 
             replicaResponseReceiver = new DcmsServerReplicaResponseReceiver(new LogUtil("ReplicasResponse"));
             replicaResponseReceiver.start();
             DatagramSocket socket1 = new DatagramSocket();
 
-            primaryMtlServer = new CenterServer(Constants.PRIMARY_SERVER_ID, isPrimary, LocationEnum.MTL,
-                    9999, socket1, s1_MTL_sender_isAlive, MTLserverName1, s1_MTL_receive_port, s2_MTL_receive_port,
-                    s3_MTL_receive_port, replicas, getLogInstance("PRIMARY_SERVER", LocationEnum.MTL));
+            primaryMtlServer = new CenterServer(Constants.PRIMARY_SERVER_ID, true, LocationEnum.MTL,
+                    9999, socket1, isMTLOneAlive, MTL1, MTL1_PORT, MTL2_PORT,
+                    MTL3_PORT, replicas, getLogInstance("PRIMARY_SERVER", LocationEnum.MTL));
 
-            primaryLvlServer = new CenterServer(Constants.PRIMARY_SERVER_ID, isPrimary, LocationEnum.LVL,
-                    7777, socket1, s1_LVL_sender_isAlive, LVLserverName1, s1_LVL_receive_port, s2_LVL_receive_port,
-                    s3_LVL_receive_port, replicas, getLogInstance("PRIMARY_SERVER", LocationEnum.LVL));
+            primaryLvlServer = new CenterServer(Constants.PRIMARY_SERVER_ID, true, LocationEnum.LVL,
+                    7777, socket1, isLVLOneAlive, LVL1, LVL1_PORT, LVL2_PORT,
+                    LVL3_PORT, replicas, getLogInstance("PRIMARY_SERVER", LocationEnum.LVL));
 
-            primaryDdoServer = new CenterServer(Constants.PRIMARY_SERVER_ID, isPrimary, LocationEnum.DDO,
-                    6666, socket1, s1_DDO_sender_isAlive, DDOserverName1, s1_DDO_receive_port, s2_DDO_receive_port,
-                    s3_DDO_receive_port, replicas, getLogInstance("PRIMARY_SERVER", LocationEnum.DDO));
+            primaryDdoServer = new CenterServer(Constants.PRIMARY_SERVER_ID, true, LocationEnum.DDO,
+                    6666, socket1, isDDOOneAlive, DDO1, DDO1_PORT, DDO2_PORT,
+                    DDO3_PORT, replicas, getLogInstance("PRIMARY_SERVER", LocationEnum.DDO));
 
-            primaryServerMap.put("MTL", primaryMtlServer);
-            primaryServerMap.put("LVL", primaryLvlServer);
-            primaryServerMap.put("DDO", primaryDdoServer);
+            primaryMap.put("MTL", primaryMtlServer);
+            primaryMap.put("LVL", primaryLvlServer);
+            primaryMap.put("DDO", primaryDdoServer);
 
             replica1Receiver = new MultiCastReceiverThread(false, ackManager);
             replica1Receiver.start();
 
             DatagramSocket socket2 = new DatagramSocket();
             CenterServer replica1MtlServer = new CenterServer(Constants.REPLICA1_SERVER_ID, false,
-                    LocationEnum.MTL, 5555, socket2, s2_MTL_sender_isAlive, MTLserverName2, s2_MTL_receive_port,
-                    s1_MTL_receive_port, s3_MTL_receive_port, replicas,
+                    LocationEnum.MTL, 5555, socket2, isMTLTwoAlive, MTL2, MTL2_PORT,
+                    MTL1_PORT, MTL3_PORT, replicas,
                     getLogInstance("REPLICA1_SERVER", LocationEnum.MTL));
 
             CenterServer replica1LvlServer = new CenterServer(Constants.REPLICA1_SERVER_ID, false,
-                    LocationEnum.LVL, 4444, socket2, s2_LVL_sender_isAlive, LVLserverName2, s2_LVL_receive_port,
-                    s1_LVL_receive_port, s3_LVL_receive_port, replicas,
+                    LocationEnum.LVL, 4444, socket2, isLVLTwoAlive, LVL2, LVL2_PORT,
+                    LVL1_PORT, LVL3_PORT, replicas,
                     getLogInstance("REPLICA1_SERVER", LocationEnum.LVL));
 
             CenterServer replica1DdoServer = new CenterServer(Constants.REPLICA1_SERVER_ID, false,
-                    LocationEnum.DDO, 2222, socket2, s2_DDO_sender_isAlive, DDOserverName2, s2_DDO_receive_port,
-                    s1_DDO_receive_port, s3_DDO_receive_port, replicas,
+                    LocationEnum.DDO, 2222, socket2, isDDOTwoAlive, DDO2, DDO2_PORT,
+                    DDO1_PORT, DDO3_PORT, replicas,
                     getLogInstance("REPLICA1_SERVER", LocationEnum.DDO));
 
-            replica1ServerMap.put("MTL", replica1MtlServer);
-            replica1ServerMap.put("LVL", replica1LvlServer);
-            replica1ServerMap.put("DDO", replica1DdoServer);
+            replicaOneMap.put("MTL", replica1MtlServer);
+            replicaOneMap.put("LVL", replica1LvlServer);
+            replicaOneMap.put("DDO", replica1DdoServer);
 
             DatagramSocket socket3 = new DatagramSocket();
             CenterServer replica2MtlServer = new CenterServer(Constants.REPLICA2_SERVER_ID, false,
-                    LocationEnum.MTL, 9878, socket3, s3_MTL_sender_isAlive, MTLserverName3, s3_MTL_receive_port,
-                    s1_MTL_receive_port, s2_MTL_receive_port, replicas,
+                    LocationEnum.MTL, 9878, socket3, isMTLThreeAlive, MTL3, MTL3_PORT,
+                    MTL1_PORT, MTL2_PORT, replicas,
                     getLogInstance("REPLICA2_SERVER", LocationEnum.MTL));
 
             CenterServer replica2LvlServer = new CenterServer(Constants.REPLICA2_SERVER_ID, false,
-                    LocationEnum.LVL, 9701, socket3, s3_LVL_sender_isAlive, LVLserverName3, s3_LVL_receive_port,
-                    s1_LVL_receive_port, s2_LVL_receive_port, replicas,
+                    LocationEnum.LVL, 9701, socket3, isLVLThreeAlive, LVL3, LVL3_PORT,
+                    LVL1_PORT, LVL2_PORT, replicas,
                     getLogInstance("REPLICA2_SERVER", LocationEnum.LVL));
 
             CenterServer replica2DdoServer = new CenterServer(Constants.REPLICA2_SERVER_ID, false,
-                    LocationEnum.DDO, 5655, socket3, s3_DDO_sender_isAlive, DDOserverName3, s3_DDO_receive_port,
-                    s1_DDO_receive_port, s2_DDO_receive_port, replicas,
+                    LocationEnum.DDO, 5655, socket3, isDDOThreeAlive, DDO3, DDO3_PORT,
+                    DDO1_PORT, DDO2_PORT, replicas,
                     getLogInstance("REPLICA2_SERVER", LocationEnum.DDO));
 
-            replica2ServerMap.put("MTL", replica2MtlServer);
-            replica2ServerMap.put("LVL", replica2LvlServer);
-            replica2ServerMap.put("DDO", replica2DdoServer);
+            replicaTwoMap.put("MTL", replica2MtlServer);
+            replicaTwoMap.put("LVL", replica2LvlServer);
+            replicaTwoMap.put("DDO", replica2DdoServer);
 
-            synchronized (centralRepository) {
-                centralRepository.put(Constants.PRIMARY_SERVER_ID, primaryServerMap);
-                centralRepository.put(Constants.REPLICA1_SERVER_ID, replica1ServerMap);
-                centralRepository.put(Constants.REPLICA2_SERVER_ID, replica2ServerMap);
+            synchronized (repo) {
+                repo.put(Constants.PRIMARY_SERVER_ID, primaryMap);
+                repo.put(Constants.REPLICA1_SERVER_ID, replicaOneMap);
+                repo.put(Constants.REPLICA2_SERVER_ID, replicaTwoMap);
             }
 
             Thread thread1 = new Thread() {
                 public void run() {
-                    while (getStatus(MTLserverName1)) {
+                    while (getStatus(MTL1)) {
                         primaryMtlServer.send();
                     }
                 }
             };
             Thread thread2 = new Thread() {
                 public void run() {
-                    while (getStatus(MTLserverName2)) {
+                    while (getStatus(MTL2)) {
                         replica1MtlServer.send();
                     }
                 }
             };
             Thread thread3 = new Thread() {
                 public void run() {
-                    while (getStatus(MTLserverName3)) {
+                    while (getStatus(MTL3)) {
                         replica2MtlServer.send();
                     }
                 }
             };
             Thread thread4 = new Thread() {
                 public void run() {
-                    while (getStatus(LVLserverName1)) {
+                    while (getStatus(LVL1)) {
                         primaryLvlServer.send();
                     }
                 }
             };
             Thread thread5 = new Thread() {
                 public void run() {
-                    while (getStatus(LVLserverName2)) {
+                    while (getStatus(LVL2)) {
                         replica1LvlServer.send();
                     }
                 }
             };
             Thread thread6 = new Thread() {
                 public void run() {
-                    while (getStatus(LVLserverName3)) {
+                    while (getStatus(LVL3)) {
                         replica2LvlServer.send();
                     }
                 }
             };
             Thread thread7 = new Thread() {
                 public void run() {
-                    while (getStatus(DDOserverName1)) {
+                    while (getStatus(DDO1)) {
                         primaryDdoServer.send();
                     }
                 }
             };
             Thread thread8 = new Thread() {
                 public void run() {
-                    while (getStatus(DDOserverName2)) {
+                    while (getStatus(DDO2)) {
                         replica1DdoServer.send();
                     }
                 }
             };
             Thread thread9 = new Thread() {
                 public void run() {
-                    while (getStatus(DDOserverName3)) {
+                    while (getStatus(DDO3)) {
                         replica2DdoServer.send();
                     }
                 }
@@ -437,6 +414,21 @@ public class FrontEnd extends corbaPOA {
         }
     }
 
+    private void startFIFOThread(){
+        FIFOThread udpReceiverFromFE = new FIFOThread(requests);
+        udpReceiverFromFE.start();
+    }
+
+    private void startUDPResponseThread(){
+        UDPResponseThread udpResponse = new UDPResponseThread(responsesMap);
+        udpResponse.start();
+    }
+
+    private void startMultiCastReceiverThread(){
+        primaryReceiver = new MultiCastReceiverThread(true, ackManager);
+        primaryReceiver.start();
+    }
+
     private String getServerLoc(String managerID) {
         return managerID.substring(0, 3);
     }
@@ -447,7 +439,7 @@ public class FrontEnd extends corbaPOA {
                 + address + "," + phone + "," + specialization + "," + location;
         String teacher = OperationsEnum.CREATE_T_RECORD + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
                 + Constants.RECEIVED_DATA_SEPERATOR + id + Constants.RECEIVED_DATA_SEPERATOR + teacherStr;
-        logManager.log(TAG + " Sending request to Server to create Teacher record: : " + teacher);
+        logUtil.log(TAG + " Sending request to Server to create Teacher record: : " + teacher);
         return sendRequestToServer(teacher);
     }
 
@@ -456,7 +448,7 @@ public class FrontEnd extends corbaPOA {
         String studentStr = fName + "," + lName + "," + courses + "," + status + "," + statusDate;
         String student = OperationsEnum.CREATE_S_RECORD + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
                 + Constants.RECEIVED_DATA_SEPERATOR + id + Constants.RECEIVED_DATA_SEPERATOR + studentStr;
-        logManager.log(TAG + " Sending request to Server to create student record: : " + student);
+        logUtil.log(TAG + " Sending request to Server to create student record: : " + student);
         return sendRequestToServer(student);
     }
 
@@ -464,7 +456,7 @@ public class FrontEnd extends corbaPOA {
     public String getRecordCounts(String id) {
         String req = OperationsEnum.GET_REC_COUNT + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
                 + Constants.RECEIVED_DATA_SEPERATOR + id;
-        logManager.log(TAG + " Sending request to Server for getRecordCount: : " + req);
+        logUtil.log(TAG + " Sending request to Server for getRecordCount: : " + req);
         return sendRequestToServer(req);
     }
 
@@ -473,7 +465,7 @@ public class FrontEnd extends corbaPOA {
         String editData = OperationsEnum.EDIT_RECORD + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
                 + Constants.RECEIVED_DATA_SEPERATOR + id + Constants.RECEIVED_DATA_SEPERATOR + recordID
                 + Constants.RECEIVED_DATA_SEPERATOR + fieldName + Constants.RECEIVED_DATA_SEPERATOR + newValue;
-        logManager.log(TAG + " Sending request to Server for editRecord: : " + editData);
+        logUtil.log(TAG + " Sending request to Server for editRecord: : " + editData);
         return sendRequestToServer(editData);
     }
 
@@ -482,34 +474,34 @@ public class FrontEnd extends corbaPOA {
         String req = OperationsEnum.TRANSFER_RECORD + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(id)
                 + Constants.RECEIVED_DATA_SEPERATOR + id + Constants.RECEIVED_DATA_SEPERATOR + recordId
                 + Constants.RECEIVED_DATA_SEPERATOR + remoteCenterServerName;
-        logManager.log(TAG + " Sending request to Server for transferRecord: : " + req);
+        logUtil.log(TAG + " Sending request to Server for transferRecord: : " + req);
         return sendRequestToServer(req);
     }
 
     @Override
     public String killPrimaryServer(String id) {
         String msg = "";
-        if (this.id.equals("MTL")) {
-            if (s1_MTL_sender_isAlive && s2_MTL_sender_isAlive && s3_MTL_sender_isAlive) {
-                s1_MTL_sender_isAlive = false;
+        if (id.equals("MTL")) {
+            if (isMTLOneAlive && isMTLTwoAlive && isMTLThreeAlive) {
+                isMTLOneAlive = false;
                 primaryMtlServer.pingReceiverThread.setStatus(false);
-                msg = "MTL1 Server is killed " + electNewLeader("MTL1", logManager);
+                msg = "MTL1 Server is killed " + electNewLeader("MTL1", logUtil);
             } else {
                 msg = "Primary is already killed!!";
             }
-        } else if (this.id.equals("LVL")) {
-            if (s1_LVL_sender_isAlive && s2_LVL_sender_isAlive && s3_LVL_sender_isAlive) {
-                s1_LVL_sender_isAlive = false;
+        } else if (id.equals("LVL")) {
+            if (isLVLOneAlive && isLVLTwoAlive && isLVLThreeAlive) {
+                isLVLOneAlive = false;
                 primaryLvlServer.pingReceiverThread.setStatus(false);
-                msg = "LVL1 Server is killed " + electNewLeader("LVL1", logManager);
+                msg = "LVL1 Server is killed " + electNewLeader("LVL1", logUtil);
             } else {
                 msg = "Primary is already killed!!";
             }
-        } else if (this.id.equals("DDO")) {
-            if (s1_DDO_sender_isAlive && s2_DDO_sender_isAlive && s3_DDO_sender_isAlive) {
-                s1_DDO_sender_isAlive = false;
+        } else if (id.equals("DDO")) {
+            if (isDDOOneAlive && isDDOTwoAlive && isDDOThreeAlive) {
+                isDDOOneAlive = false;
                 primaryDdoServer.pingReceiverThread.setStatus(false);
-                msg = "DDO1 Server is killed " + electNewLeader("DDO1", logManager);
+                msg = "DDO1 Server is killed " + electNewLeader("DDO1", logUtil);
             } else {
                 msg = "Primary is already killed!!";
             }
@@ -527,10 +519,10 @@ public class FrontEnd extends corbaPOA {
                     InetAddress.getByName(Constants.CURRENT_SERVER_IP), Constants.CURRENT_SERVER_UDP_PORT);
             ds.send(dp);
             System.out.println("Adding request to request buffer with req id..." + requestId);
-            logManager.log(TAG + "Adding request to request buffer with req id..." + requestId);
+            logUtil.log(TAG + "Adding request to request buffer with req id..." + requestId);
             requestBuffer.put(requestId, data);
             System.out.println("Waiting for acknowledgement from current ca.concordia.dsd.server...");
-            logManager.log(TAG + "Waiting for acknowledgement from current ca.concordia.dsd.server...");
+            logUtil.log(TAG + "Waiting for acknowledgement from current ca.concordia.dsd.server...");
             Thread.sleep(Constants.RETRY_TIME);
             return getResponse(requestId);
         } catch (Exception e) {
@@ -541,11 +533,11 @@ public class FrontEnd extends corbaPOA {
 
     public String getResponse(Integer requestId) {
         try {
-            responses.get(requestId).join();
+            responsesMap.get(requestId).join();
         } catch (InterruptedException e) {
             System.out.println(e.getMessage());
         }
         requestBuffer.remove(requestId);
-        return responses.get(requestId).getResponse();
+        return responsesMap.get(requestId).getResponse();
     }
 }

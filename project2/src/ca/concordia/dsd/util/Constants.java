@@ -70,4 +70,24 @@ public interface Constants {
     public static String RESPONSE_DATA_SEPERATOR = "_";
     public static String PROJECT_DIR = System.getProperty("user.dir");
 
+    public static int MTL1_PORT = 5431;
+    public static int MTL2_PORT = 5432;
+    public static int MTL3_PORT = 5433;
+    public static int LVL1_PORT = 5441;
+    public static int LVL2_PORT = 5442;
+    public static int LVL3_PORT = 5443;
+    public static int DDO1_PORT = 5451;
+    public static int DDO2_PORT = 5452;
+    public static int DDO3_PORT = 5453;
+    public static String MTL1 = "MTL1";
+    public static String MTL2 = "MTL2";
+    public static String MTL3 = "MTL3";
+    public static String LVL1 = "LVL1";
+    public static String LVL2 = "LVL2";
+    public static String LVL3 = "LVL3";
+    public static String DDO1 = "DDO1";
+    public static String DDO2 = "DDO2";
+    public static String DDO3 = "DDO3";
+
+
 }

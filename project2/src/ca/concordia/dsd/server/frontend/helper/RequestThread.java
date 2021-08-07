@@ -76,7 +76,7 @@ public class RequestThread extends Thread {
 
 
     private synchronized CenterServer chooseServer(String loc) {
-        return FrontEnd.centralRepository.get(Constants.PRIMARY_SERVER_ID).get(loc);
+        return FrontEnd.repo.get(Constants.PRIMARY_SERVER_ID).get(loc);
     }
 
 

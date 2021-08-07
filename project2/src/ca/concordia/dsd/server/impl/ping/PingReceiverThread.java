@@ -36,7 +36,7 @@ public class PingReceiverThread extends Thread {
                 DatagramPacket dp = new DatagramPacket(data, data.length);
                 ds.receive(dp);
                 synchronized (mapAccessor) {
-                    FrontEnd.server_last_updated_time.put(name, System.nanoTime() / 1000000);
+                    FrontEnd.reportingMap.put(name, System.nanoTime() / 1000000);
                 }
             } catch (IOException e) {
                 e.printStackTrace();

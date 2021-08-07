@@ -190,7 +190,7 @@ public class CenterServer {
 					}
 					System.out.println("Server id :: " + serverID);
 					req[counter] = new UDPRequestProviderThread(
-							FrontEnd.centralRepository.get(serverID).get(loc), "GET_RECORD_COUNT", null,
+							FrontEnd.repo.get(serverID).get(loc), "GET_RECORD_COUNT", null,
 							logManager);
 				} catch (IOException e) {
 					System.out.println("Exception in get rec count :: " + e.getMessage());
@@ -258,12 +258,12 @@ public class CenterServer {
 				return "Please enter a valid location to transfer. The record is already present in " + location;
 			}
 			req = new UDPRequestProviderThread(
-					FrontEnd.centralRepository.get(serverID).get(remoteCenterServerName.trim()), "TRANSFER_RECORD",
+					FrontEnd.repo.get(serverID).get(remoteCenterServerName.trim()), "TRANSFER_RECORD",
 					record, logManager);
 
 			if (isPrimary && this.replicas.size() == Constants.TOTAL_REPLICAS_COUNT - 1) {
 				System.out.println("Replicas size is ::::::::::: 1" + remoteCenterServerName);
-				req1 = new UDPRequestProviderThread(FrontEnd.centralRepository.get(Constants.REPLICA2_SERVER_ID)
+				req1 = new UDPRequestProviderThread(FrontEnd.repo.get(Constants.REPLICA2_SERVER_ID)
 						.get(remoteCenterServerName.trim()), "TRANSFER_RECORD", record, logManager);
 				req1.start();
 				try {
