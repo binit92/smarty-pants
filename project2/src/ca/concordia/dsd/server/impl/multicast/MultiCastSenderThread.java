@@ -12,15 +12,15 @@ public class MultiCastSenderThread extends Thread {
     MulticastSocket multicastsocket;
     InetAddress address;
     String data;
-    LogUtil logger;
+    LogUtil logUtil;
 
 
-    public MultiCastSenderThread(String request, LogUtil logger) {
+    public MultiCastSenderThread(String request, LogUtil logUtil) {
         try {
             multicastsocket = new MulticastSocket(Constants.MULTICAST_PORT_NUMBER);
             address = InetAddress.getByName(Constants.MULTICAST_IP_ADDRESS);
             multicastsocket.joinGroup(address);
-            this.logger = logger;
+            this.logUtil = logUtil;
             this.data = request;
         } catch (IOException e) {
             System.out.println(e.getMessage());

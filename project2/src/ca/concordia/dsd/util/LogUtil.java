@@ -11,8 +11,8 @@ public class LogUtil implements Constants {
         //LOGGER = Logger.getLogger(LogWriter.class.getName());
     }
 
-    private Handler fH;
     private final Logger logger;
+    private Handler fH;
 
     public LogUtil(String initiator) {
         logger = Logger.getLogger(initiator);

@@ -1,7 +1,7 @@
 package ca.concordia.dsd.server.impl.multicast;
 
-import ca.concordia.dsd.server.impl.replica.ReplicaStatusThread;
 import ca.concordia.dsd.server.impl.replica.ReplicaRequestThread;
+import ca.concordia.dsd.server.impl.replica.ReplicaStatusThread;
 import ca.concordia.dsd.util.Constants;
 import ca.concordia.dsd.util.LogUtil;
 

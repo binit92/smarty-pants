@@ -1,10 +1,10 @@
 package ca.concordia.dsd.server.impl.replica;
 
+import ca.concordia.dsd.database.Record;
 import ca.concordia.dsd.server.impl.multicast.MultiCastSenderThread;
 import ca.concordia.dsd.util.Constants;
-import ca.concordia.dsd.util.OperationsEnum;
-import ca.concordia.dsd.database.Record;
 import ca.concordia.dsd.util.LogUtil;
+import ca.concordia.dsd.util.OperationsEnum;
 
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.List;
 public class ReplicaHandler {
     private final String TAG = "|" + ReplicaHandler.class.getSimpleName() + "| ";
     public HashMap<String, List<Record>> recordsMap;
-    LogUtil logger;
+    LogUtil logUtil;
     String IPaddress;
     int studentCount = 0;
     int teacherCount = 0;
@@ -30,12 +30,12 @@ public class ReplicaHandler {
         requestBuffer = new HashMap<>();
         requestId = 0;
         this.replicaID = replicaID;
-        this.logger = logUtil;
+        this.logUtil = logUtil;
     }
 
 
     private void sendMulticastRequest(String req) {
-        MultiCastSenderThread sender = new MultiCastSenderThread(req, logger);
+        MultiCastSenderThread sender = new MultiCastSenderThread(req, logUtil);
         sender.start();
     }
 
@@ -44,7 +44,7 @@ public class ReplicaHandler {
         teacher = replicaID + Constants.RECEIVED_DATA_SEPERATOR + OperationsEnum.CREATE_T_RECORD
                 + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(managerID) + Constants.RECEIVED_DATA_SEPERATOR
                 + managerID + Constants.RECEIVED_DATA_SEPERATOR + teacher;
-        logger.log(TAG + "Preparing Multicast request for Create Teacher record : " + teacher);
+        logUtil.log(TAG + "Preparing Multicast request for Create Teacher record : " + teacher);
         sendMulticastRequest(teacher);
         return "";
     }
@@ -60,7 +60,7 @@ public class ReplicaHandler {
                 + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(managerID) + Constants.RECEIVED_DATA_SEPERATOR
                 + managerID + Constants.RECEIVED_DATA_SEPERATOR + student;
         sendMulticastRequest(student);
-        logger.log(TAG + "Preparing Multicast request for Create Student record : " + student);
+        logUtil.log(TAG + "Preparing Multicast request for Create Student record : " + student);
         return "";
     }
 
@@ -72,7 +72,7 @@ public class ReplicaHandler {
                 + Constants.RECEIVED_DATA_SEPERATOR + getServerLoc(data[0]) + Constants.RECEIVED_DATA_SEPERATOR
                 + manager;
         sendMulticastRequest(req);
-        logger.log(TAG + "Preparing Multicast request for get record Count :" + req);
+        logUtil.log(TAG + "Preparing Multicast request for get record Count :" + req);
         return "";
     }
 
@@ -84,7 +84,7 @@ public class ReplicaHandler {
                 + id + Constants.RECEIVED_DATA_SEPERATOR + recordID + Constants.RECEIVED_DATA_SEPERATOR
                 + fieldName + Constants.RECEIVED_DATA_SEPERATOR + newValue;
         sendMulticastRequest(editData);
-        logger.log(TAG + "Preparing Multicast request for editRecord : " + editData);
+        logUtil.log(TAG + "Preparing Multicast request for editRecord : " + editData);
         return "";
     }
 
@@ -95,7 +95,7 @@ public class ReplicaHandler {
                 + managerID + Constants.RECEIVED_DATA_SEPERATOR + recordID + Constants.RECEIVED_DATA_SEPERATOR
                 + remoteCenterServerName;
         sendMulticastRequest(req);
-        logger.log(TAG + "Preparing Multicast request for transferRecord : " + req);
+        logUtil.log(TAG + "Preparing Multicast request for transferRecord : " + req);
         return "";
     }
 

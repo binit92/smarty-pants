@@ -1,18 +1,18 @@
 package ca.concordia.dsd.server.frontend;
 
 import ca.concordia.dsd.arch.corbaPOA;
+import ca.concordia.dsd.database.Record;
 import ca.concordia.dsd.server.frontend.helper.FIFOThread;
 import ca.concordia.dsd.server.frontend.helper.RequestThread;
 import ca.concordia.dsd.server.frontend.helper.ResponseThread;
 import ca.concordia.dsd.server.frontend.helper.UDPResponseThread;
-import ca.concordia.dsd.util.Constants;
-import ca.concordia.dsd.util.LocationEnum;
-import ca.concordia.dsd.util.OperationsEnum;
-import ca.concordia.dsd.database.Record;
 import ca.concordia.dsd.server.impl.CenterServer;
 import ca.concordia.dsd.server.impl.multicast.MultiCastReceiverThread;
 import ca.concordia.dsd.server.impl.replica.ReplicaResponseThread;
+import ca.concordia.dsd.util.Constants;
+import ca.concordia.dsd.util.LocationEnum;
 import ca.concordia.dsd.util.LogUtil;
+import ca.concordia.dsd.util.OperationsEnum;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -50,9 +50,8 @@ public class FrontEnd extends corbaPOA implements Constants {
     private static Object lock = new Object();
     private static HashMap<String, Integer> ServerIDMap = new HashMap<>();
     private static LogUtil logUtil;
-    private LogUtil ackManager;
     public HashMap<String, List<Record>> recordsMap;
-
+    private LogUtil ackManager;
     private Integer requestId;
     private HashMap<Integer, String> requestBuffer;
     private ArrayList<RequestThread> requests;
@@ -60,7 +59,7 @@ public class FrontEnd extends corbaPOA implements Constants {
     private ReplicaResponseThread replicaResponseReceiver;
     private ArrayList<Integer> replicas = new ArrayList<>();
 
-    private CenterServer primaryMtlServer,primaryLvlServer,primaryDdoServer;
+    private CenterServer primaryMtlServer, primaryLvlServer, primaryDdoServer;
     private CenterServer replica1MtlServer, replica1LvlServer, replica1DdoServer;
     private CenterServer replica2MtlServer, replica2LvlServer, replica2DdoServer;
 
@@ -117,7 +116,7 @@ public class FrontEnd extends corbaPOA implements Constants {
                 }
             }
         }
-        if (maxEntry == null){
+        if (maxEntry == null) {
             return "no server appropriate to replace as Leader right now in the location " + loc;
         }
         statusMap.put(maxEntry.getKey(), true);
@@ -154,11 +153,11 @@ public class FrontEnd extends corbaPOA implements Constants {
             if (replica != null) {
                 replica.setReplicas(replicas);
                 replicamap.put(loc, replica);
-            }else{
+            } else {
                 logUtil.log(TAG + "No replica found at location " + loc);
             }
             synchronized (repo) {
-                    repo.put(Constants.REPLICA2_SERVER_ID, replicamap);
+                repo.put(Constants.REPLICA2_SERVER_ID, replicamap);
             }
 
         } else if (maxEntry.getKey().contains("3")) {
@@ -305,7 +304,7 @@ public class FrontEnd extends corbaPOA implements Constants {
 
             logUtil.log(TAG + "New request in buffer with request id : " + requestId);
             requestBuffer.put(requestId, data);
-            logUtil.log(TAG + "Waiting for ACK reply from server: "+ CURRENT_SERVER_IP + " : " + CURRENT_SERVER_UDP_PORT);
+            logUtil.log(TAG + "Waiting for ACK reply from server: " + CURRENT_SERVER_IP + " : " + CURRENT_SERVER_UDP_PORT);
             Thread.sleep(Constants.RETRY_TIME);
             return getResponse(requestId);
         } catch (Exception e) {
@@ -384,27 +383,27 @@ public class FrontEnd extends corbaPOA implements Constants {
         }
     }
 
-    private void startFIFOThread(){
-        FIFOThread udpReceiverFromFE = new FIFOThread(requests,logUtil);
+    private void startFIFOThread() {
+        FIFOThread udpReceiverFromFE = new FIFOThread(requests, logUtil);
         udpReceiverFromFE.start();
     }
 
-    private void startUDPResponseThread(){
-        UDPResponseThread udpResponse = new UDPResponseThread(responsesMap,logUtil);
+    private void startUDPResponseThread() {
+        UDPResponseThread udpResponse = new UDPResponseThread(responsesMap, logUtil);
         udpResponse.start();
     }
 
-    private void startMultiCastReceiverThread(){
+    private void startMultiCastReceiverThread() {
         primaryReceiver = new MultiCastReceiverThread(true, ackManager);
         primaryReceiver.start();
     }
 
-    private void startReplicaResponseThread(){
+    private void startReplicaResponseThread() {
         replicaResponseReceiver = new ReplicaResponseThread(new LogUtil("ReplicasResponse"));
         replicaResponseReceiver.start();
     }
 
-    private void startReplicaOneMulticastReceiverThread(){
+    private void startReplicaOneMulticastReceiverThread() {
         replica1Receiver = new MultiCastReceiverThread(false, ackManager);
         replica1Receiver.start();
     }
@@ -428,7 +427,7 @@ public class FrontEnd extends corbaPOA implements Constants {
         primaryMap.put("DDO", primaryDdoServer);
     }
 
-    private void createReplicaOneServers()throws SocketException{
+    private void createReplicaOneServers() throws SocketException {
         DatagramSocket socket2 = new DatagramSocket();
         replica1MtlServer = new CenterServer(Constants.REPLICA1_SERVER_ID, false,
                 LocationEnum.MTL, 5555, socket2, isMTLTwoAlive, MTL2, MTL2_PORT,
@@ -450,7 +449,7 @@ public class FrontEnd extends corbaPOA implements Constants {
         replicaOneMap.put("DDO", replica1DdoServer);
     }
 
-    private void createReplicaTwoServers()throws SocketException{
+    private void createReplicaTwoServers() throws SocketException {
         DatagramSocket socket3 = new DatagramSocket();
         replica2MtlServer = new CenterServer(Constants.REPLICA2_SERVER_ID, false,
                 LocationEnum.MTL, 9878, socket3, isMTLThreeAlive, MTL3, MTL3_PORT,
@@ -472,7 +471,7 @@ public class FrontEnd extends corbaPOA implements Constants {
         replicaTwoMap.put("DDO", replica2DdoServer);
     }
 
-    private void startPingFromAllServers(){
+    private void startPingFromAllServers() {
         Thread thread1 = new Thread() {
             public void run() {
                 while (getStatus(MTL1)) {
@@ -547,7 +546,7 @@ public class FrontEnd extends corbaPOA implements Constants {
         thread9.start();
     }
 
-    private void startWatcherThread(){
+    private void startWatcherThread() {
         Thread statusChecker = new Thread() {
             public void run() {
                 while (true) {

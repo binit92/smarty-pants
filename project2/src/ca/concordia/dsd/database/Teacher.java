@@ -12,6 +12,17 @@ public class Teacher extends Record implements Serializable {
     private String TeacherID;
     private String ManagerID;
 
+    public Teacher(String managerID, String teacherID, String firstName,
+                   String lastname, String address, String phone, String Specialization,
+                   String location) {
+        super(teacherID, firstName, lastname);
+        this.setManagerID(managerID);
+        this.setAddress(address);
+        this.setPhone(phone);
+        this.setSpecialization(Specialization);
+        this.setLocation(location);
+    }
+
     public String getFirstName() {
         return FirstName;
     }
@@ -78,16 +89,5 @@ public class Teacher extends Record implements Serializable {
                 + this.getPhone() + ","
                 + this.getSpecialization() + ","
                 + this.getLocation();
-    }
-
-    public Teacher(String managerID, String teacherID, String firstName,
-                   String lastname, String address, String phone, String Specialization,
-                   String location) {
-        super(teacherID, firstName, lastname);
-        this.setManagerID(managerID);
-        this.setAddress(address);
-        this.setPhone(phone);
-        this.setSpecialization(Specialization);
-        this.setLocation(location);
     }
 }

@@ -1,10 +1,10 @@
 package ca.concordia.dsd.server.impl.replica;
 
+import ca.concordia.dsd.server.frontend.FrontEnd;
 import ca.concordia.dsd.server.impl.CenterServer;
 import ca.concordia.dsd.util.Constants;
-import ca.concordia.dsd.util.OperationsEnum;
-import ca.concordia.dsd.server.frontend.FrontEnd;
 import ca.concordia.dsd.util.LogUtil;
+import ca.concordia.dsd.util.OperationsEnum;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;

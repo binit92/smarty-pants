@@ -1,8 +1,8 @@
 package ca.concordia.dsd.server.impl.replica;
 
+import ca.concordia.dsd.server.frontend.helper.ResponseThread;
 import ca.concordia.dsd.util.Constants;
 import ca.concordia.dsd.util.LocationEnum;
-import ca.concordia.dsd.server.frontend.helper.ResponseThread;
 import ca.concordia.dsd.util.LogUtil;
 
 import java.net.DatagramPacket;
@@ -19,14 +19,14 @@ public class ReplicaResponseThread extends Thread {
     DatagramPacket sendPacket;
     int udpPortNum;
     LocationEnum location;
-    LogUtil loggerInstance;
+    LogUtil logUtil;
     String recordCount;
     HashMap<Integer, ResponseThread> responses;
     int c;
 
-    public ReplicaResponseThread(LogUtil logManager) {
+    public ReplicaResponseThread(LogUtil logUtil) {
         try {
-            loggerInstance = logManager;
+            logUtil = logUtil;
             serverSocket = new DatagramSocket(Constants.CURRENT_PRIMARY_PORT_FOR_REPLICAS);
         } catch (SocketException e) {
             System.out.println(e.getMessage());
@@ -46,10 +46,10 @@ public class ReplicaResponseThread extends Thread {
                 String inputPkt = new String(receivedData).trim();
                 if (inputPkt.contains("ACKNOWLEDGEMENT")) {
                     System.out.println(new String(receivedData));
-                    loggerInstance.log(TAG + inputPkt);
+                    logUtil.log(TAG + inputPkt);
                 } else {
                     System.out.println("Received response packet in PRIMARY:: " + new String(receivedData));
-                    loggerInstance.log(TAG + "Received response in Primary " + inputPkt);
+                    logUtil.log(TAG + "Received response in Primary " + inputPkt);
                 }
             } catch (Exception e) {
 

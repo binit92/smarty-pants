@@ -2,9 +2,9 @@ package ca.concordia.dsd;
 
 import ca.concordia.dsd.arch.corba;
 import ca.concordia.dsd.arch.corbaHelper;
+import ca.concordia.dsd.server.frontend.FrontEnd;
 import ca.concordia.dsd.util.Constants;
 import ca.concordia.dsd.util.LocationEnum;
-import ca.concordia.dsd.server.frontend.FrontEnd;
 import org.omg.CORBA.ORB;
 import org.omg.CosNaming.NameComponent;
 import org.omg.CosNaming.NamingContextExt;
@@ -19,6 +19,7 @@ import java.io.IOException;
 public class RunAllServers implements Constants {
     private static final String TAG = "|" + RunAllServers.class.getSimpleName() + "| ";
     static corba ref;
+
     static {
         try {
             Runtime.getRuntime()
@@ -31,7 +32,7 @@ public class RunAllServers implements Constants {
 
     private static void init() {
         new File(Constants.LOG_DIR + File.separator + FRONTEND_TAG).mkdir();
-        new File(Constants.LOG_DIR + File.separator + REPLICA_RESPONSE_TAG ).mkdir();
+        new File(Constants.LOG_DIR + File.separator + REPLICA_RESPONSE_TAG).mkdir();
 
         new File(Constants.LOG_DIR + File.separator + LEADER_TAG).mkdir();
         new File(Constants.LOG_DIR + File.separator + LEADER_TAG + File.separator + LocationEnum.MTL).mkdir();

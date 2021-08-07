@@ -1,6 +1,5 @@
 package ca.concordia.dsd.server.frontend.helper;
 
-import ca.concordia.dsd.server.impl.udp.UDPRequestReceiverThread;
 import ca.concordia.dsd.util.Constants;
 import ca.concordia.dsd.util.LocationEnum;
 import ca.concordia.dsd.util.LogUtil;
@@ -11,8 +10,6 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class FIFOThread extends Thread {
     private final String TAG = "|" + FIFOThread.class.getSimpleName() + "| ";

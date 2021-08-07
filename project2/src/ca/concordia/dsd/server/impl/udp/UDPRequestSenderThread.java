@@ -1,10 +1,10 @@
 package ca.concordia.dsd.server.impl.udp;
 
-import ca.concordia.dsd.server.impl.CenterServer;
-import ca.concordia.dsd.util.LocationEnum;
 import ca.concordia.dsd.database.Record;
 import ca.concordia.dsd.database.Student;
 import ca.concordia.dsd.database.Teacher;
+import ca.concordia.dsd.server.impl.CenterServer;
+import ca.concordia.dsd.util.LocationEnum;
 import ca.concordia.dsd.util.LogUtil;
 
 import java.net.DatagramPacket;
@@ -16,19 +16,19 @@ import java.util.Map;
 public class UDPRequestSenderThread extends Thread {
 
     private final String TAG = "|" + UDPRequestSenderThread.class.getSimpleName() + "| ";
-    DatagramSocket serverSocket;
-    LocationEnum location;
     private final DatagramPacket receivePacket;
     private final CenterServer server;
-    private final LogUtil loggerInstance;
+    private final LogUtil logUtil;
     private final Object mapLock;
+    DatagramSocket serverSocket;
+    LocationEnum location;
 
 
     public UDPRequestSenderThread(DatagramPacket pkt, CenterServer serverImp, LogUtil logger) {
         receivePacket = pkt;
         server = serverImp;
         mapLock = new Object();
-        this.loggerInstance = logger;
+        this.logUtil = logger;
         try {
             serverSocket = new DatagramSocket();
         } catch (SocketException e) {
@@ -49,7 +49,7 @@ public class UDPRequestSenderThread extends Thread {
             switch (inputPkt) {
                 case "TRANSFER_RECORD":
                     System.out.println("Transferring :: " + pktSplit[1]);
-                    loggerInstance.log(TAG + "Transferring :: " + pktSplit[1]);
+                    logUtil.log(TAG + "Transferring :: " + pktSplit[1]);
                     responseData = transferRecord(pktSplit[1]).getBytes();
                     serverSocket.send(new DatagramPacket(responseData, responseData.length, receivePacket.getAddress(),
                             receivePacket.getPort()));
@@ -57,13 +57,13 @@ public class UDPRequestSenderThread extends Thread {
                 case "GET_RECORD_COUNT":
                     responseData = Integer.toString(getRecCount()).getBytes();
                     System.out.println("data in udp req ca.concordia.dsd.server :: " + getRecCount());
-                    loggerInstance.log(TAG + "data in udp req ca.concordia.dsd.server :: " + getRecCount());
+                    logUtil.log(TAG + "data in udp req ca.concordia.dsd.server :: " + getRecCount());
                     serverSocket.send(new DatagramPacket(responseData, responseData.length, receivePacket.getAddress(),
                             receivePacket.getPort()));
                     break;
                 default:
                     System.out.println("Invalid UDP request type");
-                    loggerInstance.log(TAG + "Invalid UDP request type");
+                    logUtil.log(TAG + "Invalid UDP request type");
             }
 
         } catch (Exception e) {

@@ -1,6 +1,5 @@
 package ca.concordia.dsd.server.frontend.helper;
 
-import ca.concordia.dsd.server.frontend.FrontEnd;
 import ca.concordia.dsd.util.Constants;
 import ca.concordia.dsd.util.LocationEnum;
 import ca.concordia.dsd.util.LogUtil;
@@ -9,8 +8,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class UDPResponseThread extends Thread {
 
