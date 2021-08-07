@@ -108,6 +108,7 @@ public class FrontEnd extends corbaPOA implements Constants {
         reportingMap.remove(oldLeader);
         ServerIDMap.remove(oldLeader);
         String loc = oldLeader.substring(0, 3);
+
         Map.Entry<String, Integer> maxEntry = null;
         for (Map.Entry<String, Integer> entry : ServerIDMap.entrySet()) {
             if (entry.getKey().contains(loc)) {
@@ -115,6 +116,9 @@ public class FrontEnd extends corbaPOA implements Constants {
                     maxEntry = entry;
                 }
             }
+        }
+        if (maxEntry == null){
+            return "no server appropriate to replace as Leader right now in the location " + loc;
         }
         statusMap.put(maxEntry.getKey(), true);
         ServerIDMap.put(maxEntry.getKey(), LEADER_ID);
@@ -147,10 +151,14 @@ public class FrontEnd extends corbaPOA implements Constants {
             }
             HashMap<String, CenterServer> replicamap = repo.get(Constants.REPLICA2_SERVER_ID);
             CenterServer replica = replicamap.get(loc);
-            replica.setReplicas(replicas);
-            replicamap.put(loc, replica);
+            if (replica != null) {
+                replica.setReplicas(replicas);
+                replicamap.put(loc, replica);
+            }else{
+                logUtil.log(TAG + "No replica found at location " + loc);
+            }
             synchronized (repo) {
-                repo.put(Constants.REPLICA2_SERVER_ID, replicamap);
+                    repo.put(Constants.REPLICA2_SERVER_ID, replicamap);
             }
 
         } else if (maxEntry.getKey().contains("3")) {
@@ -377,12 +385,12 @@ public class FrontEnd extends corbaPOA implements Constants {
     }
 
     private void startFIFOThread(){
-        FIFOThread udpReceiverFromFE = new FIFOThread(requests);
+        FIFOThread udpReceiverFromFE = new FIFOThread(requests,logUtil);
         udpReceiverFromFE.start();
     }
 
     private void startUDPResponseThread(){
-        UDPResponseThread udpResponse = new UDPResponseThread(responsesMap);
+        UDPResponseThread udpResponse = new UDPResponseThread(responsesMap,logUtil);
         udpResponse.start();
     }
 

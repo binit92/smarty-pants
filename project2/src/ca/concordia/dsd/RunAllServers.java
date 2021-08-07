@@ -71,7 +71,7 @@ public class RunAllServers implements Constants {
             NameComponent[] fePath = ncRef.to_name("FE");
 
             ncRef.rebind(fePath, ref);
-            System.out.println(TAG + "Starting front end and all servers");
+            System.out.println(TAG + "Started CORBA front-end and all servers in all datacenters");
             orb.run();
         } catch (Exception e) {
             System.out.println(TAG + e.getMessage());

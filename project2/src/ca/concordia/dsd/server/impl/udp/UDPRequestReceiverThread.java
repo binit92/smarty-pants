@@ -21,22 +21,22 @@ public class UDPRequestReceiverThread extends Thread {
     CenterServer server;
     int c;
     boolean isAlive;
-    private final LogUtil loggerInstance;
+    private LogUtil logUtil;
 
 
-    public UDPRequestReceiverThread(boolean isAlive, int udpPort, LocationEnum loc, LogUtil logger,
+    public UDPRequestReceiverThread(boolean isAlive, int udpPort, LocationEnum loc, LogUtil logUtil,
                                     CenterServer serverImp) {
         location = loc;
-        loggerInstance = logger;
+        logUtil = logUtil;
         this.server = serverImp;
         this.isAlive = isAlive;
         c = 0;
         try {
             serverSocket = new DatagramSocket(udpPort);
             udpPortNum = udpPort;
-            logger.log(TAG + loc.toString() + " UDP Server Started");
+            logUtil.log(TAG + loc.toString() + " UDP Server Started");
         } catch (IOException e) {
-            logger.log(TAG + e.getMessage());
+            logUtil.log(TAG + e.getMessage());
         }
     }
 
@@ -51,8 +51,8 @@ public class UDPRequestReceiverThread extends Thread {
                 System.out.println("LOc :: " + location + "1 Received pkt in udp Receiver :: "
                         + new String(receivePacket.getData()));
                 String inputPkt = new String(receivePacket.getData()).trim();
-                new UDPRequestSenderThread(receivePacket, server, loggerInstance).start();
-                loggerInstance.log(TAG + "2 Received in udp receiver " + inputPkt + " from " + location);
+                new UDPRequestSenderThread(receivePacket, server, logUtil).start();
+                logUtil.log(TAG + "2 Received in udp receiver " + inputPkt + " from " + location);
             } catch (Exception e) {
             }
         }

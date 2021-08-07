@@ -10,7 +10,9 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 public class UDPRequestProviderThread extends Thread {
-    LogUtil logger;
+    private final String TAG = "|" + UDPRequestProviderThread.class.getSimpleName() + "| ";
+
+    LogUtil logUtil;
     private String recordCount = "";
     private String transferResult = "";
     private final CenterServer server;
@@ -19,11 +21,11 @@ public class UDPRequestProviderThread extends Thread {
 
 
     public UDPRequestProviderThread(CenterServer server, String requestType,
-                                    Record recordForTransfer, LogUtil logger) throws IOException {
+                                    Record recordForTransfer, LogUtil logUtil) throws IOException {
         this.server = server;
         this.requestType = requestType;
         this.recordForTransfer = recordForTransfer;
-        this.logger = logger;
+        this.logUtil = logUtil;
     }
 
     public String getRemoteRecordCount() {

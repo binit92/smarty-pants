@@ -2,6 +2,7 @@ package ca.concordia.dsd.server.frontend.helper;
 
 import ca.concordia.dsd.server.frontend.FrontEnd;
 import ca.concordia.dsd.util.Constants;
+import ca.concordia.dsd.util.LogUtil;
 import ca.concordia.dsd.util.OperationsEnum;
 import ca.concordia.dsd.server.impl.CenterServer;
 
@@ -15,13 +16,13 @@ public class RequestThread extends Thread {
     String currentOperationData;
     CenterServer server;
     String response;
-    Logger loggerInstance;
+    LogUtil logUtil;
 
-    public RequestThread(byte[] operationData, Logger loggerInstance) {
+    public RequestThread(byte[] operationData, LogUtil logUtil) {
         this.currentOperationData = new String(operationData);
         this.server = null;
         response = null;
-        this.loggerInstance = loggerInstance;
+        this.logUtil = logUtil;
     }
 
 
