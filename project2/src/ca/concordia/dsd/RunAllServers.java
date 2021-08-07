@@ -20,6 +20,16 @@ public class RunAllServers implements Constants {
     private static final String TAG = "|" + RunAllServers.class.getSimpleName() + "| ";
     static corba ref;
 
+    static {
+        try {
+            Runtime.getRuntime()
+                    .exec("orbd -ORBInitialPort 5555 -ORBInitialHost localhost");
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
     public static void main(String[] args) {
         try {
             createLogDirectories();
@@ -46,17 +56,6 @@ public class RunAllServers implements Constants {
             orb.run();
         } catch (Exception e) {
             System.out.println(TAG + e.getMessage());
-        }
-    }
-
-
-    static {
-        try {
-            Runtime.getRuntime()
-                    .exec("orbd -ORBInitialPort 5555 -ORBInitialHost localhost");
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(1);
         }
     }
 

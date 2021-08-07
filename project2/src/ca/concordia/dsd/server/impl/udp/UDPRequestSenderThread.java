@@ -4,7 +4,6 @@ import ca.concordia.dsd.database.Record;
 import ca.concordia.dsd.database.Student;
 import ca.concordia.dsd.database.Teacher;
 import ca.concordia.dsd.server.impl.CenterServer;
-import ca.concordia.dsd.util.LocationEnum;
 import ca.concordia.dsd.util.LogUtil;
 
 import java.net.DatagramPacket;
@@ -58,7 +57,7 @@ public class UDPRequestSenderThread extends Thread {
                             receivePacket.getPort()));
                     break;
                 default:
-                   logUtil.log(TAG + "request type is not identified");
+                    logUtil.log(TAG + "request type is not identified");
             }
 
         } catch (Exception e) {

@@ -43,7 +43,7 @@ public class UDPResponseThread extends Thread {
                 byte[] receivedData = receivePacket.getData();
                 String inputPkt = new String(receivedData).trim();
                 String[] data = inputPkt.split(Constants.RESPONSE_DATA_SEPERATOR);
-                ResponseThread transferResponse = new ResponseThread(data[0],logUtil);
+                ResponseThread transferResponse = new ResponseThread(data[0], logUtil);
                 transferResponse.start();
                 responses.put(Integer.parseInt(data[1]), transferResponse);
                 logUtil.log(TAG + "Received " + inputPkt + " from " + location);

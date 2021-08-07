@@ -15,11 +15,11 @@ public class UDPRequestReceiverThread extends Thread {
     private DatagramSocket serverSocket;
     private DatagramPacket receivePacket;
     private int udpPortNum;
-    private LocationEnum location;
-    private CenterServer server;
-    private int c;
+    private final LocationEnum location;
+    private final CenterServer server;
+    private final int c;
     private boolean isAlive;
-    private LogUtil logUtil;
+    private final LogUtil logUtil;
 
     public UDPRequestReceiverThread(boolean isAlive, int udpPort, LocationEnum loc, LogUtil logUtil,
                                     CenterServer serverImp) {

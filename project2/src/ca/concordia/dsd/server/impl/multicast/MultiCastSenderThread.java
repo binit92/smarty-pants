@@ -27,6 +27,7 @@ public class MultiCastSenderThread extends Thread {
             logUtil.log(TAG + "error: " + e.getMessage());
         }
     }
+
     public synchronized void run() {
         try {
             DatagramPacket packet = new DatagramPacket(data.getBytes(),

@@ -6,8 +6,8 @@ import ca.concordia.dsd.util.LogUtil;
 public class ResponseThread extends Thread {
     private static final String TAG = "|" + ResponseThread.class.getSimpleName() + "| ";
 
-    private String response;
-    private LogUtil logUtil;
+    private final String response;
+    private final LogUtil logUtil;
 
     public ResponseThread(String response, LogUtil logUtil) {
         this.response = response;

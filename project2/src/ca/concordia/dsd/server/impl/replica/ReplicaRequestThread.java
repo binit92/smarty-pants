@@ -13,10 +13,10 @@ import java.util.Arrays;
 
 public class ReplicaRequestThread extends Thread {
     private final String TAG = "|" + ReplicaRequestThread.class.getSimpleName() + "| ";
-    private String currentOperationData;
+    private final String currentOperationData;
     private CenterServer server;
     private String response;
-    private LogUtil logUtil;
+    private final LogUtil logUtil;
 
     public ReplicaRequestThread(String operationData, LogUtil logManager) {
         this.currentOperationData = operationData;
@@ -31,7 +31,7 @@ public class ReplicaRequestThread extends Thread {
         String[] dataToBeSent = this.currentOperationData.trim().split(Constants.RECEIVED_DATA_SEPERATOR);
 
         Integer replicaId = Integer.parseInt(dataToBeSent[0]);
-        logUtil.log(TAG + "Processing replica id : "+ replicaId);
+        logUtil.log(TAG + "Processing replica id : " + replicaId);
         OperationsEnum oprn = OperationsEnum.valueOf(dataToBeSent[1]);
 
         String requestId = dataToBeSent[dataToBeSent.length - 1];

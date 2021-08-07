@@ -22,7 +22,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 
 
-//public class DcmsServerImpl extends corbaPOA{
 public class CenterServer {
     private final String TAG = "|" + CenterServer.class.getSimpleName() + "| ";
     public HashMap<String, List<Record>> recordsMap;
@@ -30,31 +29,30 @@ public class CenterServer {
     public ArrayList<Integer> replicas;
     public String location;
     public int locUDPPort = 0;
-    UDPRequestReceiverThread UDPRequestReceiverThread;
-    String IPaddress;
-    Object recordsMapAccessorLock = new Object();
-    int studentCount = 0;
-    int teacherCount = 0;
-    String recordsCount;
-    boolean isPrimary;
-    Integer serverID = 0;
-    PingSenderThread pingSenderThread;
-    String name;
-    int port1, port2;
-    boolean isAlive;
-    DatagramSocket ds = null;
-    private LogUtil logManager;
+    private UDPRequestReceiverThread UDPRequestReceiverThread;
+    private String IPaddress;
+    private Object recordsMapAccessorLock = new Object();
+    private int studentCount = 0;
+    private int teacherCount = 0;
+    private String recordsCount;
+    private boolean isPrimary;
+    private Integer serverID = 0;
+    private PingSenderThread pingSenderThread;
+    private String name;
+    private int port1, port2;
+    private boolean isAlive;
+    private DatagramSocket ds = null;
+    private final LogUtil logUtil;
 
     public CenterServer(int serverID, boolean isPrimary, LocationEnum loc, int locUDPPort, DatagramSocket ds,
                         boolean isAlive, String name, int receivePort, int port1, int port2, ArrayList<Integer> replicas,
                         LogUtil logUtil) {
-        logManager = logUtil;
+        this.logUtil = logUtil;
         synchronized (recordsMapAccessorLock) {
             recordsMap = new HashMap<>();
         }
         this.locUDPPort = locUDPPort;
-        UDPRequestReceiverThread = new UDPRequestReceiverThread(true, locUDPPort, loc, logManager, this);
-        UDPRequestReceiverThread.start();
+
         location = loc.toString();
         this.isPrimary = isPrimary;
         this.serverID = serverID;
@@ -62,26 +60,38 @@ public class CenterServer {
         this.port1 = port1;
         this.port2 = port2;
         this.isAlive = isAlive;
-        pingReceiverThread = new PingReceiverThread(isAlive, name, receivePort, logManager);
-        pingReceiverThread.start();
+
         this.ds = ds;
         this.replicas = replicas;
+
+        startUDPRequestReceiverThread(loc);
+        startPingReceiverThread(receivePort);
+    }
+
+    private void startUDPRequestReceiverThread(LocationEnum loc){
+        UDPRequestReceiverThread = new UDPRequestReceiverThread(true, locUDPPort, loc, this.logUtil, this);
+        UDPRequestReceiverThread.start();
+    }
+
+    private void startPingReceiverThread(int receivePort){
+        pingReceiverThread = new PingReceiverThread(isAlive, name, receivePort, this.logUtil);
+        pingReceiverThread.start();
     }
 
     public int getlocUDPPort() {
         return this.locUDPPort;
     }
 
-    //@Override
+
     public synchronized String createTRecord(String managerID, String teacher) {
+        // If it is a primary server send the teacher record to replicas as well..
         if (isPrimary) {
             for (Integer replicaId : replicas) {
-                ReplicaHandler req = new ReplicaHandler(replicaId,
-                        logManager);
+                ReplicaHandler req = new ReplicaHandler(replicaId,logUtil);
                 req.createTRecord(managerID, teacher);
             }
         }
-        String temp[] = teacher.split(",");
+        String[] temp = teacher.split(",");
         String teacherID = "TR" + (++teacherCount);
         String firstName = temp[0];
         String lastname = temp[1];
@@ -95,10 +105,10 @@ public class CenterServer {
         String key = lastname.substring(0, 1);
         String message = addRecordToHashMap(key, teacherObj, null);
         if (message.equals("success")) {
-            logManager.log(TAG + "Teacher record created " + teacherID + " by Manager : " + managerID
+            logUtil.log(TAG + "Teacher record created " + teacherID + " by Manager : " + managerID
                     + " for the request ID: " + requestID);
         } else {
-            logManager.log(TAG + "Error in creating T record" + requestID);
+            logUtil.log(TAG + "Error in creating T record" + requestID);
             return "Error in creating T record";
         }
 
@@ -106,17 +116,15 @@ public class CenterServer {
 
     }
 
-
-    //@Override
     public synchronized String createSRecord(String managerID, String student) {
+        // if it is a primary server send the student record to replicas as well
         if (isPrimary) {
             for (Integer replicaId : replicas) {
-                ReplicaHandler req = new ReplicaHandler(replicaId,
-                        logManager);
+                ReplicaHandler req = new ReplicaHandler(replicaId, logUtil);
                 req.createSRecord(managerID, student);
             }
         }
-        String temp[] = student.split(",");
+        String[] temp = student.split(",");
         String firstName = temp[0];
         String lastName = temp[1];
         String CoursesRegistered = temp[2];
@@ -131,7 +139,7 @@ public class CenterServer {
         if (message.equals("success")) {
             System.out.println(" Student is added " + studentObj + " with this key " + key + " by Manager " + managerID
                     + " for the requestID " + requestID);
-            logManager.log(TAG + "Student record created " + studentID + " by manager : " + managerID
+            logUtil.log(TAG + "Student record created " + studentID + " by manager : " + managerID
                     + " for the requestID " + requestID);
         } else {
             return "Error in creating S record";
@@ -151,17 +159,15 @@ public class CenterServer {
         return count;
     }
 
-
-    //@Override
-    public synchronized String getRecordCount(String manager) {
+  public synchronized String getRecordCount(String manager) {
+        // if it is primary server, send the request to replicas as well
         if (isPrimary) {
             for (Integer replicaId : replicas) {
-                ReplicaHandler req = new ReplicaHandler(replicaId,
-                        logManager);
+                ReplicaHandler req = new ReplicaHandler(replicaId, logUtil);
                 req.getRecordCount(manager);
             }
         }
-        String data[] = manager.split(Constants.RECEIVED_DATA_SEPERATOR);
+        String[] data = manager.split(Constants.RECEIVED_DATA_SEPERATOR);
         String managerID = data[0];
         String requestID = data[1];
         String recordCount = null;
@@ -172,14 +178,10 @@ public class CenterServer {
         locList.add("LVL");
         locList.add("DDO");
         for (String loc : locList) {
-            // System.out.println("11>>>>>>>>>>>>>>>>>>>>>>>>>>>Now serving
-            // location :: " + loc);
             if (loc == this.location) {
                 recordCount = loc + " " + getCurrServerCnt();
             } else {
                 try {
-                    // System.out.println("22>>>>>>>>>>>>>>>>>>>>>>>>>>>Now
-                    // serving location :: " + loc);
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
@@ -187,11 +189,9 @@ public class CenterServer {
                     }
                     System.out.println("Server id :: " + serverID);
                     req[counter] = new UDPRequestProviderThread(
-                            FrontEnd.repo.get(serverID).get(loc), "GET_RECORD_COUNT", null,
-                            logManager);
+                            FrontEnd.repo.get(serverID).get(loc), "GET_RECORD_COUNT", null, logUtil);
                 } catch (IOException e) {
-                    System.out.println("Exception in get rec count :: " + e.getMessage());
-                    logManager.log(TAG + e.getMessage());
+                   logUtil.log(TAG + e.getMessage());
                 }
                 req[counter].start();
                 counter++;
@@ -205,23 +205,20 @@ public class CenterServer {
             }
             recordCount += " , " + request.getRemoteRecordCount().trim();
         }
-        System.out.println(
-                recordCount + " for the request ID " + requestID + " as requested by the managerID " + managerID);
-        logManager.log(TAG +
+        logUtil.log(TAG +
                 recordCount + " for the request ID " + requestID + " as requested by the managerID " + managerID);
         return recordCount;
     }
 
-    //@Override
     public String editRecord(String id, String recordID, String fieldName, String newValue) {
         if (isPrimary) {
             for (Integer replicaId : replicas) {
                 ReplicaHandler req = new ReplicaHandler(replicaId,
-                        logManager);
+                        logUtil);
                 req.editRecord(id, recordID, fieldName, newValue);
             }
         }
-        String data[] = newValue.split(Constants.RECEIVED_DATA_SEPERATOR);
+        String[] data = newValue.split(Constants.RECEIVED_DATA_SEPERATOR);
         String requestID = data[1];
         String type = recordID.substring(0, 2);
         if (type.equals("TR")) {
@@ -229,7 +226,7 @@ public class CenterServer {
         } else if (type.equals("SR")) {
             return editSRRecord(id, recordID, fieldName, newValue);
         }
-        logManager.log(TAG + "Record edit successful for the request ID " + requestID);
+        logUtil.log(TAG + "Record edit successful for the request ID " + requestID);
         return "Operation not performed!";
     }
 
@@ -237,11 +234,11 @@ public class CenterServer {
         if (isPrimary) {
             for (Integer replicaId : replicas) {
                 ReplicaHandler req = new ReplicaHandler(replicaId,
-                        logManager);
+                        logUtil);
                 req.transferRecord(managerID, recordID, data);
             }
         }
-        String parsedata[] = data.split(Constants.RECEIVED_DATA_SEPERATOR);
+        String[] parsedata = data.split(Constants.RECEIVED_DATA_SEPERATOR);
         String remoteCenterServerName = parsedata[0];
         String requestID = parsedata[1];
         String type = recordID.substring(0, 2);
@@ -256,12 +253,12 @@ public class CenterServer {
             }
             req = new UDPRequestProviderThread(
                     FrontEnd.repo.get(serverID).get(remoteCenterServerName.trim()), "TRANSFER_RECORD",
-                    record, logManager);
+                    record, logUtil);
 
             if (isPrimary && this.replicas.size() == Constants.TOTAL_REPLICAS_COUNT - 1) {
                 System.out.println("Replicas size is ::::::::::: 1" + remoteCenterServerName);
                 req1 = new UDPRequestProviderThread(FrontEnd.repo.get(Constants.REPLICA2_SERVER_ID)
-                        .get(remoteCenterServerName.trim()), "TRANSFER_RECORD", record, logManager);
+                        .get(remoteCenterServerName.trim()), "TRANSFER_RECORD", record, logUtil);
                 req1.start();
                 try {
                     req1.join();
@@ -270,7 +267,7 @@ public class CenterServer {
                 }
             }
         } catch (IOException e) {
-            logManager.log(TAG + e.getMessage());
+            logUtil.log(TAG + e.getMessage());
         }
         if (req != null) {
             req.start();
@@ -280,14 +277,12 @@ public class CenterServer {
                 req.join();
             }
             if (removeRecordAfterTransfer(recordID) == "success") {
-                logManager.log(TAG + "Record created in  " + remoteCenterServerName + "  and removed from "
+                logUtil.log(TAG + "Record created in  " + remoteCenterServerName + "  and removed from "
                         + location + " with requestID " + requestID);
-                System.out.println("Record created in " + remoteCenterServerName + "and removed from " + location
-                        + " with requestID " + requestID);
                 return "Record created in " + remoteCenterServerName + "and removed from " + location;
             }
         } catch (Exception e) {
-            System.out.println("Exception in transfer record :: " + e.getMessage());
+            logUtil.log(TAG + "error: " + e.getMessage());
         }
 
         return "Transfer record operation unsuccessful!";
@@ -304,7 +299,7 @@ public class CenterServer {
                 }
                 recordsMap.put(element.getKey(), mylist);
             }
-            System.out.println("Removed record from " + this.location);
+            logUtil.log(TAG + "Record is removed successfully from " + this.location);
         }
         return "success";
     }
@@ -316,10 +311,10 @@ public class CenterServer {
                 Optional<Record> record = mylist.stream().filter(x -> x.getRecordID().equals(recordID)).findFirst();
                 if (recordID.contains("TR")) {
                     if (record.isPresent())
-                        return (Teacher) record.get();
+                        return record.get();
                 } else {
                     if (record.isPresent())
-                        return (Student) record.get();
+                        return record.get();
                 }
             }
         }
@@ -327,7 +322,7 @@ public class CenterServer {
     }
 
     private synchronized String editSRRecord(String maangerID, String recordID, String fieldname, String data) {
-        String newdata[] = data.split(Constants.RECEIVED_DATA_SEPERATOR);
+        String[] newdata = data.split(Constants.RECEIVED_DATA_SEPERATOR);
         String newvalue = newdata[0];
         String requestID = newdata[1];
         for (Entry<String, List<Record>> value : recordsMap.entrySet()) {
@@ -336,29 +331,34 @@ public class CenterServer {
             if (record.isPresent()) {
                 if (record.isPresent() && fieldname.equals("Status")) {
                     ((Student) record.get()).setStatus(newvalue);
-                    logManager.log(TAG + maangerID + " performed the operation with the requestID "
+                    logUtil.log(TAG + maangerID + " performed the operation with the requestID "
                             + requestID + " and Updated the records\t" + location);
-                    System.out.println("Record with recordID " + recordID + "update with new " + fieldname + " as "
-                            + newvalue + " with requestID " + requestID);
+                    logUtil.log(TAG + "Record with recordID " + recordID +
+                            "update with new " + fieldname
+                            + " as " + newvalue
+                            + " with requestID " + requestID);
                     return "Updated record with status :: " + newvalue;
                 } else if (record.isPresent() && fieldname.equals("StatusDate")) {
                     ((Student) record.get()).setStatusDate(newvalue);
-                    logManager.log(TAG + maangerID + " performed the operation with the requestID "
+                    logUtil.log(TAG + maangerID + " performed the operation with the requestID "
                             + requestID + "Updated the records\t" + location);
-                    System.out.println("Record with recordID " + recordID + "update with new " + fieldname + " as "
-                            + newvalue + " with requestID " + requestID);
+                    logUtil.log(TAG + "Record with recordID " + recordID
+                            + "update with new " + fieldname
+                            + " as " + newvalue
+                            + " with requestID " + requestID);
                     return "Updated record with status date :: " + newvalue;
                 } else if (record.isPresent() && fieldname.equals("CoursesRegistered")) {
                     List<String> courseList = putCoursesinList(newvalue);
                     ((Student) record.get()).setCoursesRegistered(courseList);
-                    logManager.log(TAG + maangerID + " performed the operation with the requestID "
+                    logUtil.log(TAG + maangerID + " performed the operation with the requestID "
                             + requestID + "Updated the courses registered\t" + location);
-                    System.out.println("Record with recordID " + recordID + "update with new " + fieldname + " as "
-                            + newvalue + " with requestID " + requestID);
+                    logUtil.log(TAG +"Record with recordID " + recordID
+                            + "update with new " + fieldname
+                            + " as " + newvalue
+                            + " with requestID " + requestID);
                     return "Updated record with courses :: " + courseList;
                 } else {
-                    System.out.println("Record with " + recordID + " not found");
-                    logManager.log(TAG + "Record with " + recordID + "not found!" + location);
+                    logUtil.log(TAG + "record id:" + recordID + " is not found at location " + location);
                     return "Record with " + recordID + " not found";
                 }
             }
@@ -368,7 +368,7 @@ public class CenterServer {
 
 
     private synchronized String editTRRecord(String managerID, String recordID, String fieldname, String data) {
-        String newdata[] = data.split(Constants.RECEIVED_DATA_SEPERATOR);
+        String[] newdata = data.split(Constants.RECEIVED_DATA_SEPERATOR);
         String newvalue = newdata[0];
         String requestID = newdata[1];
         for (Entry<String, List<Record>> val : recordsMap.entrySet()) {
@@ -378,28 +378,27 @@ public class CenterServer {
             if (record.isPresent()) {
                 if (record.isPresent() && fieldname.equals("Phone")) {
                     ((Teacher) record.get()).setPhone(newvalue);
-                    logManager.log(TAG + managerID + " performed the operation with the requestID "
+                    logUtil.log(TAG + managerID + " performed the operation with the requestID "
                             + requestID + "Updated the records\t" + location);
-                    System.out.println("Record with recordID " + recordID + "update with new " + fieldname + " as "
+                    logUtil.log(TAG + "Record with recordID " + recordID + "update with new " + fieldname + " as "
                             + newvalue + " with requestID " + requestID);
                     return "Updated record with Phone :: " + newvalue;
                 } else if (record.isPresent() && fieldname.equals("Address")) {
                     ((Teacher) record.get()).setAddress(newvalue);
-                    logManager.log(TAG + managerID + " performed the operation with the requestID "
+                    logUtil.log(TAG + managerID + " performed the operation with the requestID "
                             + requestID + "Updated the records\t" + location);
-                    System.out.println("Record with recordID " + recordID + "update with new " + fieldname + " as "
+                    logUtil.log(TAG + "Record with recordID " + recordID + "update with new " + fieldname + " as "
                             + newvalue + " with requestID " + requestID);
                     return "Updated record with address :: " + newvalue;
                 } else if (record.isPresent() && fieldname.equals("Location")) {
                     ((Teacher) record.get()).setLocation(newvalue);
-                    logManager.log(TAG + managerID + " performed the operation with the requestID "
+                    logUtil.log(TAG + managerID + " performed the operation with the requestID "
                             + requestID + "Updated the records\t" + location);
-                    System.out.println("Record with recordID " + recordID + "update with new " + fieldname + " as "
+                    logUtil.log(TAG + "Record with recordID " + recordID + "update with new " + fieldname + " as "
                             + newvalue + " with requestID " + requestID);
                     return "Updated record with location :: " + newvalue;
                 } else {
-                    System.out.println("Record with " + recordID + " not found");
-                    logManager.log(TAG + "Record with " + recordID + "not found!" + location);
+                    logUtil.log(TAG + "record id : " + recordID + "is not found at location: " + location);
                     return "Record with " + recordID + " not found";
                 }
             }
@@ -429,7 +428,6 @@ public class CenterServer {
         this.replicas = replicas;
     }
 
-    //@Override
     public String killPrimaryServer(String id) {
         return null;
     }
@@ -441,7 +439,6 @@ public class CenterServer {
     public void setServerID(Integer serverID) {
         this.serverID = serverID;
     }
-
 
     public synchronized String addRecordToHashMap(String key, Teacher teacher, Student student) {
         String message = "Error";

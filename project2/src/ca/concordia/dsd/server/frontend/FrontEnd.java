@@ -34,30 +34,30 @@ public class FrontEnd extends corbaPOA implements Constants {
     public static HashMap<String, Long> reportingMap = new HashMap<>();
 
     private static boolean isMTLOneAlive = true;
-    private static boolean isMTLTwoAlive = true;
-    private static boolean isMTLThreeAlive = true;
+    private static final boolean isMTLTwoAlive = true;
+    private static final boolean isMTLThreeAlive = true;
     private static boolean isLVLOneAlive = true;
-    private static boolean isLVLTwoAlive = true;
-    private static boolean isLVLThreeAlive = true;
+    private static final boolean isLVLTwoAlive = true;
+    private static final boolean isLVLThreeAlive = true;
     private static boolean isDDOOneAlive = true;
-    private static boolean isDDOTwoAlive = true;
-    private static boolean isDDOThreeAlive = true;
-    private static int ONE_SECOND_TIMEOUT = 1000;
-    private static int LEADER_ID = 100;
-    private static int S1_ID = 1;
-    private static int S2_ID = 2;
-    private static int S3_ID = 3;
-    private static Object lock = new Object();
-    private static HashMap<String, Integer> ServerIDMap = new HashMap<>();
+    private static final boolean isDDOTwoAlive = true;
+    private static final boolean isDDOThreeAlive = true;
+    private static final int ONE_SECOND_TIMEOUT = 1000;
+    private static final int LEADER_ID = 100;
+    private static final int S1_ID = 1;
+    private static final int S2_ID = 2;
+    private static final int S3_ID = 3;
+    private static final Object lock = new Object();
+    private static final HashMap<String, Integer> ServerIDMap = new HashMap<>();
     private static LogUtil logUtil;
     public HashMap<String, List<Record>> recordsMap;
     private LogUtil ackManager;
     private Integer requestId;
-    private HashMap<Integer, String> requestBuffer;
-    private ArrayList<RequestThread> requests;
+    private final HashMap<Integer, String> requestBuffer;
+    private final ArrayList<RequestThread> requests;
     private MultiCastReceiverThread primaryReceiver, replica1Receiver, replica2Receiver;
     private ReplicaResponseThread replicaResponseReceiver;
-    private ArrayList<Integer> replicas = new ArrayList<>();
+    private final ArrayList<Integer> replicas = new ArrayList<>();
 
     private CenterServer primaryMtlServer, primaryLvlServer, primaryDdoServer;
     private CenterServer replica1MtlServer, replica1LvlServer, replica1DdoServer;
@@ -154,7 +154,7 @@ public class FrontEnd extends corbaPOA implements Constants {
                 repo.put(Constants.REPLICA2_SERVER_ID, replicamap);
             }
 
-            } else if (maxEntry.getKey().contains("3")) {
+        } else if (maxEntry.getKey().contains("3")) {
             ArrayList<Integer> replicas = new ArrayList<>();
             replicas.add(Constants.REPLICA1_SERVER_ID);
             HashMap<String, CenterServer> getnewserver = repo.get(Constants.REPLICA2_SERVER_ID);

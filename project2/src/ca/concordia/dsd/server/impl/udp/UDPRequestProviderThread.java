@@ -14,7 +14,7 @@ public class UDPRequestProviderThread extends Thread {
     private final CenterServer server;
     private final String requestType;
     private final Record recordForTransfer;
-    private LogUtil logUtil;
+    private final LogUtil logUtil;
     private String recordCount = "";
     private String transferResult = "";
 

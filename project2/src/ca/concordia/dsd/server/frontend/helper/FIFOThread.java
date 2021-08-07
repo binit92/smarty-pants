@@ -23,7 +23,7 @@ public class FIFOThread extends Thread {
     private ArrayList<RequestThread> requests;
     private int c;
     // First In - First Out queue
-    private Queue<String> FIFORequest = new LinkedList<String>();
+    private final Queue<String> FIFORequest = new LinkedList<String>();
     private LogUtil logUtil;
 
 

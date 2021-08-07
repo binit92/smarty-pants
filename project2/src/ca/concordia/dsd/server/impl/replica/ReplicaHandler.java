@@ -12,10 +12,10 @@ import java.util.List;
 public class ReplicaHandler {
     private final String TAG = "|" + ReplicaHandler.class.getSimpleName() + "| ";
     public HashMap<String, List<Record>> recordsMap;
-    private LogUtil logUtil;
-    private Integer requestId;
-    private HashMap<Integer, String> requestBuffer;
-    private Integer replicaID;
+    private final LogUtil logUtil;
+    private final Integer requestId;
+    private final HashMap<Integer, String> requestBuffer;
+    private final Integer replicaID;
 
     public ReplicaHandler(Integer replicaID, LogUtil logUtil) {
         recordsMap = new HashMap<>();

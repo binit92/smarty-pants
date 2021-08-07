@@ -13,10 +13,10 @@ import java.util.Arrays;
 
 public class RequestThread extends Thread {
     private static final String TAG = "|" + RequestThread.class.getSimpleName() + "| ";
-    private String currentOperationData;
+    private final String currentOperationData;
     private CenterServer server;
     private String response;
-    private LogUtil logUtil;
+    private final LogUtil logUtil;
 
     public RequestThread(byte[] operationData, LogUtil logUtil) {
         this.currentOperationData = new String(operationData);

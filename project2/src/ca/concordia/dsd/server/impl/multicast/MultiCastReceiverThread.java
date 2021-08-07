@@ -39,7 +39,7 @@ public class MultiCastReceiverThread extends Thread {
                 socket.receive(packet);
                 if (!isPrimary) {
 
-                    logUtil.log(TAG + " received data in multicast received" );
+                    logUtil.log(TAG + " received data in multicast received");
                     logUtil.log(TAG + " sending ACK back to primary server");
 
                     startACKThread(packet);
@@ -52,13 +52,13 @@ public class MultiCastReceiverThread extends Thread {
         }
     }
 
-    private void startACKThread(DatagramPacket packet){
+    private void startACKThread(DatagramPacket packet) {
         ReplicaStatusThread ack = new ReplicaStatusThread(
                 new String(packet.getData()), logUtil);
         ack.start();
     }
 
-    private void startReplicaRequestThread(DatagramPacket packet){
+    private void startReplicaRequestThread(DatagramPacket packet) {
         ReplicaRequestThread req = new ReplicaRequestThread(
                 new String(packet.getData()), logUtil);
         req.start();

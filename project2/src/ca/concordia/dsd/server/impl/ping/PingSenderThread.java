@@ -9,9 +9,10 @@ public class PingSenderThread extends Thread {
 
     private final String TAG = "|" + PingSenderThread.class.getSimpleName() + "| ";
 
-    private int port1, port2;
-    private String name;
-    private DatagramSocket socket;
+    private final int port1;
+    private final int port2;
+    private final String name;
+    private final DatagramSocket socket;
 
     public PingSenderThread(DatagramSocket socket, String name, int port1, int port2) {
         this.port1 = port1;
